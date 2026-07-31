@@ -59,6 +59,7 @@
 | 2026-07-31 | D-015 | 하위 노드의 의미상 소속과 화면 표현을 분리한다. 같은 하위 노드 데이터를 부모 안에 담기, 주변에 펼치기, hover·키보드 초점·click·tap으로 열기, 하위 구조에 집중하기, 단계별로 등장시키기, 요약 후 펼치기 중 설명 맥락에 맞는 방식으로 보여 줄 수 있어야 한다. Editor에서는 설명·하위 노드·이미지·코드·예시 같은 부품을 부모에 끌어다 놓거나 click·keyboard로 추가한 뒤 표현 방식과 등장 단계를 정한다. | 하나의 고정 배치는 하위 노드 수, 설명 목적, 화면 크기에 모두 대응하기 어렵다. 콘텐츠를 한 번만 만들고도 제작자 의도와 학습자 기기에 맞는 표현으로 바꾸기 위해서다. 기본 선택과 자동 전환 규칙은 Q-015에서 결정한다. |
 | 2026-07-31 | D-016 | 부모 안에 표시된 하위 노드는 단순한 이름표가 아니라 더 볼 수 있는 항목임을 문구와 방향 표시로 드러낸다. 제작 화면과 학습 화면 모두에서 click·tap·keyboard로 역할, 설명, 예시를 열고 닫을 수 있어야 하며, 부모 경로를 유지한 채 하위 구조 집중 보기로 이동할 수 있어야 한다. | 하위 노드의 존재만 보여 주고 여는 방법을 알리지 않으면 학습자가 추가 내용을 발견할 수 없기 때문이다. hover는 보조 수단으로만 사용한다. |
 | 2026-07-31 | D-017 | 제작자가 줌 단계별 묶음을 미리 전부 만들도록 요구하지 않는다. 웹앱이 노드 위치, 연결 관계, 부모·자식 관계, 노드 내용을 바탕으로 축소 시 묶음과 이름을 먼저 제안한다. 제작자는 제안된 이름과 포함 노드를 그대로 사용하거나 수정하고, 확대하여 원래 노드의 강조 상태에서 구성을 확인한다. 자동 제안은 계산된 화면 상태로 유지하고 제작자가 확정하거나 수정한 부분만 문서에 덮어쓴 값으로 저장한다. | 노드 수가 늘어날수록 수동 묶음 관리 비용이 커지고, 제작 과정에서 줌 단계마다 같은 구조를 반복 편집하게 되기 때문이다. 세부 점수와 재계산 규칙은 Q-014에서 결정한다. |
+| 2026-07-31 | D-018 | 디자인 시스템은 `semantic token과 일반 UI`, `캔버스 전용 컴포넌트`, `프레임워크 비종속 인터랙션·기하 로직`의 세 층으로 만든다. Svelte 컴포넌트를 먼저 제공하되 선택·hover·drag·pan·zoom·상세 열기·자동 묶음 전환 같은 캔버스 동작은 공통 상태와 event 규칙으로 관리한다. Paper와 Midnight는 컴포넌트별 색상 복제가 아니라 같은 semantic token의 theme 값으로 구현한다. | 캔버스의 모양만 통일하고 동작을 화면마다 따로 구현하면 Editor와 Viewer의 상태 의미, 접근성, gesture 우선순위가 달라지기 때문이다. 내부 작업 패키지 이름은 Q-005가 확정될 때까지 public API가 아니다. |
 
 ## 디자인 탐색 자료
 
@@ -135,6 +136,24 @@ Editor의 기본 저작 흐름은 콘텐츠 구성과 표현 설정을 분리한
 자동 묶음은 노드 생성과 별개의 필수 선행 작업이 아니라 시맨틱 줌 과정에서 제공되는
 저작 보조 기능이다. 앱은 우선 쓸 만한 결과를 만들고, 확신이 낮거나 여러 해석이 가능한
 경우에만 제작자에게 이름과 구성을 확인하도록 유도한다.
+
+### 디자인 시스템 구현 기준
+
+디자인 시스템은 화면 예시를 모아 둔 문서가 아니라 제품 코드가 직접 사용하는 패키지다.
+
+1. **Foundation:** 색, 글자, 간격, radius, 그림자, motion, layer를 semantic token으로 제공한다.
+2. **일반 UI:** Button, IconButton, Badge, SegmentedControl, Field, Panel처럼 캔버스 밖에서도 재사용하는 컴포넌트를 제공한다.
+3. **Canvas UI:** CanvasSurface, CanvasNode, EdgeLayer, CanvasControls, ChildNodeTrigger, ClusterSuggestion처럼 다이어그램 문맥을 아는 컴포넌트를 제공한다.
+4. **Interaction system:** 선택, hover, node drag, canvas pan, cursor 기준 zoom, keyboard nudge, 상세 열기, gesture 차단 영역을 event와 state transition으로 정의한다.
+5. **검증 카탈로그:** 공식 Svelte 데모 안에서 token, component state, 실제 캔버스 동작을 함께 조작하고 확인할 수 있어야 한다.
+
+컴포넌트는 `idle`, `hovered`, `focused`, `selected`, `dragging`, `disabled`, `readonly` 같은
+상태를 명시적인 props와 `data-*` 상태로 노출한다. 색만으로 상태를 구분하지 않고 focus
+ring, cursor, 문구, ARIA 상태를 함께 사용한다. 노드 안의 버튼·입력·링크에는 캔버스 drag를
+막는 공통 표식을 사용하고, 이 표식의 의미와 gesture 우선순위도 디자인 시스템에 포함한다.
+
+상세 컴포넌트 목록, token 이름, 상호작용 상태표와 사용 예시는
+[`docs/design-system.md`](./design-system.md)를 구현 기준으로 사용한다.
 
 ### 디자인 탐색 화면 검증 기준
 
@@ -535,6 +554,9 @@ diagram-library/
 │  │  ├─ src/types.ts
 │  │  ├─ src/dagre-adapter.ts
 │  │  └─ src/elk-adapter.ts
+│  │
+│  ├─ design-system/         # semantic token, canvas interaction, geometry
+│  ├─ design-system-svelte/  # Svelte 일반 UI와 canvas component
 │  │
 │  └─ collaboration/          # MVP 이후
 │     ├─ src/yjs/
@@ -1607,6 +1629,9 @@ type ReducedMotionPolicy = 'respect-system' | 'always' | 'never';
 - edge path
 - serialization migration
 - timeline seek determinism
+- canvas interaction state transition
+- cursor 기준 zoom과 keyboard nudge
+- 자동 묶음의 stable ID와 parent-child 포함
 
 ### 21.2 Contract test
 
@@ -1652,6 +1677,8 @@ Playwright 권장.
 19. 부모 안의 하위 노드 상세를 mouse·touch·keyboard로 열고 닫은 뒤 집중 보기로 이동
 20. 미리 묶지 않은 노드를 축소했을 때 자동 묶음 제안 생성
 21. 묶음 이름과 포함 노드를 수정하고 원래 노드 강조로 확인한 뒤 다시 축소해 수정 유지
+22. 노드 안의 버튼을 조작할 때 node drag나 canvas pan이 시작되지 않음
+23. selection·drag·pan·zoom·keyboard nudge가 디자인 시스템의 같은 interaction state를 사용
 
 ### 21.4 Visual regression
 
@@ -1695,6 +1722,7 @@ Playwright 권장.
 - 기본 resizer
 - 시맨틱 줌용 자동 묶음 제안과 제작자 검토·수정
 - Svelte demo와 후속 React playground
+- semantic token, 일반 UI, canvas component, interaction state를 포함한 디자인 시스템
 - unit 및 E2E test
 
 ### 제외
@@ -1803,6 +1831,7 @@ Svelte를 첫 renderer로 구현하고, 공식 demo를 라이브러리의 refere
 10. 본문 내 concept reference 저작
 11. concept preview, 원 설명 이동, 관련 개념 탐색
 12. 자동 묶음 제안 검토, 이름 변경, 포함 노드 조정, 원래 노드 강조 확인
+13. 디자인 시스템 카탈로그와 canvas interaction 상태 검증 화면
 
 ---
 
@@ -1962,6 +1991,8 @@ MVP는 다음 조건을 모두 만족해야 완료로 간주한다.
 - [ ] pan/zoom 및 fit view 가능
 - [ ] 축소 시 앱이 묶음을 자동 제안하고 제작자가 이름과 포함 노드를 수정 가능
 - [ ] 부모 안의 하위 노드가 상세 보기 가능 여부를 알리고 mouse·touch·keyboard로 열림
+- [ ] Svelte 디자인 시스템 패키지가 token·일반 UI·canvas component를 제공
+- [ ] 선택·drag·pan·zoom·keyboard·노드 내부 gesture 차단이 공통 interaction system으로 동작
 - [ ] Scene별 viewport 저장 가능
 - [ ] Scene 전환 시 노드 enter/update/exit 애니메이션 가능
 - [ ] Scene 전환 시 viewport pan/zoom 애니메이션 가능

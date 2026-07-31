@@ -1,0 +1,37 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:where(.dz-root) {
+  color: var(--dz-text-primary);
+  font-family: var(--dz-font-sans);
+  font-size: var(--dz-font-size-3);
+  line-height: var(--dz-line-normal);
+}
+
+:where(.dz-root button, .dz-root input, .dz-root textarea, .dz-root select) {
+  color: inherit;
+  font: inherit;
+}
+
+:where(.dz-root button) {
+  border: 0;
+}
+
+:where(.dz-root :focus-visible) {
+  outline: 2px solid var(--dz-accent);
+  outline-offset: 2px;
+}
+
+:where(.dz-visually-hidden) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

@@ -7,6 +7,11 @@
 공개 미리보기는 [dotzari.memos.my](https://dotzari.memos.my)에서 볼 수 있다.
 Jamserver의 `dotzari` 앱으로 등록되어 있으며, 별도 종료 시각 없이 계속 실행된다.
 
+구현 가능한 컴포넌트와 캔버스 인터랙션을 묶은 새 디자인 시스템 데모는
+[dotzari.memos.my/design-system/](https://dotzari.memos.my/design-system/)에서 볼 수 있다.
+`apps/design-system-demo`를 빌드하면 이 디렉터리의 `design-system/` 정적 파일이
+갱신된다.
+
 현재 `index.html`은 다음 세 기능을 하나의 데스크톱 Editor에 합치고, 같은 강의를
 모바일 우선 Viewer에서 확인할 수 있게 확장한 하위 노드 저작·표현 시안이다.
 

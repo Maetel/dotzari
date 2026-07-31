@@ -1,0 +1,131 @@
+:root,
+[data-dz-theme='paper'] {
+  color-scheme: light;
+
+  --dz-surface-page: #f2f0ea;
+  --dz-surface-panel: #fffefa;
+  --dz-surface-raised: #ffffff;
+  --dz-surface-subtle: #f6f4ee;
+  --dz-surface-canvas: #eeece6;
+  --dz-surface-code: #111821;
+
+  --dz-text-primary: #171b21;
+  --dz-text-secondary: #67717c;
+  --dz-text-tertiary: #8b949e;
+  --dz-text-inverse: #ffffff;
+
+  --dz-border-subtle: #d9d6cc;
+  --dz-border-strong: #b9b6ad;
+  --dz-border-interactive: #7b91ff;
+
+  --dz-accent: #4268ea;
+  --dz-accent-hover: #3157d6;
+  --dz-accent-soft: #e4eaff;
+  --dz-success: #147a54;
+  --dz-success-soft: #ddf3e9;
+  --dz-warning: #ae5b32;
+  --dz-warning-soft: #f8e6dc;
+  --dz-danger: #b83b47;
+
+  --dz-edge: #a4abb5;
+  --dz-edge-active: var(--dz-accent);
+  --dz-grid-dot: color-mix(in srgb, var(--dz-text-secondary) 18%, transparent);
+  --dz-selection-ring: color-mix(in srgb, var(--dz-accent) 28%, transparent);
+
+  --dz-font-sans: Inter, Pretendard, 'Noto Sans KR', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --dz-font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+
+  --dz-font-size-1: 0.6875rem;
+  --dz-font-size-2: 0.75rem;
+  --dz-font-size-3: 0.875rem;
+  --dz-font-size-4: 1rem;
+  --dz-font-size-5: 1.25rem;
+  --dz-font-size-6: 1.75rem;
+
+  --dz-line-tight: 1.2;
+  --dz-line-normal: 1.45;
+  --dz-weight-medium: 560;
+  --dz-weight-semibold: 680;
+  --dz-weight-bold: 780;
+
+  --dz-space-1: 0.25rem;
+  --dz-space-2: 0.5rem;
+  --dz-space-3: 0.75rem;
+  --dz-space-4: 1rem;
+  --dz-space-5: 1.25rem;
+  --dz-space-6: 1.5rem;
+  --dz-space-7: 2rem;
+  --dz-space-8: 3rem;
+
+  --dz-radius-xs: 0.375rem;
+  --dz-radius-sm: 0.5rem;
+  --dz-radius-md: 0.75rem;
+  --dz-radius-lg: 1rem;
+  --dz-radius-xl: 1.375rem;
+  --dz-radius-pill: 999px;
+
+  --dz-shadow-node: 0 8px 22px rgb(31 38 48 / 10%);
+  --dz-shadow-panel: 0 18px 52px rgb(31 38 48 / 13%);
+  --dz-shadow-dragging: 0 18px 46px rgb(31 38 48 / 22%);
+
+  --dz-duration-fast: 110ms;
+  --dz-duration-normal: 190ms;
+  --dz-duration-slow: 320ms;
+  --dz-ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  --dz-layer-edge: 10;
+  --dz-layer-node: 20;
+  --dz-layer-selection: 30;
+  --dz-layer-overlay: 40;
+  --dz-layer-popover: 50;
+
+  --dz-control-height-sm: 1.75rem;
+  --dz-control-height-md: 2.25rem;
+  --dz-control-height-lg: 2.75rem;
+  --dz-focus-ring: 0 0 0 3px var(--dz-selection-ring);
+}
+
+[data-dz-theme='midnight'] {
+  color-scheme: dark;
+
+  --dz-surface-page: #080c12;
+  --dz-surface-panel: #111821;
+  --dz-surface-raised: #17212d;
+  --dz-surface-subtle: #0d141d;
+  --dz-surface-canvas: #0b1119;
+  --dz-surface-code: #05090e;
+
+  --dz-text-primary: #f3f6fb;
+  --dz-text-secondary: #9aa8b8;
+  --dz-text-tertiary: #6d7a89;
+  --dz-text-inverse: #07101b;
+
+  --dz-border-subtle: #263242;
+  --dz-border-strong: #3d4b5f;
+  --dz-border-interactive: #7895ff;
+
+  --dz-accent: #7895ff;
+  --dz-accent-hover: #92a8ff;
+  --dz-accent-soft: #1d2b52;
+  --dz-success: #54c99b;
+  --dz-success-soft: #12372d;
+  --dz-warning: #f0a271;
+  --dz-warning-soft: #452a20;
+  --dz-danger: #ff7d86;
+
+  --dz-edge: #425064;
+  --dz-grid-dot: color-mix(in srgb, var(--dz-text-secondary) 20%, transparent);
+  --dz-selection-ring: color-mix(in srgb, var(--dz-accent) 30%, transparent);
+
+  --dz-shadow-node: 0 10px 30px rgb(0 0 0 / 28%);
+  --dz-shadow-panel: 0 22px 60px rgb(0 0 0 / 38%);
+  --dz-shadow-dragging: 0 24px 64px rgb(0 0 0 / 52%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dz-duration-fast: 1ms;
+    --dz-duration-normal: 1ms;
+    --dz-duration-slow: 1ms;
+  }
+}
