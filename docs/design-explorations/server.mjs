@@ -1,7 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
 
-const html = await readFile(new URL('./index.html', import.meta.url));
 const port = Number(process.env.PORT || 4318);
 
 if (!Number.isInteger(port) || port < 1 || port > 65_535) {
@@ -17,7 +16,7 @@ const securityHeaders = {
   'x-content-type-options': 'nosniff',
 };
 
-const server = createServer((request, response) => {
+const server = createServer(async (request, response) => {
   const url = new URL(request.url ?? '/', 'http://dotzari.local');
 
   if (url.pathname === '/health') {
@@ -32,6 +31,7 @@ const server = createServer((request, response) => {
 
   if ((url.pathname === '/' || url.pathname === '/index.html')
     && (request.method === 'GET' || request.method === 'HEAD')) {
+    const html = await readFile(new URL('./index.html', import.meta.url));
     response.writeHead(200, {
       ...securityHeaders,
       'content-length': String(html.byteLength),

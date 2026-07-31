@@ -1,0 +1,1789 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Dotzari Editor와 Viewer를 위한 다섯 가지 인터랙티브 디자인 탐색"
+    />
+    <title>Dotzari Design Explorations</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #17202a;
+        --muted: #66717e;
+        --line: #dfe3e8;
+        --paper: #f7f7f5;
+        --white: #ffffff;
+        --accent: #5a5be7;
+        --shadow: 0 24px 70px rgba(28, 35, 48, 0.12);
+        --radius: 24px;
+        font-family:
+          Inter, Pretendard, "Noto Sans KR", system-ui, -apple-system,
+          BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at 10% 0%, rgba(122, 95, 255, 0.09), transparent 28rem),
+          linear-gradient(180deg, #f2f1ed 0%, #e9e8e4 100%);
+        min-height: 100vh;
+      }
+
+      button {
+        color: inherit;
+        font: inherit;
+      }
+
+      .gallery-header {
+        position: sticky;
+        z-index: 20;
+        top: 0;
+        display: grid;
+        grid-template-columns: minmax(180px, 0.7fr) minmax(500px, 1.6fr) auto;
+        align-items: center;
+        gap: 20px;
+        padding: 14px 24px;
+        border-bottom: 1px solid rgba(31, 37, 49, 0.1);
+        background: rgba(247, 247, 245, 0.9);
+        backdrop-filter: blur(22px);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 780;
+        letter-spacing: -0.03em;
+      }
+
+      .brand-mark {
+        display: grid;
+        width: 32px;
+        height: 32px;
+        place-items: center;
+        border-radius: 10px 10px 4px 10px;
+        color: white;
+        background: #191a22;
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+      }
+
+      .brand small {
+        display: block;
+        color: var(--muted);
+        font-size: 10px;
+        font-weight: 650;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .design-tabs {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        padding: 5px;
+        border: 1px solid rgba(31, 37, 49, 0.08);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.72);
+      }
+
+      .design-tab {
+        min-width: 0;
+        padding: 9px 13px;
+        border: 0;
+        border-radius: 11px;
+        color: #5e6570;
+        background: transparent;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 720;
+        white-space: nowrap;
+      }
+
+      .design-tab:hover {
+        background: #f1f1f0;
+      }
+
+      .design-tab[aria-selected="true"] {
+        color: white;
+        background: #1c1d24;
+        box-shadow: 0 7px 18px rgba(28, 29, 36, 0.2);
+      }
+
+      .gallery-note {
+        color: var(--muted);
+        font-size: 11px;
+        text-align: right;
+      }
+
+      .gallery-main {
+        width: min(1500px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 34px 0 72px;
+      }
+
+      .design-panel {
+        display: none;
+      }
+
+      .design-panel.is-active {
+        display: block;
+        animation: panel-in 320ms ease both;
+      }
+
+      @keyframes panel-in {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+      }
+
+      .design-intro {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(260px, 0.48fr);
+        gap: 28px;
+        align-items: end;
+        margin: 0 auto 22px;
+        padding: 0 8px;
+      }
+
+      .eyebrow {
+        margin: 0 0 8px;
+        color: #6b6fc7;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .design-intro h1 {
+        margin: 0;
+        font-size: clamp(30px, 4vw, 52px);
+        letter-spacing: -0.055em;
+        line-height: 0.98;
+      }
+
+      .design-intro p {
+        max-width: 720px;
+        margin: 14px 0 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.65;
+      }
+
+      .design-facts {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 7px;
+      }
+
+      .design-facts span {
+        padding: 8px 11px;
+        border: 1px solid rgba(26, 31, 42, 0.1);
+        border-radius: 999px;
+        color: #555d68;
+        background: rgba(255, 255, 255, 0.62);
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .prototype {
+        overflow: hidden;
+        min-height: 760px;
+        border: 1px solid rgba(18, 24, 34, 0.13);
+        border-radius: 28px;
+        background: white;
+        box-shadow: var(--shadow);
+      }
+
+      .app-topbar {
+        display: flex;
+        min-height: 58px;
+        align-items: center;
+        gap: 12px;
+        padding: 0 18px;
+        border-bottom: 1px solid rgba(29, 34, 44, 0.09);
+      }
+
+      .app-title {
+        font-size: 13px;
+        font-weight: 780;
+      }
+
+      .app-title small {
+        margin-left: 8px;
+        color: #8a9098;
+        font-weight: 600;
+      }
+
+      .spacer {
+        flex: 1;
+      }
+
+      .icon-button,
+      .soft-button,
+      .primary-button {
+        display: inline-flex;
+        min-height: 34px;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        padding: 0 12px;
+        border: 1px solid rgba(29, 34, 44, 0.12);
+        border-radius: 10px;
+        background: white;
+        cursor: pointer;
+        font-size: 11px;
+        font-weight: 740;
+      }
+
+      .icon-button {
+        width: 34px;
+        padding: 0;
+      }
+
+      .primary-button {
+        border-color: transparent;
+        color: white;
+        background: #272936;
+      }
+
+      .soft-button:hover,
+      .icon-button:hover {
+        background: #f1f2f3;
+      }
+
+      .avatar {
+        display: grid;
+        width: 30px;
+        height: 30px;
+        place-items: center;
+        border-radius: 50%;
+        color: #564028;
+        background: #f2c887;
+        font-size: 10px;
+        font-weight: 850;
+      }
+
+      .mini-label {
+        color: #89909a;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+      }
+
+      .concept-link {
+        padding: 0;
+        border: 0;
+        border-bottom: 2px solid currentColor;
+        color: inherit;
+        background: transparent;
+        cursor: pointer;
+        font-weight: 760;
+      }
+
+      .concept-popover {
+        position: absolute;
+        z-index: 9;
+        display: none;
+        width: min(300px, calc(100vw - 48px));
+        padding: 16px;
+        border: 1px solid rgba(20, 27, 38, 0.13);
+        border-radius: 16px;
+        color: #222734;
+        background: rgba(255, 255, 255, 0.98);
+        box-shadow: 0 18px 48px rgba(24, 31, 43, 0.2);
+        font-size: 12px;
+        line-height: 1.55;
+      }
+
+      .concept-popover.is-open {
+        display: block;
+        animation: pop-in 180ms ease both;
+      }
+
+      @keyframes pop-in {
+        from {
+          opacity: 0;
+          transform: translateY(5px) scale(0.98);
+        }
+      }
+
+      .concept-popover strong {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 13px;
+      }
+
+      .concept-popover a {
+        display: inline-block;
+        margin-top: 9px;
+        color: #5456c7;
+        font-weight: 760;
+        text-decoration: none;
+      }
+
+      .step-row {
+        display: flex;
+        gap: 7px;
+      }
+
+      .step-chip {
+        min-width: 31px;
+        height: 30px;
+        padding: 0 10px;
+        border: 1px solid rgba(25, 31, 42, 0.12);
+        border-radius: 9px;
+        color: #7a818c;
+        background: white;
+        cursor: pointer;
+        font-size: 10px;
+        font-weight: 800;
+      }
+
+      .step-chip.is-active {
+        border-color: #595be0;
+        color: white;
+        background: #595be0;
+      }
+
+      /* 01 — Slide Studio */
+      .studio {
+        color: #27241f;
+        background: #faf8f2;
+      }
+
+      .studio .app-topbar {
+        background: #fffdf8;
+      }
+
+      .studio-grid {
+        display: grid;
+        grid-template-columns: 190px minmax(520px, 1fr) 236px;
+        height: 640px;
+      }
+
+      .slide-rail {
+        padding: 18px 14px;
+        border-right: 1px solid #e5e1d8;
+        background: #f1eee6;
+      }
+
+      .rail-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 14px;
+      }
+
+      .slide-thumb {
+        position: relative;
+        height: 94px;
+        margin-bottom: 12px;
+        padding: 10px;
+        border: 2px solid transparent;
+        border-radius: 10px;
+        background: white;
+        box-shadow: 0 5px 14px rgba(68, 59, 43, 0.07);
+      }
+
+      .slide-thumb.is-current {
+        border-color: #7057d9;
+      }
+
+      .slide-number {
+        position: absolute;
+        left: -8px;
+        top: 4px;
+        color: #817b72;
+        font-size: 9px;
+      }
+
+      .thumb-title {
+        width: 70%;
+        height: 7px;
+        border-radius: 4px;
+        background: #25231f;
+      }
+
+      .thumb-node {
+        display: inline-block;
+        width: 42px;
+        height: 23px;
+        margin: 23px 4px 0 0;
+        border-radius: 5px;
+        background: #eee9dc;
+      }
+
+      .studio-workspace {
+        display: grid;
+        min-width: 0;
+        grid-template-rows: 1fr 84px;
+        background:
+          radial-gradient(#cfc9bc 0.8px, transparent 0.8px) 0 0 / 16px 16px,
+          #e9e6df;
+      }
+
+      .studio-canvas-wrap {
+        display: grid;
+        place-items: center;
+        padding: 24px;
+      }
+
+      .studio-canvas {
+        position: relative;
+        width: min(720px, 92%);
+        aspect-ratio: 16 / 9;
+        overflow: hidden;
+        border-radius: 4px;
+        background: #fffefb;
+        box-shadow: 0 18px 38px rgba(60, 53, 41, 0.16);
+      }
+
+      .studio-canvas::after {
+        position: absolute;
+        right: 24px;
+        bottom: 18px;
+        color: #aaa399;
+        content: "01 / 06";
+        font-size: 9px;
+        letter-spacing: 0.12em;
+      }
+
+      .canvas-kicker {
+        position: absolute;
+        top: 42px;
+        left: 48px;
+        color: #7458d7;
+        font-size: 10px;
+        font-weight: 820;
+        letter-spacing: 0.1em;
+      }
+
+      .canvas-title {
+        position: absolute;
+        top: 64px;
+        left: 48px;
+        max-width: 360px;
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: clamp(24px, 3vw, 42px);
+        font-weight: 500;
+        letter-spacing: -0.04em;
+        line-height: 1.04;
+      }
+
+      .flow-node {
+        position: absolute;
+        min-width: 118px;
+        padding: 13px 15px;
+        border: 1px solid #d7d0c4;
+        border-radius: 13px;
+        background: white;
+        box-shadow: 0 9px 22px rgba(55, 49, 40, 0.08);
+        font-size: 11px;
+        font-weight: 760;
+      }
+
+      .flow-node small {
+        display: block;
+        margin-top: 5px;
+        color: #968f83;
+        font-size: 8px;
+        font-weight: 650;
+      }
+
+      .node-program {
+        top: 62%;
+        left: 14%;
+        border-color: #7458d7;
+        box-shadow: 0 0 0 2px rgba(116, 88, 215, 0.13);
+      }
+
+      .node-runtime {
+        top: 56%;
+        left: 57%;
+      }
+
+      .studio-wire {
+        position: absolute;
+        top: 70%;
+        left: 36%;
+        width: 22%;
+        height: 2px;
+        background: #b9b2a7;
+        transform: rotate(-8deg);
+        transform-origin: left center;
+      }
+
+      .studio-wire::after {
+        position: absolute;
+        right: -1px;
+        top: -3px;
+        width: 7px;
+        height: 7px;
+        border-top: 2px solid #b9b2a7;
+        border-right: 2px solid #b9b2a7;
+        content: "";
+        transform: rotate(45deg);
+      }
+
+      .studio .concept-popover {
+        left: 19%;
+        bottom: 25%;
+      }
+
+      .studio-timeline {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 12px 18px;
+        border-top: 1px solid #dcd7cc;
+        background: rgba(255, 253, 248, 0.94);
+      }
+
+      .timeline-label {
+        width: 90px;
+        font-size: 10px;
+        font-weight: 760;
+      }
+
+      .timeline-label small {
+        display: block;
+        margin-top: 3px;
+        color: #979188;
+        font-size: 8px;
+      }
+
+      .inspector {
+        padding: 18px;
+        border-left: 1px solid #e5e1d8;
+        background: #fffdf8;
+      }
+
+      .property-group {
+        padding: 18px 0;
+        border-bottom: 1px solid #ebe6dc;
+      }
+
+      .property-title {
+        margin-bottom: 10px;
+        font-size: 10px;
+        font-weight: 800;
+      }
+
+      .field-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 7px;
+      }
+
+      .fake-field {
+        padding: 9px;
+        border: 1px solid #dfdbd2;
+        border-radius: 8px;
+        color: #777169;
+        background: white;
+        font-size: 9px;
+      }
+
+      /* 02 — Concept Atlas */
+      .atlas {
+        color: #ecf3ef;
+        background: #111815;
+      }
+
+      .atlas .app-topbar {
+        border-color: #28322d;
+        background: #151e1a;
+      }
+
+      .atlas .primary-button {
+        color: #10221a;
+        background: #9ce3b9;
+      }
+
+      .atlas .icon-button,
+      .atlas .soft-button {
+        border-color: #34413a;
+        color: #d8e3dd;
+        background: #1b2520;
+      }
+
+      .atlas-grid {
+        display: grid;
+        grid-template-columns: 250px minmax(520px, 1fr) 270px;
+        height: 700px;
+      }
+
+      .asset-library {
+        padding: 20px 16px;
+        border-right: 1px solid #27332d;
+        background: #151e1a;
+      }
+
+      .search-box {
+        margin: 14px 0 18px;
+        padding: 10px 12px;
+        border: 1px solid #334039;
+        border-radius: 10px;
+        color: #829089;
+        background: #101713;
+        font-size: 10px;
+      }
+
+      .asset-card {
+        margin-bottom: 9px;
+        padding: 13px;
+        border: 1px solid transparent;
+        border-radius: 12px;
+        background: #1c2822;
+      }
+
+      .asset-card.is-selected {
+        border-color: #78d69f;
+        background: #21372a;
+      }
+
+      .asset-card strong {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 11px;
+      }
+
+      .asset-card span {
+        color: #8f9f96;
+        font-size: 9px;
+      }
+
+      .atlas-map {
+        position: relative;
+        overflow: hidden;
+        background:
+          linear-gradient(rgba(145, 192, 164, 0.035) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(145, 192, 164, 0.035) 1px, transparent 1px),
+          radial-gradient(circle at 50% 50%, #1a2821, #101713 68%);
+        background-size: 32px 32px, 32px 32px, auto;
+      }
+
+      .map-heading {
+        position: absolute;
+        top: 26px;
+        left: 28px;
+      }
+
+      .map-heading h2 {
+        margin: 5px 0 0;
+        font-size: 20px;
+        letter-spacing: -0.035em;
+      }
+
+      .map-node {
+        position: absolute;
+        z-index: 2;
+        min-width: 120px;
+        padding: 14px 16px;
+        border: 1px solid #35483e;
+        border-radius: 16px;
+        background: rgba(27, 39, 33, 0.96);
+        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.18);
+        font-size: 11px;
+        font-weight: 780;
+      }
+
+      .map-node small {
+        display: block;
+        margin-top: 5px;
+        color: #789083;
+        font-size: 8px;
+      }
+
+      .map-node.central {
+        top: 42%;
+        left: 42%;
+        min-width: 154px;
+        border-color: #83dbaa;
+        color: #132219;
+        background: #a5e9bf;
+      }
+
+      .map-node.central small {
+        color: #476b57;
+      }
+
+      .map-node.npm {
+        top: 24%;
+        left: 14%;
+      }
+
+      .map-node.program {
+        top: 65%;
+        left: 66%;
+      }
+
+      .map-node.js {
+        top: 23%;
+        left: 72%;
+      }
+
+      .map-wire {
+        position: absolute;
+        z-index: 1;
+        height: 1px;
+        background: #577062;
+        transform-origin: left center;
+      }
+
+      .wire-a {
+        top: 38%;
+        left: 27%;
+        width: 25%;
+        transform: rotate(22deg);
+      }
+
+      .wire-b {
+        top: 57%;
+        left: 55%;
+        width: 24%;
+        transform: rotate(27deg);
+      }
+
+      .wire-c {
+        top: 40%;
+        left: 57%;
+        width: 22%;
+        transform: rotate(-25deg);
+      }
+
+      .map-stage {
+        position: absolute;
+        bottom: 22px;
+        left: 50%;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 10px;
+        border: 1px solid #314039;
+        border-radius: 14px;
+        background: rgba(18, 27, 23, 0.92);
+        transform: translateX(-50%);
+      }
+
+      .atlas .step-chip {
+        border-color: #35463d;
+        color: #8aa096;
+        background: #1a2520;
+      }
+
+      .atlas .step-chip.is-active {
+        border-color: #93e1b3;
+        color: #132219;
+        background: #93e1b3;
+      }
+
+      .concept-detail {
+        padding: 22px 18px;
+        border-left: 1px solid #27332d;
+        background: #151e1a;
+      }
+
+      .concept-detail h3 {
+        margin: 18px 0 8px;
+        font-size: 23px;
+        letter-spacing: -0.04em;
+      }
+
+      .concept-detail p {
+        color: #9caba3;
+        font-size: 11px;
+        line-height: 1.65;
+      }
+
+      .relation-path {
+        margin-top: 18px;
+        padding: 13px;
+        border: 1px solid #314039;
+        border-radius: 12px;
+        color: #a7b6ae;
+        background: #111914;
+        font-size: 9px;
+        line-height: 1.9;
+      }
+
+      .atlas .concept-popover {
+        right: 250px;
+        top: 180px;
+      }
+
+      /* 03 — Focus Deck */
+      .focus {
+        color: #1d2941;
+        background: #eef3f9;
+      }
+
+      .focus .app-topbar {
+        background: rgba(255, 255, 255, 0.86);
+      }
+
+      .focus-body {
+        display: grid;
+        grid-template-columns: 210px minmax(540px, 1fr);
+        height: 700px;
+      }
+
+      .focus-outline {
+        padding: 26px 18px;
+        border-right: 1px solid #dbe4ef;
+        background: #f8fbff;
+      }
+
+      .outline-item {
+        position: relative;
+        margin: 13px 0;
+        padding: 11px 10px 11px 26px;
+        border-radius: 10px;
+        color: #68748a;
+        font-size: 10px;
+        font-weight: 700;
+      }
+
+      .outline-item::before {
+        position: absolute;
+        left: 9px;
+        top: 15px;
+        width: 6px;
+        height: 6px;
+        border: 2px solid #b9c5d7;
+        border-radius: 50%;
+        content: "";
+      }
+
+      .outline-item.is-current {
+        color: #204483;
+        background: #e4edff;
+      }
+
+      .outline-item.is-current::before {
+        border-color: #386bd4;
+        background: #386bd4;
+      }
+
+      .focus-workspace {
+        display: grid;
+        grid-template-rows: 1fr 116px;
+        min-width: 0;
+      }
+
+      .focus-stage {
+        position: relative;
+        display: grid;
+        place-items: center;
+        padding: 34px;
+        background: #e8eef6;
+      }
+
+      .focus-slide {
+        position: relative;
+        width: min(820px, 94%);
+        aspect-ratio: 16 / 9;
+        overflow: hidden;
+        border-radius: 18px;
+        color: #132140;
+        background:
+          radial-gradient(circle at 83% 17%, rgba(73, 112, 214, 0.18), transparent 170px),
+          #ffffff;
+        box-shadow: 0 25px 54px rgba(59, 79, 111, 0.16);
+      }
+
+      .focus-slide-copy {
+        position: absolute;
+        top: 15%;
+        left: 9%;
+        max-width: 52%;
+      }
+
+      .focus-slide-copy h2 {
+        margin: 8px 0 14px;
+        font-size: clamp(27px, 4vw, 48px);
+        letter-spacing: -0.055em;
+        line-height: 1.04;
+      }
+
+      .focus-slide-copy p {
+        color: #62718a;
+        font-size: 12px;
+        line-height: 1.75;
+      }
+
+      .focus-diagram {
+        position: absolute;
+        right: 7%;
+        bottom: 14%;
+        width: 36%;
+        height: 43%;
+      }
+
+      .orb {
+        position: absolute;
+        display: grid;
+        place-items: center;
+        width: 92px;
+        height: 92px;
+        border-radius: 50%;
+        color: #234b96;
+        background: #dfe9ff;
+        box-shadow: inset 0 0 0 1px #cbdafe;
+        font-size: 10px;
+        font-weight: 800;
+        text-align: center;
+      }
+
+      .orb-a {
+        top: 0;
+        left: 0;
+      }
+
+      .orb-b {
+        right: 0;
+        bottom: 0;
+        color: white;
+        background: #376dd6;
+      }
+
+      .orb-line {
+        position: absolute;
+        top: 46%;
+        left: 29%;
+        width: 52%;
+        height: 3px;
+        border-radius: 3px;
+        background: #9ab4e9;
+        transform: rotate(29deg);
+      }
+
+      .speaker-note {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 20px;
+        align-items: center;
+        padding: 16px 24px;
+        border-top: 1px solid #d5dfeb;
+        background: #f8fbff;
+      }
+
+      .speaker-note p {
+        margin: 5px 0 0;
+        color: #67758a;
+        font-size: 10px;
+        line-height: 1.55;
+      }
+
+      .focus .concept-popover {
+        left: 31%;
+        top: 39%;
+      }
+
+      /* 04 — Pocket Lesson */
+      .pocket {
+        position: relative;
+        min-height: 800px;
+        color: #26231e;
+        background:
+          radial-gradient(circle at 20% 15%, #ffe5bb, transparent 29%),
+          radial-gradient(circle at 85% 72%, #c8e7dd, transparent 27%),
+          #f7f0e3;
+      }
+
+      .pocket-layout {
+        display: grid;
+        grid-template-columns: minmax(280px, 0.55fr) minmax(340px, 0.8fr) minmax(270px, 0.5fr);
+        min-height: 800px;
+        align-items: center;
+        gap: 42px;
+        padding: 54px clamp(30px, 5vw, 86px);
+      }
+
+      .pocket-copy h2 {
+        margin: 10px 0 18px;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: clamp(35px, 5vw, 64px);
+        font-weight: 500;
+        letter-spacing: -0.055em;
+        line-height: 0.98;
+      }
+
+      .pocket-copy p {
+        color: #70695f;
+        font-size: 13px;
+        line-height: 1.7;
+      }
+
+      .phone {
+        position: relative;
+        width: min(390px, 100%);
+        min-height: 720px;
+        margin: 0 auto;
+        padding: 11px;
+        border: 1px solid rgba(22, 24, 24, 0.18);
+        border-radius: 46px;
+        background: #171816;
+        box-shadow: 0 38px 70px rgba(67, 54, 34, 0.26);
+      }
+
+      .phone-screen {
+        position: relative;
+        overflow: hidden;
+        min-height: 696px;
+        border-radius: 36px;
+        background: #fffdf8;
+      }
+
+      .phone-status {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 15px 22px 8px;
+        font-size: 9px;
+        font-weight: 800;
+      }
+
+      .lesson-progress {
+        height: 3px;
+        margin: 4px 20px 0;
+        border-radius: 4px;
+        background: #e7e2d8;
+      }
+
+      .lesson-progress span {
+        display: block;
+        width: 42%;
+        height: 100%;
+        border-radius: inherit;
+        background: #e56847;
+        transition: width 220ms ease;
+      }
+
+      .phone-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 17px 20px 12px;
+      }
+
+      .phone-header strong {
+        font-size: 11px;
+      }
+
+      .phone-header span {
+        display: block;
+        color: #8b847b;
+        font-size: 8px;
+      }
+
+      .lesson-card {
+        position: relative;
+        min-height: 430px;
+        margin: 4px 15px;
+        padding: 26px 22px;
+        border-radius: 24px;
+        color: #f8f7f2;
+        background:
+          radial-gradient(circle at 80% 10%, rgba(255, 255, 255, 0.13), transparent 120px),
+          #263d38;
+      }
+
+      .lesson-card h3 {
+        max-width: 250px;
+        margin: 9px 0 12px;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 32px;
+        font-weight: 500;
+        letter-spacing: -0.045em;
+        line-height: 1.03;
+      }
+
+      .lesson-card p {
+        color: #c7d3ce;
+        font-size: 11px;
+        line-height: 1.65;
+      }
+
+      .lesson-card .concept-link {
+        color: #ffd28c;
+      }
+
+      .mobile-nodes {
+        position: absolute;
+        right: 18px;
+        bottom: 24px;
+        left: 18px;
+        height: 138px;
+      }
+
+      .mobile-node {
+        position: absolute;
+        padding: 12px 14px;
+        border-radius: 14px;
+        color: #28332f;
+        background: #f4f1e8;
+        font-size: 10px;
+        font-weight: 800;
+      }
+
+      .mobile-node:first-child {
+        top: 8px;
+        left: 0;
+      }
+
+      .mobile-node:last-child {
+        right: 0;
+        bottom: 3px;
+        background: #f5be6f;
+      }
+
+      .mobile-node-line {
+        position: absolute;
+        top: 48%;
+        left: 31%;
+        width: 42%;
+        height: 2px;
+        background: rgba(255, 255, 255, 0.42);
+        transform: rotate(15deg);
+      }
+
+      .mobile-player {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        display: grid;
+        grid-template-columns: 42px 1fr 42px;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 18px 20px;
+        border-top: 1px solid #ece6dc;
+        background: rgba(255, 253, 248, 0.96);
+      }
+
+      .mobile-player .next-step {
+        height: 44px;
+        border: 0;
+        border-radius: 13px;
+        color: white;
+        background: #e56847;
+        cursor: pointer;
+        font-weight: 800;
+      }
+
+      .mobile-player .icon-button {
+        width: 42px;
+        height: 42px;
+        border-radius: 13px;
+      }
+
+      .pocket .concept-popover {
+        right: 20px;
+        top: 220px;
+      }
+
+      .viewer-principles {
+        display: grid;
+        gap: 10px;
+      }
+
+      .principle {
+        padding: 16px;
+        border: 1px solid rgba(54, 46, 34, 0.1);
+        border-radius: 16px;
+        background: rgba(255, 253, 248, 0.64);
+      }
+
+      .principle b {
+        display: block;
+        margin-bottom: 5px;
+        font-size: 11px;
+      }
+
+      .principle span {
+        color: #766e63;
+        font-size: 10px;
+        line-height: 1.5;
+      }
+
+      /* 05 — Live Bridge */
+      .bridge {
+        color: #27242a;
+        background: #f7f5f8;
+      }
+
+      .bridge .app-topbar {
+        background: #fff;
+      }
+
+      .bridge-body {
+        display: grid;
+        grid-template-columns: minmax(640px, 1.2fr) minmax(370px, 0.65fr);
+        min-height: 700px;
+      }
+
+      .bridge-editor {
+        display: grid;
+        grid-template-columns: 180px 1fr;
+        border-right: 1px solid #ddd8e1;
+      }
+
+      .bridge-sidebar {
+        padding: 19px 13px;
+        background: #efebf1;
+      }
+
+      .bridge-slide {
+        margin: 12px 0;
+        padding: 10px;
+        border: 2px solid transparent;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.76);
+      }
+
+      .bridge-slide.is-current {
+        border-color: #d14d79;
+        background: white;
+      }
+
+      .bridge-slide strong {
+        display: block;
+        font-size: 9px;
+      }
+
+      .bridge-slide span {
+        color: #8a818d;
+        font-size: 8px;
+      }
+
+      .bridge-workspace {
+        display: grid;
+        grid-template-rows: 1fr 96px;
+        min-width: 0;
+        background:
+          radial-gradient(#cec7d1 0.8px, transparent 0.8px) 0 0 / 17px 17px,
+          #e8e3ea;
+      }
+
+      .bridge-canvas-wrap {
+        display: grid;
+        place-items: center;
+        padding: 28px;
+      }
+
+      .bridge-canvas {
+        position: relative;
+        width: min(680px, 94%);
+        aspect-ratio: 16 / 9;
+        overflow: hidden;
+        border-radius: 13px;
+        color: #fff7f9;
+        background:
+          radial-gradient(circle at 70% 25%, rgba(242, 133, 171, 0.34), transparent 160px),
+          #3a263d;
+        box-shadow: 0 18px 40px rgba(63, 43, 67, 0.2);
+      }
+
+      .bridge-canvas h2 {
+        position: absolute;
+        top: 12%;
+        left: 8%;
+        max-width: 46%;
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: clamp(24px, 3.4vw, 44px);
+        font-weight: 500;
+        letter-spacing: -0.045em;
+        line-height: 1.05;
+      }
+
+      .bridge-node {
+        position: absolute;
+        padding: 13px 17px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(12px);
+        font-size: 10px;
+        font-weight: 800;
+      }
+
+      .bridge-node.one {
+        bottom: 17%;
+        left: 10%;
+      }
+
+      .bridge-node.two {
+        right: 10%;
+        bottom: 28%;
+        color: #3a263d;
+        background: #f3b2c8;
+      }
+
+      .bridge-timeline {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 18px;
+        border-top: 1px solid #d5ced8;
+        background: #faf8fb;
+      }
+
+      .bridge-preview {
+        display: grid;
+        align-content: center;
+        justify-items: center;
+        padding: 30px;
+        background:
+          linear-gradient(140deg, rgba(245, 180, 203, 0.22), transparent 45%),
+          #fff;
+      }
+
+      .preview-label {
+        display: flex;
+        width: min(360px, 100%);
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        font-size: 10px;
+        font-weight: 800;
+      }
+
+      .live-dot {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #b33e65;
+      }
+
+      .live-dot::before {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #d94e7d;
+        box-shadow: 0 0 0 4px rgba(217, 78, 125, 0.12);
+        content: "";
+      }
+
+      .bridge-phone {
+        position: relative;
+        overflow: hidden;
+        width: min(330px, 100%);
+        aspect-ratio: 9 / 16;
+        border: 9px solid #262128;
+        border-radius: 38px;
+        color: #fff6f8;
+        background:
+          radial-gradient(circle at 70% 22%, rgba(242, 133, 171, 0.36), transparent 120px),
+          #3a263d;
+        box-shadow: 0 28px 60px rgba(69, 46, 72, 0.22);
+      }
+
+      .bridge-phone-copy {
+        padding: 58px 25px 0;
+      }
+
+      .bridge-phone-copy h3 {
+        margin: 8px 0 12px;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 34px;
+        font-weight: 500;
+        letter-spacing: -0.05em;
+        line-height: 1.03;
+      }
+
+      .bridge-phone-copy p {
+        color: #d8c8d9;
+        font-size: 11px;
+        line-height: 1.65;
+      }
+
+      .bridge-phone-controls {
+        position: absolute;
+        right: 16px;
+        bottom: 18px;
+        left: 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 16px;
+        background: rgba(29, 21, 31, 0.72);
+        backdrop-filter: blur(12px);
+      }
+
+      .bridge-phone-controls .next-step {
+        flex: 1;
+        height: 38px;
+        border: 0;
+        border-radius: 10px;
+        color: #442838;
+        background: #f3b2c8;
+        cursor: pointer;
+        font-size: 10px;
+        font-weight: 820;
+      }
+
+      .bridge .concept-popover {
+        right: 18px;
+        top: 190px;
+      }
+
+      .bridge-status {
+        width: min(360px, 100%);
+        margin-top: 14px;
+        color: #857b88;
+        font-size: 9px;
+        text-align: center;
+      }
+
+      .prototype.reveal-secondary .secondary-content {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .secondary-content {
+        opacity: 0.18;
+        transform: translateY(5px);
+        transition: 260ms ease;
+      }
+
+      @media (max-width: 1100px) {
+        .gallery-header {
+          grid-template-columns: 1fr;
+          gap: 10px;
+        }
+
+        .brand,
+        .gallery-note {
+          display: none;
+        }
+
+        .design-tabs {
+          overflow-x: auto;
+          justify-content: flex-start;
+        }
+
+        .design-intro {
+          grid-template-columns: 1fr;
+        }
+
+        .design-facts {
+          justify-content: flex-start;
+        }
+
+        .prototype {
+          overflow-x: auto;
+        }
+
+        .studio-grid,
+        .atlas-grid,
+        .focus-body,
+        .bridge-body {
+          min-width: 930px;
+        }
+
+        .pocket-layout {
+          grid-template-columns: 1fr;
+        }
+
+        .pocket-copy,
+        .viewer-principles {
+          max-width: 520px;
+          margin: 0 auto;
+        }
+      }
+
+      @media (max-width: 620px) {
+        .gallery-header {
+          padding: 10px 12px;
+        }
+
+        .design-tab {
+          padding: 8px 10px;
+        }
+
+        .gallery-main {
+          width: min(100% - 16px, 1500px);
+          padding-top: 22px;
+        }
+
+        .design-intro {
+          padding: 0 4px;
+        }
+
+        .prototype {
+          border-radius: 20px;
+        }
+
+        .pocket-layout {
+          padding: 30px 12px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          scroll-behavior: auto !important;
+          animation-duration: 0.01ms !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="gallery-header">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">D</span>
+        <span>Dotzari <small>Design explorations</small></span>
+      </div>
+      <nav class="design-tabs" aria-label="디자인 안 선택" role="tablist">
+        <button class="design-tab" role="tab" aria-selected="true" aria-controls="design-1" data-design="1">01 Slide Studio</button>
+        <button class="design-tab" role="tab" aria-selected="false" aria-controls="design-2" data-design="2">02 Concept Atlas</button>
+        <button class="design-tab" role="tab" aria-selected="false" aria-controls="design-3" data-design="3">03 Focus Deck</button>
+        <button class="design-tab" role="tab" aria-selected="false" aria-controls="design-4" data-design="4">04 Pocket Lesson</button>
+        <button class="design-tab" role="tab" aria-selected="false" aria-controls="design-5" data-design="5">05 Live Bridge</button>
+      </nav>
+      <div class="gallery-note">탭 · 단계 버튼 · 밑줄 친 개념을 눌러보세요</div>
+    </header>
+
+    <main class="gallery-main">
+      <section class="design-panel is-active" id="design-1" role="tabpanel" aria-labelledby="tab-1" data-panel="1">
+        <div class="design-intro">
+          <div>
+            <p class="eyebrow">Direction 01 · Familiar authoring</p>
+            <h1>Slide Studio</h1>
+            <p>PowerPoint에 익숙한 제작자가 학습 없이 바로 시작하도록 슬라이드 목록, 캔버스, 속성 패널, 단계 타임라인을 한 화면에 배치한 정석적인 데스크톱 Editor입니다.</p>
+          </div>
+          <div class="design-facts"><span>제작자 중심</span><span>낮은 학습 비용</span><span>고밀도 UI</span></div>
+        </div>
+        <div class="prototype studio" data-prototype>
+          <div class="app-topbar">
+            <div class="brand-mark" aria-hidden="true">D</div>
+            <div class="app-title">Node.js 첫걸음 <small>저장됨</small></div>
+            <div class="spacer"></div>
+            <button class="soft-button">미리보기</button><button class="primary-button">공유하기</button><span class="avatar">MJ</span>
+          </div>
+          <div class="studio-grid">
+            <aside class="slide-rail">
+              <div class="rail-heading"><span class="mini-label">슬라이드</span><button class="icon-button" aria-label="슬라이드 추가">＋</button></div>
+              <div class="slide-thumb is-current"><span class="slide-number">1</span><div class="thumb-title"></div><span class="thumb-node"></span><span class="thumb-node"></span></div>
+              <div class="slide-thumb"><span class="slide-number">2</span><div class="thumb-title" style="width:55%"></div><span class="thumb-node" style="width:78px"></span></div>
+              <div class="slide-thumb"><span class="slide-number">3</span><div class="thumb-title" style="width:64%"></div><span class="thumb-node"></span><span class="thumb-node" style="background:#dcd3ef"></span></div>
+            </aside>
+            <div class="studio-workspace">
+              <div class="studio-canvas-wrap">
+                <div class="studio-canvas">
+                  <span class="canvas-kicker">SLIDE 01 · 프로그램의 정체</span>
+                  <h2 class="canvas-title">Node.js는 어떤 종류의 프로그램일까요?</h2>
+                  <button class="flow-node node-program concept-link" data-concept-link>프로그램<small>실행 가능한 명령의 집합</small></button>
+                  <div class="studio-wire secondary-content"></div>
+                  <div class="flow-node node-runtime secondary-content">Node.js runtime<small>JavaScript 실행 환경</small></div>
+                  <div class="concept-popover" role="dialog" aria-label="프로그램 개념 미리보기"><strong>프로그램</strong>컴퓨터가 수행할 명령을 정해진 순서와 규칙으로 표현한 것입니다.<a href="#">1강의 원 설명으로 이동 →</a></div>
+                </div>
+              </div>
+              <div class="studio-timeline">
+                <div class="timeline-label">슬라이드 1<small>3개의 단계</small></div>
+                <div class="step-row"><button class="step-chip is-active" data-step="1">1</button><button class="step-chip" data-step="2">2</button><button class="step-chip" data-step="3">3</button></div>
+                <div class="spacer"></div><span class="mini-label">전환 0.6s · Ease out</span><button class="icon-button play-toggle" aria-label="재생" aria-pressed="false">▶</button>
+              </div>
+            </div>
+            <aside class="inspector">
+              <span class="mini-label">속성</span>
+              <div class="property-group"><div class="property-title">선택한 노드 · 프로그램</div><div class="field-row"><div class="fake-field">X&nbsp; 184</div><div class="fake-field">Y&nbsp; 292</div></div></div>
+              <div class="property-group"><div class="property-title">단계 애니메이션</div><div class="fake-field">등장 · Fade up&nbsp;&nbsp;⌄</div></div>
+              <div class="property-group"><div class="property-title">개념 에셋</div><div class="fake-field">원본 · 1강 / 슬라이드 2</div><div class="fake-field" style="margin-top:7px">참조 6곳</div></div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <section class="design-panel" id="design-2" role="tabpanel" data-panel="2" hidden>
+        <div class="design-intro">
+          <div><p class="eyebrow">Direction 02 · Knowledge first</p><h1>Concept Atlas</h1><p>슬라이드보다 ‘내가 축적한 개념’이 중심입니다. 제작자는 개념 에셋을 검색해 캔버스에 놓고, 관계를 연결하며, 여러 강의에서 어떻게 재사용되는지 한눈에 확인합니다.</p></div>
+          <div class="design-facts"><span>개념 에셋 중심</span><span>지식 그래프</span><span>전문 제작자</span></div>
+        </div>
+        <div class="prototype atlas" data-prototype>
+          <div class="app-topbar"><div class="brand-mark" style="background:#9ce3b9;color:#15241b">D</div><div class="app-title">Concept Atlas <small>Node.js course</small></div><div class="spacer"></div><button class="soft-button">Viewer</button><button class="primary-button">강의에 반영</button><span class="avatar">MJ</span></div>
+          <div class="atlas-grid">
+            <aside class="asset-library"><div class="mini-label">내 개념 라이브러리</div><div class="search-box">⌕&nbsp;&nbsp;개념 검색</div><div class="asset-card"><strong>npm</strong><span>3개 강의 · 참조 12회</span></div><div class="asset-card is-selected"><strong>Node.js</strong><span>4개 강의 · 참조 18회</span></div><div class="asset-card"><strong>프로그램</strong><span>6개 강의 · 참조 31회</span></div><div class="asset-card"><strong>JavaScript</strong><span>8개 강의 · 참조 44회</span></div></aside>
+            <div class="atlas-map">
+              <div class="map-heading"><span class="mini-label">슬라이드 03 · 실행 환경</span><h2>Node.js를 둘러싼 개념들</h2></div>
+              <div class="map-wire wire-a"></div><div class="map-wire wire-b secondary-content"></div><div class="map-wire wire-c secondary-content"></div>
+              <div class="map-node npm">npm<small>패키지 관리자</small></div>
+              <button class="map-node central concept-link" data-concept-link>Node.js<small>JavaScript runtime</small></button>
+              <div class="map-node program secondary-content">프로그램<small>상위 개념</small></div><div class="map-node js secondary-content">JavaScript<small>실행 언어</small></div>
+              <div class="map-stage"><button class="icon-button play-toggle" aria-label="재생" aria-pressed="false">▶</button><div class="step-row"><button class="step-chip is-active" data-step="1">관계 1</button><button class="step-chip" data-step="2">관계 2</button><button class="step-chip" data-step="3">완성</button></div></div>
+              <div class="concept-popover" role="dialog"><strong>Node.js</strong>브라우저 밖에서 JavaScript를 실행하는 runtime입니다.<a href="#">개념 상세 열기 →</a></div>
+            </div>
+            <aside class="concept-detail"><span class="mini-label">선택한 개념</span><h3>Node.js</h3><p>Chrome V8 엔진을 기반으로 JavaScript를 서버와 도구 환경에서 실행합니다.</p><div class="relation-path">npm<br />└─ 실행됨 → Node.js<br />&nbsp;&nbsp;&nbsp;└─ 종류 → 프로그램<br />&nbsp;&nbsp;&nbsp;└─ 실행 → JavaScript</div><div class="property-group"><div class="property-title">사용 중인 강의</div><div class="fake-field" style="background:#1b2520;border-color:#35443c;color:#9daaa3">Node.js 첫걸음 · 7회</div></div></aside>
+          </div>
+        </div>
+      </section>
+
+      <section class="design-panel" id="design-3" role="tabpanel" data-panel="3" hidden>
+        <div class="design-intro">
+          <div><p class="eyebrow">Direction 03 · Narrative focus</p><h1>Focus Deck</h1><p>복잡한 도구를 감추고 ‘지금 설명할 한 장면’에 집중합니다. 왼쪽에는 강의 흐름, 아래에는 발표 노트와 단계만 남겨 강의 제작과 실제 발표를 자연스럽게 연결합니다.</p></div>
+          <div class="design-facts"><span>집중형 UI</span><span>발표 노트</span><span>낮은 시각 소음</span></div>
+        </div>
+        <div class="prototype focus" data-prototype>
+          <div class="app-topbar"><div class="brand-mark" style="background:#376dd6">D</div><div class="app-title">Node.js 첫걸음 <small>슬라이드 2 / 8</small></div><div class="spacer"></div><button class="soft-button">발표 모드</button><button class="primary-button" style="background:#376dd6">Viewer 열기</button><span class="avatar">MJ</span></div>
+          <div class="focus-body">
+            <aside class="focus-outline"><span class="mini-label">강의 흐름</span><div class="outline-item">우리가 실행하는 것</div><div class="outline-item is-current">프로그램과 runtime</div><div class="outline-item">Node.js의 역할</div><div class="outline-item">npm으로 확장하기</div></aside>
+            <div class="focus-workspace">
+              <div class="focus-stage">
+                <div class="focus-slide">
+                  <div class="focus-slide-copy"><span class="mini-label" style="color:#376dd6">핵심 질문</span><h2>runtime은 코드를 어떻게 움직일까요?</h2><p><button class="concept-link" data-concept-link>프로그램</button>은 명령의 집합이고, runtime은 그 명령을 실제 환경에서 해석하고 실행합니다.</p></div>
+                  <div class="focus-diagram"><div class="orb orb-a">프로그램</div><div class="orb-line secondary-content"></div><div class="orb orb-b secondary-content">runtime</div></div>
+                  <div class="concept-popover" role="dialog"><strong>프로그램</strong>컴퓨터가 수행할 명령을 표현한 실행 단위입니다.<a href="#">처음 배운 슬라이드 보기 →</a></div>
+                </div>
+              </div>
+              <div class="speaker-note"><div><span class="mini-label">발표 노트</span><p>“명령을 적어둔 것”과 “실제로 명령을 수행하는 환경”을 구분해서 설명합니다.</p></div><div class="step-row"><button class="step-chip is-active" data-step="1">질문</button><button class="step-chip" data-step="2">비교</button><button class="step-chip" data-step="3">정리</button><button class="icon-button play-toggle" aria-label="재생" aria-pressed="false">▶</button></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="design-panel" id="design-4" role="tabpanel" data-panel="4" hidden>
+        <div class="design-intro">
+          <div><p class="eyebrow">Direction 04 · Mobile consumer</p><h1>Pocket Lesson</h1><p>소비자의 모바일 경험을 제품의 얼굴로 삼은 안입니다. 큰 글자, 한 손 조작, 명확한 진행률, tap 가능한 개념 참조를 통해 짧은 시간에도 강의를 이어볼 수 있습니다.</p></div>
+          <div class="design-facts"><span>모바일 우선</span><span>한 손 조작</span><span>학습자 중심</span></div>
+        </div>
+        <div class="prototype pocket" data-prototype>
+          <div class="pocket-layout">
+            <div class="pocket-copy"><span class="mini-label">Consumer Viewer</span><h2>강의는 화면보다 생각에 맞춰집니다.</h2><p>편집 도구는 모두 걷어내고, 소비자가 지금 이해해야 할 내용과 다음 행동만 남깁니다.</p></div>
+            <div class="phone">
+              <div class="phone-screen">
+                <div class="phone-status"><span>9:41</span><span>● ● ●</span></div><div class="lesson-progress"><span></span></div>
+                <div class="phone-header"><button class="icon-button" aria-label="강의 닫기">×</button><div><strong>Node.js 첫걸음</strong><span>2강 · 프로그램과 runtime</span></div><div class="spacer"></div><button class="icon-button" aria-label="목차">☰</button></div>
+                <article class="lesson-card"><span class="mini-label" style="color:#9bb3aa">슬라이드 2 · 단계 1/3</span><h3>Node.js는 어떤 프로그램일까요?</h3><p>Node.js는 JavaScript를 실행하는 <button class="concept-link" data-concept-link>runtime</button>입니다.</p><div class="mobile-nodes"><div class="mobile-node">JavaScript</div><div class="mobile-node-line secondary-content"></div><div class="mobile-node secondary-content">Node.js</div></div><div class="concept-popover" role="dialog"><strong>runtime</strong>다른 프로그램이나 코드를 실행하기 위한 환경입니다.<a href="#">이 개념을 처음 배운 곳 →</a></div></article>
+                <div class="mobile-player"><button class="icon-button" aria-label="이전 단계">←</button><button class="next-step">다음 단계</button><button class="icon-button play-toggle" aria-label="자동 재생" aria-pressed="false">▶</button></div>
+              </div>
+            </div>
+            <div class="viewer-principles"><div class="principle"><b>Thumb zone</b><span>핵심 진행 조작을 화면 아래 엄지 영역에 둡니다.</span></div><div class="principle"><b>No hover</b><span>개념은 tap, focus, keyboard 모두로 열립니다.</span></div><div class="principle"><b>Resume anywhere</b><span>슬라이드와 단계 진행률을 항상 확인할 수 있습니다.</span></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="design-panel" id="design-5" role="tabpanel" data-panel="5" hidden>
+        <div class="design-intro">
+          <div><p class="eyebrow">Direction 05 · Two surfaces, one truth</p><h1>Live Bridge</h1><p>제작자가 편집하는 순간 모바일 Viewer 결과를 함께 확인합니다. Editor와 Viewer가 같은 문서와 player semantics를 공유한다는 제품 원칙을 가장 직접적으로 보여주는 안입니다.</p></div>
+          <div class="design-facts"><span>실시간 미리보기</span><span>반응형 검증</span><span>발행 흐름</span></div>
+        </div>
+        <div class="prototype bridge" data-prototype>
+          <div class="app-topbar"><div class="brand-mark" style="background:#d94e7d">D</div><div class="app-title">Node.js 첫걸음 <small>Editor</small></div><div class="spacer"></div><button class="soft-button">모바일 배치</button><button class="primary-button" style="background:#d94e7d">게시</button><span class="avatar">MJ</span></div>
+          <div class="bridge-body">
+            <div class="bridge-editor">
+              <aside class="bridge-sidebar"><span class="mini-label">슬라이드</span><div class="bridge-slide"><strong>01 · 프로그램</strong><span>2단계</span></div><div class="bridge-slide is-current"><strong>02 · runtime</strong><span>3단계</span></div><div class="bridge-slide"><strong>03 · Node.js</strong><span>4단계</span></div></aside>
+              <div class="bridge-workspace"><div class="bridge-canvas-wrap"><div class="bridge-canvas"><h2>runtime은 코드를 실제로 움직입니다.</h2><div class="bridge-node one">JavaScript code</div><div class="bridge-node two secondary-content">Node.js runtime</div></div></div><div class="bridge-timeline"><span class="mini-label">슬라이드 2</span><div class="step-row"><button class="step-chip is-active" data-step="1">1</button><button class="step-chip" data-step="2">2</button><button class="step-chip" data-step="3">3</button></div><div class="spacer"></div><span class="mini-label">모바일과 동기화됨</span></div></div>
+            </div>
+            <aside class="bridge-preview"><div class="preview-label"><span>Mobile Viewer</span><span class="live-dot">Live</span></div><div class="bridge-phone"><div class="bridge-phone-copy"><span class="mini-label" style="color:#d9b7cc">슬라이드 2 · 단계 1/3</span><h3>runtime은 코드를 실제로 움직입니다.</h3><p><button class="concept-link" style="color:#f3b2c8" data-concept-link>JavaScript</button>를 Node.js runtime이 실행하는 과정을 살펴봅니다.</p></div><div class="bridge-node one" style="left:25px;bottom:130px">JavaScript code</div><div class="bridge-node two secondary-content" style="right:25px;bottom:74px">Node.js runtime</div><div class="concept-popover" role="dialog"><strong>JavaScript</strong>웹과 다양한 runtime에서 실행되는 프로그래밍 언어입니다.<a href="#">개념 상세 보기 →</a></div><div class="bridge-phone-controls"><button class="icon-button" style="border-color:#594657;background:#352a37;color:white" aria-label="이전 단계">←</button><button class="next-step">다음 단계</button></div></div><div class="bridge-status">390 × 844 · Touch preview · Safe area on</div></aside>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const tabs = [...document.querySelectorAll('[data-design]')];
+      const panels = [...document.querySelectorAll('[data-panel]')];
+
+      function selectDesign(number, updateHash = true) {
+        tabs.forEach((tab) => {
+          const selected = tab.dataset.design === String(number);
+          tab.setAttribute('aria-selected', String(selected));
+          tab.tabIndex = selected ? 0 : -1;
+          if (selected) tab.id = `tab-${number}`;
+        });
+        panels.forEach((panel) => {
+          const selected = panel.dataset.panel === String(number);
+          panel.classList.toggle('is-active', selected);
+          panel.hidden = !selected;
+        });
+        if (updateHash) history.replaceState(null, '', `#design-${number}`);
+      }
+
+      tabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => selectDesign(tab.dataset.design));
+        tab.addEventListener('keydown', (event) => {
+          if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+          event.preventDefault();
+          const offset = event.key === 'ArrowRight' ? 1 : -1;
+          const next = tabs[(index + offset + tabs.length) % tabs.length];
+          next.focus();
+          selectDesign(next.dataset.design);
+        });
+      });
+
+      document.querySelectorAll('[data-step]').forEach((button) => {
+        button.addEventListener('click', () => {
+          const prototype = button.closest('[data-prototype]');
+          const row = button.closest('.step-row');
+          row.querySelectorAll('[data-step]').forEach((item) => item.classList.remove('is-active'));
+          button.classList.add('is-active');
+          prototype.classList.toggle('reveal-secondary', Number(button.dataset.step) > 1);
+          const progress = prototype.querySelector('.lesson-progress span');
+          if (progress) progress.style.width = `${30 + Number(button.dataset.step) * 22}%`;
+        });
+      });
+
+      document.querySelectorAll('.next-step').forEach((button) => {
+        button.addEventListener('click', () => {
+          const prototype = button.closest('[data-prototype]');
+          prototype.classList.toggle('reveal-secondary');
+          button.textContent = prototype.classList.contains('reveal-secondary') ? '단계 다시 보기' : '다음 단계';
+          const progress = prototype.querySelector('.lesson-progress span');
+          if (progress) progress.style.width = prototype.classList.contains('reveal-secondary') ? '68%' : '42%';
+        });
+      });
+
+      document.querySelectorAll('[data-concept-link]').forEach((button) => {
+        button.addEventListener('click', (event) => {
+          event.stopPropagation();
+          const prototype = button.closest('[data-prototype]');
+          const popover = prototype.querySelector('.concept-popover');
+          const willOpen = !popover.classList.contains('is-open');
+          document.querySelectorAll('.concept-popover.is-open').forEach((item) => item.classList.remove('is-open'));
+          popover.classList.toggle('is-open', willOpen);
+        });
+      });
+
+      document.querySelectorAll('.play-toggle').forEach((button) => {
+        button.addEventListener('click', () => {
+          const playing = button.getAttribute('aria-pressed') !== 'true';
+          button.setAttribute('aria-pressed', String(playing));
+          button.textContent = playing ? 'Ⅱ' : '▶';
+          button.closest('[data-prototype]').classList.toggle('reveal-secondary', playing);
+        });
+      });
+
+      document.addEventListener('click', () => {
+        document.querySelectorAll('.concept-popover.is-open').forEach((item) => item.classList.remove('is-open'));
+      });
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') document.querySelectorAll('.concept-popover.is-open').forEach((item) => item.classList.remove('is-open'));
+      });
+
+      const initial = location.hash.match(/design-(\d)/)?.[1];
+      selectDesign(initial && Number(initial) <= 5 ? initial : 1, false);
+    </script>
+  </body>
+</html>
