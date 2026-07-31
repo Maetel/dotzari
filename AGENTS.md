@@ -10,6 +10,14 @@
 - If code, tests, README content, or another document conflicts with the SSOT, report the conflict and align them with the SSOT unless the user explicitly revises the SSOT.
 - Keep unresolved questions, decisions, and superseded decisions traceable; do not erase decision history.
 
+## Visual design verification
+
+- Treat related UI capabilities as one coherent workspace when the user says they should be combined; do not present them as mutually exclusive proposals unless the user explicitly asks for alternatives.
+- Before completing any HTML, demo, or UI checkpoint, render it in a real browser at 1024×768, 1280×900, and 1440×900 and inspect both supported themes.
+- Inspect screenshots and DOM geometry for panel overlap, clipping, unintended page overflow, canvas bounds, node placement, and edge endpoints. Source parsing or HTTP success alone is not visual verification.
+- Diagram edges must derive their endpoints from measured node bounds or shared geometry. Do not use independently tuned percentages, widths, and rotations for lines that must stay attached to nodes.
+- Check the browser console and key interactions after visual inspection. Record the verified viewports and outcomes in the checkpoint evidence.
+
 ## Checkpoint commits and pushes
 
 - Treat each coherent, user-visible increment that has been verified as a work checkpoint.
