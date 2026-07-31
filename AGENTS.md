@@ -16,6 +16,7 @@
 - Before completing any HTML, demo, or UI checkpoint, render it in a real browser at 1024×768, 1280×900, and 1440×900 and inspect both supported themes.
 - Inspect screenshots and DOM geometry for panel overlap, clipping, unintended page overflow, canvas bounds, node placement, and edge endpoints. Source parsing or HTTP success alone is not visual verification.
 - Diagram edges must derive their endpoints from measured node bounds or shared geometry. Do not use independently tuned percentages, widths, and rotations for lines that must stay attached to nodes.
+- When a design uses semantic zoom, nested nodes, or computed grouping, verify every supported zoom level for node overlap, content clipping, group transitions, and measured edge attachment. Do not validate only the default zoom.
 - Check the browser console and key interactions after visual inspection. Record the verified viewports and outcomes in the checkpoint evidence.
 
 ## Checkpoint commits and pushes
