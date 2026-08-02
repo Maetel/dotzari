@@ -265,11 +265,12 @@
     .lesson-body h3 { margin: 6px 0 5px; font-size: 19px; line-height: 1.18; letter-spacing: -.04em; }
     .lesson-body > p { margin: 0; color: var(--muted); font-size: 10px; line-height: 1.55; }
     .viewer-diagram { position: relative; height: 205px; margin-top: 13px; overflow: hidden; border: 1px solid var(--line); border-radius: 13px; background-color: var(--canvas); background-image: radial-gradient(var(--grid) 1px, transparent 1px); background-size: 14px 14px; }
-    .v-node { position: absolute; display: grid; place-items: center; min-width: 78px; max-width: 110px; min-height: 48px; padding: 8px; border: 1px solid var(--strong); border-radius: 9px; background: var(--panel); box-shadow: var(--node-shadow); color: var(--ink); cursor: pointer; font-size: 9px; font-weight: 850; text-align: center; transform: translate(-50%, -50%); }
+    .viewer-edge-layer { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+    .viewer-edge-path { fill: none; stroke: var(--edge); stroke-width: 2; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+    .viewer-edge-path.hot { stroke: var(--accent); }
+    .v-node { position: absolute; z-index: 2; display: grid; place-items: center; min-width: 78px; max-width: 110px; min-height: 48px; padding: 8px; border: 1px solid var(--strong); border-radius: 9px; background: var(--panel); box-shadow: var(--node-shadow); color: var(--ink); cursor: pointer; font-size: 9px; font-weight: 850; text-align: center; transform: translate(-50%, -50%); }
     .v-node.compact { min-width: 62px; max-width: 82px; min-height: 34px; padding: 5px 6px; border-radius: 8px; font-size: 7.5px; line-height: 1.2; }
     .v-node.hot { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
-    .v-line { position: absolute; height: 2px; background: var(--edge); transform-origin: left center; }
-    .v-line.hot { background: var(--accent); }
     .explain-card { margin-top: 10px; padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel2); font-size: 9px; line-height: 1.45; }
     .term-btn { padding: 0; background: transparent; color: var(--ink); cursor: pointer; font-weight: 850; text-decoration-line: underline; text-decoration-style: dotted; text-decoration-color: var(--accent); text-decoration-thickness: 1.5px; text-underline-offset: .12em; }
     .term-btn:hover, .term-btn:focus-visible { outline: none; color: var(--accent); text-decoration-style: solid; }
@@ -291,7 +292,7 @@
     .feedback { margin-top: 9px; padding: 9px; border-radius: 9px; background: var(--good-soft); color: var(--good); font-size: 8px; line-height: 1.45; }
     .feedback[hidden] { display: none; }
     .viewer-code { margin: 9px 0 0; padding: 10px; overflow-x: auto; border-radius: 9px; background: #111821; color: #c9f4df; font: 8px/1.5 ui-monospace, SFMono-Regular, Consolas, monospace; white-space: pre; }
-    .viewer-parent-node { position: absolute; left: 50%; top: 46%; display: grid; place-items: center; width: 154px; min-height: 104px; padding: 9px; border: 1px solid var(--accent); border-radius: 11px; background: var(--accent-soft); color: var(--accent); font-size: 10px; font-weight: 900; text-align: center; transform: translate(-50%, -50%); }
+    .viewer-parent-node { position: absolute; left: 50%; top: 46%; z-index: 2; display: grid; place-items: center; width: 154px; min-height: 104px; padding: 9px; border: 1px solid var(--accent); border-radius: 11px; background: var(--accent-soft); color: var(--accent); font-size: 10px; font-weight: 900; text-align: center; transform: translate(-50%, -50%); }
     .viewer-parent-node > em { margin-top: 4px; color: var(--muted); font-size: 6px; font-style: normal; font-weight: 750; }
     .viewer-parent-node > small { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; width: 100%; margin-top: 7px; }
     .viewer-nested-child { display: grid; gap: 2px; padding: 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--ink); cursor: pointer; font-size: 7px; font-weight: 850; text-align: left; }
@@ -485,7 +486,7 @@
         assets:[['HTTP 요청','→','method·path·header','4'],['Middleware','M','인증·검증·제한','5'],['Cache','C','hit·miss·TTL','4'],['Database','DB','조건·index·행','3']],
         selected:['HTTP 요청','연결선의 방향과 강조 시간을 편집합니다. 학습 화면에서는 현재 단계의 경로만 파란색으로 표시됩니다.','흐름 애니메이션 편집'],
         steps:[['주소와 요청 조립','브라우저가 URL을 해석하고 GET 요청과 header를 만듭니다.','강조'],['연결과 암호화','DNS로 IP를 찾고 TCP·TLS 연결을 맺습니다.','이동'],['경로와 권한 확인','Router가 handler를 고르고 Middleware가 인증과 입력을 검사합니다.','검증'],['캐시 먼저 확인','같은 조건의 최신 결과가 있으면 데이터베이스 조회를 건너뜁니다.','분기'],['데이터 조회','캐시에 없으면 index를 이용해 필요한 사용자 행을 찾습니다.','조회'],['응답 도착','서버가 200 JSON을 만들고 암호화된 연결로 브라우저에 돌려줍니다.','완료']],
-        viewer:{kicker:'요청의 여정 · 2/6',title:'한 번의 GET 요청도<br>검사와 분기를 거칩니다.',intro:'브라우저는 서버에 바로 닿지 않습니다. 주소 확인과 암호화 뒤 Router·Middleware를 지나고, Cache 결과가 없을 때만 Database를 조회합니다.',type:'flow',diagram:[['Browser',10,50],['DNS',26,50],['TLS',42,50],['Router',58,50],['Cache',74,50],['DB',90,50]]}
+        viewer:{kicker:'요청의 여정 · 2/6',title:'한 번의 GET 요청도<br>검사와 분기를 거칩니다.',intro:'브라우저는 서버에 바로 닿지 않습니다. 주소 확인과 암호화 뒤 Router·Middleware를 지나고, Cache 결과가 없을 때만 Database를 조회합니다.',type:'flow',diagram:[['Browser',18,30],['DNS',50,30],['TLS',82,30],['Router',82,72],['Cache',50,72],['DB',18,72]]}
       },
       {
         id:'media', title:'미디어 보충 설명', short:'음성·영상을 단계에 맞춤', audience:'보면서 듣고 확인', document:'이벤트 루프를 눈으로 보기', meta:'8강 · 슬라이드 2', mode:'미디어 보충', hint:'도형 설명에 짧은 영상과 자막을 동기화',
@@ -846,24 +847,46 @@
       return `<aside class="viewer-child-sheet viewer-detail-sheet"><header><span><small>${escapeHtml(detail.role)}</small><br><b>${escapeHtml(detail.title)}</b></span><button id="closeViewerChildDetail" aria-label="${escapeHtml(detail.title)} 상세 닫기">×</button></header><p>${escapeHtml(detail.description)}</p><ul>${detail.examples.map(example=>`<li>${escapeHtml(example)}</li>`).join('')}</ul><button class="viewer-detail-action" id="viewerChildFocus">하위 구조에서 크게 보기</button></aside>`;
     }
 
+    function viewerEdgeMarkup(edges) {
+      return `<svg class="viewer-edge-layer" aria-hidden="true">${edges.map(([source,target,active])=>`<path class="viewer-edge-path ${active?'hot':''}" data-viewer-edge-source="${escapeHtml(source)}" data-viewer-edge-target="${escapeHtml(target)}"></path>`).join('')}</svg>`;
+    }
+
+    function drawViewerEdges() {
+      $$('.viewer-diagram').forEach(diagram=>{
+        const svg=diagram.querySelector('.viewer-edge-layer');
+        if(!svg)return;
+        const diagramRect=diagram.getBoundingClientRect();
+        svg.setAttribute('viewBox',`0 0 ${diagramRect.width} ${diagramRect.height}`);
+        svg.querySelectorAll('[data-viewer-edge-source]').forEach(path=>{
+          const source=diagram.querySelector(`[data-viewer-node-id="${path.dataset.viewerEdgeSource}"]`);
+          const target=diagram.querySelector(`[data-viewer-node-id="${path.dataset.viewerEdgeTarget}"]`);
+          if(!source||!target)return;
+          const sourceRect=source.getBoundingClientRect(), targetRect=target.getBoundingClientRect();
+          const start=anchorPoint(sourceRect,targetRect,diagramRect), end=anchorPoint(targetRect,sourceRect,diagramRect);
+          path.setAttribute('d',`M ${start.x} ${start.y} L ${end.x} ${end.y}`);
+          path.dataset.x1=start.x; path.dataset.y1=start.y; path.dataset.x2=end.x; path.dataset.y2=end.y;
+        });
+      });
+    }
+
     function conceptViewer(s) {
-      if(state.childView==='inside') return `<div class="viewer-diagram"><span class="v-node compact hot" style="left:16%;top:16%">V8<br><small>코드 실행</small></span><span class="v-node compact hot" style="left:84%;top:16%">Call Stack<br><small>함수 순서</small></span><span class="v-node compact ${state.step>1?'hot':''}" style="left:16%;top:84%">libuv<br><small>I/O 처리</small></span><span class="v-node compact ${state.step>2?'hot':''}" style="left:84%;top:84%">Event Loop<br><small>다음 callback</small></span><i class="v-line hot" style="left:26%;top:18%;width:48%;transform:rotate(0deg)"></i><i class="v-line ${state.step>1?'hot':''}" style="left:22%;top:29%;width:46%;transform:rotate(57deg)"></i><i class="v-line ${state.step>2?'hot':''}" style="left:26%;top:84%;width:48%;transform:rotate(0deg)"></i><div class="viewer-parent-node"><strong>Node.js</strong><em>V8 + 운영체제 기능</em><small><button class="viewer-nested-child" data-viewer-child-detail="npm"><b>npm</b><i>패키지 관리 →</i></button><button class="viewer-nested-child" data-viewer-child-detail="npx"><b>npx</b><i>명령 실행 →</i></button></small></div>${viewerChildDetailMarkup(state.viewerChildDetail)}</div>`;
-      if(state.childView==='around') return `<div class="viewer-diagram"><span class="v-node hot" style="left:50%;top:34%">Node.js</span><i class="v-line hot" style="left:41%;top:45%;width:18%;transform:rotate(125deg)"></i><i class="v-line hot" style="left:52%;top:47%;width:20%;transform:rotate(55deg)"></i><button class="v-node hot" data-viewer-child-detail="npm" style="left:28%;top:72%">npm<br><small>패키지 관리 →</small></button><button class="v-node hot" data-viewer-child-detail="npx" style="left:72%;top:72%">npx<br><small>명령 실행 →</small></button>${viewerChildDetailMarkup(state.viewerChildDetail)}</div>`;
+      if(state.childView==='inside') return `<div class="viewer-diagram">${viewerEdgeMarkup([['node-runtime','node-v8',true],['node-runtime','node-stack',true],['node-runtime','node-libuv',state.step>1],['node-runtime','node-loop',state.step>2]])}<span class="v-node compact hot" data-viewer-node-id="node-v8" style="left:16%;top:16%">V8<br><small>코드 실행</small></span><span class="v-node compact hot" data-viewer-node-id="node-stack" style="left:84%;top:16%">Call Stack<br><small>함수 순서</small></span><span class="v-node compact ${state.step>1?'hot':''}" data-viewer-node-id="node-libuv" style="left:16%;top:84%">libuv<br><small>I/O 처리</small></span><span class="v-node compact ${state.step>2?'hot':''}" data-viewer-node-id="node-loop" style="left:84%;top:84%">Event Loop<br><small>다음 callback</small></span><div class="viewer-parent-node" data-viewer-node-id="node-runtime"><strong>Node.js</strong><em>V8 + 운영체제 기능</em><small><button class="viewer-nested-child" data-viewer-child-detail="npm"><b>npm</b><i>패키지 관리 →</i></button><button class="viewer-nested-child" data-viewer-child-detail="npx"><b>npx</b><i>명령 실행 →</i></button></small></div>${viewerChildDetailMarkup(state.viewerChildDetail)}</div>`;
+      if(state.childView==='around') return `<div class="viewer-diagram">${viewerEdgeMarkup([['node-runtime','node-npm',true],['node-runtime','node-npx',true]])}<span class="v-node hot" data-viewer-node-id="node-runtime" style="left:50%;top:34%">Node.js</span><button class="v-node hot" data-viewer-node-id="node-npm" data-viewer-child-detail="npm" style="left:28%;top:72%">npm<br><small>패키지 관리 →</small></button><button class="v-node hot" data-viewer-node-id="node-npx" data-viewer-child-detail="npx" style="left:72%;top:72%">npx<br><small>명령 실행 →</small></button>${viewerChildDetailMarkup(state.viewerChildDetail)}</div>`;
       if(state.childView==='popover') return `<div class="viewer-diagram"><button class="viewer-child-trigger" id="viewerChildTrigger">Node.js<br><small>하위 도구 2개 ⌄</small></button>${state.viewerChildOpen&&!state.viewerChildDetail?'<aside class="viewer-child-sheet"><header><b>Node.js의 하위 도구</b><button id="closeViewerChildren">×</button></header><div><button class="viewer-child-option" data-viewer-child-detail="npm">npm<br><small>패키지 관리 →</small></button><button class="viewer-child-option" data-viewer-child-detail="npx">npx<br><small>명령 실행 →</small></button></div></aside>':''}${viewerChildDetailMarkup(state.viewerChildDetail)}</div>`;
       return `<div class="viewer-focus-wrap"><div class="viewer-focus-card"><small>실행 구조 / Node.js</small><h4>Node.js의 하위 도구</h4><div class="viewer-focus-children"><button data-viewer-child-detail="npm"><b>npm</b>패키지의 버전을 결정하고 설치합니다.<br><small>구조 보기 →</small></button><button data-viewer-child-detail="npx"><b>npx</b>패키지의 실행 파일을 한 번 호출합니다.<br><small>구조 보기 →</small></button></div></div>${viewerChildDetailMarkup(state.viewerChildDetail)}</div>`;
     }
 
     function viewerDiagram(s) {
-      const items=s.viewer.diagram||[]; let lines='';
-      for(let i=0;i<items.length-1;i++){const a=items[i],b=items[i+1],dx=b[1]-a[1],dy=b[2]-a[2],len=Math.sqrt(dx*dx+dy*dy),angle=Math.atan2(dy,dx)*180/Math.PI;lines+=`<i class="v-line ${i<state.step?'hot':''}" style="left:${a[1]}%;top:${a[2]}%;width:${len}%;transform:rotate(${angle}deg)"></i>`;}
-      return `<div class="viewer-diagram">${lines}${items.map((n,i)=>`<span class="v-node ${i<=state.step?'hot':''}" style="left:${n[1]}%;top:${n[2]}%">${escapeHtml(n[0])}</span>`).join('')}</div><div class="explain-card">${escapeHtml(s.steps[state.step][1])}</div>`;
+      const items=s.viewer.diagram||[], edges=items.slice(0,-1).map((_,i)=>[`viewer-seq-${i}`,`viewer-seq-${i+1}`,i<state.step]);
+      const compact=items.length>4?'compact':'';
+      return `<div class="viewer-diagram">${viewerEdgeMarkup(edges)}${items.map((n,i)=>`<span class="v-node ${compact} ${i<=state.step?'hot':''}" data-viewer-node-id="viewer-seq-${i}" style="left:${n[1]}%;top:${n[2]}%">${escapeHtml(n[0])}</span>`).join('')}</div><div class="explain-card">${escapeHtml(s.steps[state.step][1])}</div>`;
     }
 
     function learnerContent(s) {
       const v=s.viewer;
       if(v.type==='diagram') return s.id==='concept'?conceptViewer(s):viewerDiagram(s);
       if(v.type==='flow') return viewerDiagram(s)+`<pre class="viewer-code">fetch('/users')\n  → GET /users\n  → 200 JSON</pre>`;
-      if(v.type==='recall') return `<div class="viewer-diagram"><span class="v-node compact hot" style="left:50%;top:16%">package.json</span><i class="v-line hot" style="left:47%;top:23%;width:39%;transform:rotate(140deg)"></i><i class="v-line ${state.step>0?'hot':''}" style="left:53%;top:23%;width:39%;transform:rotate(40deg)"></i><span class="v-node compact hot" style="left:18%;top:47%">npm CLI</span><span class="v-node compact ${state.step>0?'hot':''}" style="left:82%;top:47%">Registry</span><i class="v-line ${state.step>1?'hot':''}" style="left:18%;top:55%;width:27%;transform:rotate(90deg)"></i><i class="v-line ${state.step>1?'hot':''}" style="left:82%;top:55%;width:27%;transform:rotate(90deg)"></i><span class="v-node compact ${state.step>1?'hot':''}" style="left:18%;top:82%">Node.js</span><span class="v-node compact ${state.step>1?'hot':''}" style="left:82%;top:82%">의존성 트리</span><i class="v-line ${state.step>2?'hot':''}" style="left:70%;top:82%;width:40%;transform:rotate(180deg)"></i><span class="v-node compact ${state.step>2?'hot':''}" style="left:50%;top:82%">node_modules</span></div><div class="explain-card">npm CLI는 <button class="term-btn" data-concept-ref="package-json">package.json</button>을 읽고 Registry에서 버전을 고른 뒤 패키지를 설치합니다. scripts에 적힌 명령은 <button class="term-btn" data-concept-ref="node-runtime">Node.js 런타임</button>에 전달합니다.</div>`;
+      if(v.type==='recall') return `<div class="viewer-diagram">${viewerEdgeMarkup([['recall-package','recall-cli',true],['recall-package','recall-registry',state.step>0],['recall-cli','recall-node',state.step>1],['recall-registry','recall-tree',state.step>1],['recall-tree','recall-modules',state.step>2]])}<span class="v-node compact hot" data-viewer-node-id="recall-package" style="left:50%;top:16%">package.json</span><span class="v-node compact hot" data-viewer-node-id="recall-cli" style="left:18%;top:47%">npm CLI</span><span class="v-node compact ${state.step>0?'hot':''}" data-viewer-node-id="recall-registry" style="left:82%;top:47%">Registry</span><span class="v-node compact ${state.step>1?'hot':''}" data-viewer-node-id="recall-node" style="left:18%;top:82%">Node.js</span><span class="v-node compact ${state.step>1?'hot':''}" data-viewer-node-id="recall-tree" style="left:82%;top:82%">의존성 트리</span><span class="v-node compact ${state.step>2?'hot':''}" data-viewer-node-id="recall-modules" style="left:50%;top:82%">node_modules</span></div><div class="explain-card">npm CLI는 <button class="term-btn" data-concept-ref="package-json">package.json</button>을 읽고 Registry에서 버전을 고른 뒤 패키지를 설치합니다. scripts에 적힌 명령은 <button class="term-btn" data-concept-ref="node-runtime">Node.js 런타임</button>에 전달합니다.</div>`;
       if(v.type==='media') return `<div class="media-box"><button class="media-play" id="mediaPlay" aria-label="영상 재생">${state.playing?'Ⅱ':'▶'}</button><span class="media-caption">${state.playing?'Event Loop가 빈 스택을 확인한 뒤 Queue의 callback을 올립니다.':'파일 읽기는 libuv가 처리하고 JavaScript 실행은 멈추지 않습니다.'}</span></div><div class="media-track"><i style="width:${state.playing?'64':'36'}%"></i></div><div class="explain-card">비동기 작업의 완료와 callback의 실행은 같은 순간이 아닙니다. 완료된 callback도 Call Stack이 빌 때까지 Queue에서 기다립니다.</div>`;
       return `<div class="quiz"><button data-answer="wrong">① 브라우저 안에서만</button><button data-answer="correct">② Node.js 실행 환경에서</button><button data-answer="wrong">③ 데이터베이스 안에서</button></div><div class="feedback" id="feedback" hidden></div>`;
     }
@@ -873,6 +896,7 @@
       $('#phoneTitle').textContent=s.document; $('#phoneMeta').textContent=s.meta; $('#phoneStepTitle').textContent=s.steps[state.step][0]; $('#phoneStepCount').textContent=`${state.step+1} / ${s.steps.length} 단계`;
       $('#phoneProgress').innerHTML=s.steps.map((_,i)=>`<i class="${i<=state.step?'done':''}"></i>`).join('');
       $('#lessonBody').innerHTML=`<span class="lesson-kicker">${escapeHtml(s.viewer.kicker)}</span><h3>${s.viewer.title}</h3><p>${escapeHtml(s.viewer.intro)}</p>${learnerContent(s)}`;
+      requestAnimationFrame(drawViewerEdges);
       bindConceptReferences($('#lessonBody'));
       $('#viewerChildTrigger')?.addEventListener('click',()=>{state.viewerChildOpen=true;renderViewer(s);});
       $('#closeViewerChildren')?.addEventListener('click',()=>{state.viewerChildOpen=false;renderViewer(s);});
@@ -895,7 +919,7 @@
       if(role==='producer') requestAnimationFrame(drawEdges);
     }
 
-    $$('[data-theme-choice]').forEach(btn=>btn.addEventListener('click',()=>{document.documentElement.dataset.theme=btn.dataset.themeChoice;$$('[data-theme-choice]').forEach(b=>b.classList.toggle('active',b===btn));requestAnimationFrame(drawEdges);}));
+    $$('[data-theme-choice]').forEach(btn=>btn.addEventListener('click',()=>{document.documentElement.dataset.theme=btn.dataset.themeChoice;$$('[data-theme-choice]').forEach(b=>b.classList.toggle('active',b===btn));requestAnimationFrame(()=>{drawEdges();drawViewerEdges();});}));
     $$('[data-role]').forEach(btn=>btn.addEventListener('click',()=>setRole(btn.dataset.role)));
     $$('[data-child-mode]').forEach(button=>button.addEventListener('click',()=>{state.childView=button.dataset.childMode;state.childPopover=false;state.childDetail=null;state.viewerChildOpen=false;state.viewerChildDetail=null;if(state.zoom===60)state.zoom=100;renderEditor(scenarios[state.scenario]);if(state.role==='learner')renderViewer(scenarios[state.scenario]);}));
     $('#previewButton').addEventListener('click',()=>setRole('learner'));
@@ -911,7 +935,8 @@
     document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!$('#conceptPopover').hidden)closeConceptPreview(true);});
     $('#playSteps').addEventListener('click',()=>{state.step=(state.step+1)%scenarios[state.scenario].steps.length;renderEditor(scenarios[state.scenario]);});
     new ResizeObserver(()=>requestAnimationFrame(drawEdges)).observe($('#canvas'));
-    window.addEventListener('resize',()=>{requestAnimationFrame(drawEdges);positionConceptPreview();});
+    new ResizeObserver(()=>requestAnimationFrame(drawViewerEdges)).observe($('#lessonBody'));
+    window.addEventListener('resize',()=>{requestAnimationFrame(()=>{drawEdges();drawViewerEdges();});positionConceptPreview();});
     window.addEventListener('scroll',positionConceptPreview,true);
     const initialTheme=previewParams.get('theme');
     if(initialTheme==='paper'||initialTheme==='midnight'){
