@@ -12,6 +12,10 @@
 
 ## Visual design verification
 
+- Do not replace affordance with instructional copy. A concept reference, expandable detail, navigation path, or retained context must reveal itself through shape, placement, state, focus, pointer/touch feedback, and a concise label where needed. Remove sentences that merely narrate what the visible interaction already communicates, and never repeat the same action or outcome across headings, intro copy, cards, and hints.
+- Before completing a UI checkpoint, audit every visible sentence. Keep only content the user is here to learn, a decision they must make, or guidance that cannot be expressed safely through the interaction itself. Reclaim the space from redundant explanatory copy for the primary content.
+- Design explorations must use realistic instructional material and representative graph complexity. Placeholder terms, shallow word chains, and decorative sample nodes are not sufficient evidence that information density, hierarchy, semantic zoom, concept preview, or mobile adaptation works.
+- Concept references use a close dotted underline rather than a solid rule. Their preview is a shared top-level overlay anchored beside the activating text or virtual canvas region; it must not be clipped by a node, canvas, phone mockup, transform, or overflow container. DOM, SVG, and canvas-backed references must use the same visual component and interaction states.
 - Treat related UI capabilities as one coherent workspace when the user says they should be combined; do not present them as mutually exclusive proposals unless the user explicitly asks for alternatives.
 - Before completing any HTML, demo, or UI checkpoint, render it in a real browser at 1024×768, 1280×900, and 1440×900 and inspect both supported themes.
 - Inspect screenshots and DOM geometry for panel overlap, clipping, unintended page overflow, canvas bounds, node placement, and edge endpoints. Source parsing or HTTP success alone is not visual verification.

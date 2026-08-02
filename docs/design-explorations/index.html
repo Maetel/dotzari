@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
   <title>Dotzari — Child node interaction & authoring lab</title>
   <style>
     * { box-sizing: border-box; }
@@ -33,7 +34,7 @@
     .showcase { max-width: 1440px; margin: 0 auto; }
     .showcase-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 28px; margin-bottom: 14px; }
     .eyebrow { margin: 0 0 6px; color: var(--accent); font-size: 10px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
-    h1 { margin: 0; font-size: clamp(27px, 3vw, 42px); line-height: 1.08; letter-spacing: -.045em; }
+    h1 { margin: 0; overflow-wrap: anywhere; font-size: clamp(27px, 3vw, 42px); line-height: 1.08; letter-spacing: -.045em; }
     .lead { max-width: 790px; margin: 8px 0 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
     .theme-switch, .role-switch { display: flex; flex: 0 0 auto; gap: 2px; padding: 4px; border: 1px solid var(--line); border-radius: 11px; background: var(--panel); }
     .theme-switch button, .role-switch button { padding: 7px 11px; border-radius: 8px; background: transparent; color: var(--muted); cursor: pointer; font-size: 10px; font-weight: 850; white-space: nowrap; }
@@ -247,14 +248,10 @@
     .step-tags { display: flex; gap: 3px; flex-wrap: wrap; } .step-tags span { padding: 3px 4px; border-radius: 4px; background: var(--panel); font-size: 6px; }
 
     /* Learner */
-    .viewer-layout { display: grid; grid-template-columns: minmax(190px, 1fr) 370px minmax(210px, 1fr); gap: 24px; align-items: center; min-height: 610px; padding: 26px clamp(20px, 4vw, 58px); background: radial-gradient(circle at 50% 40%, var(--accent-soft), transparent 42%), var(--shell); }
-    .viewer-context h2 { margin: 0; font-size: 21px; letter-spacing: -.035em; } .viewer-context p { margin: 9px 0 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
+    .viewer-layout { display: grid; place-items: center; min-height: 650px; padding: 24px; background: radial-gradient(circle at 50% 40%, var(--accent-soft), transparent 42%), var(--shell); }
     .perspective-label { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 12px; color: var(--accent); font-size: 8px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
     .perspective-label::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
-    .outcome-list { display: grid; gap: 8px; margin-top: 18px; }
-    .outcome { display: grid; grid-template-columns: 22px 1fr; gap: 8px; align-items: start; padding: 9px; border: 1px solid var(--line); border-radius: 9px; background: color-mix(in srgb, var(--panel) 80%, transparent); font-size: 9px; line-height: 1.45; }
-    .outcome b { display: grid; place-items: center; width: 21px; height: 21px; border-radius: 7px; background: var(--good-soft); color: var(--good); font-size: 8px; }
-    .phone { position: relative; width: 370px; height: 570px; overflow: hidden; border: 7px solid var(--ink); border-radius: 34px; background: var(--panel); box-shadow: 0 30px 60px rgba(0,0,0,.22); }
+    .phone { position: relative; width: min(410px, calc(100vw - 42px)); height: 610px; overflow: hidden; border: 7px solid var(--ink); border-radius: 34px; background: var(--panel); box-shadow: 0 30px 60px rgba(0,0,0,.22); }
     .phone::before { content: ""; position: absolute; left: 50%; top: 7px; z-index: 20; width: 76px; height: 20px; border-radius: 12px; background: var(--ink); transform: translateX(-50%); }
     .phone-status { display: flex; justify-content: space-between; height: 35px; padding: 11px 18px 0; font-size: 7px; font-weight: 850; }
     .phone-head { display: flex; align-items: center; gap: 8px; height: 42px; padding: 0 14px; border-bottom: 1px solid var(--line); }
@@ -263,20 +260,26 @@
     .phone-title strong { font-size: 9px; } .phone-title span { margin-top: 2px; color: var(--muted); font-size: 7px; }
     .phone-progress { display: flex; gap: 3px; padding: 9px 14px 0; }
     .phone-progress i { flex: 1; height: 3px; border-radius: 3px; background: var(--line); } .phone-progress i.done { background: var(--accent); }
-    .lesson-body { height: 400px; padding: 14px; overflow-y: auto; }
+    .lesson-body { height: 440px; padding: 14px; overflow-y: auto; }
     .lesson-kicker { color: var(--accent); font-size: 7px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
     .lesson-body h3 { margin: 6px 0 5px; font-size: 19px; line-height: 1.18; letter-spacing: -.04em; }
     .lesson-body > p { margin: 0; color: var(--muted); font-size: 10px; line-height: 1.55; }
     .viewer-diagram { position: relative; height: 205px; margin-top: 13px; overflow: hidden; border: 1px solid var(--line); border-radius: 13px; background-color: var(--canvas); background-image: radial-gradient(var(--grid) 1px, transparent 1px); background-size: 14px 14px; }
     .v-node { position: absolute; display: grid; place-items: center; min-width: 78px; max-width: 110px; min-height: 48px; padding: 8px; border: 1px solid var(--strong); border-radius: 9px; background: var(--panel); box-shadow: var(--node-shadow); color: var(--ink); cursor: pointer; font-size: 9px; font-weight: 850; text-align: center; transform: translate(-50%, -50%); }
+    .v-node.compact { min-width: 62px; max-width: 82px; min-height: 34px; padding: 5px 6px; border-radius: 8px; font-size: 7.5px; line-height: 1.2; }
     .v-node.hot { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
     .v-line { position: absolute; height: 2px; background: var(--edge); transform-origin: left center; }
     .v-line.hot { background: var(--accent); }
     .explain-card { margin-top: 10px; padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel2); font-size: 9px; line-height: 1.45; }
-    .term-btn { padding: 0 1px 2px; border-bottom: 2px solid var(--accent); background: transparent; color: var(--ink); cursor: pointer; font-weight: 850; }
-    .concept-popover { position: absolute; left: 18px; right: 18px; bottom: 72px; z-index: 15; padding: 13px; border: 1px solid var(--accent); border-radius: 12px; background: var(--panel); box-shadow: 0 18px 45px rgba(0,0,0,.25); }
-    .concept-popover[hidden] { display: none; } .concept-popover strong { font-size: 11px; } .concept-popover p { margin: 5px 0 9px; color: var(--muted); font-size: 8px; line-height: 1.5; }
-    .concept-popover div { display: flex; gap: 6px; } .concept-popover button { flex: 1; padding: 7px; border-radius: 7px; background: var(--panel2); cursor: pointer; font-size: 8px; }
+    .term-btn { padding: 0; background: transparent; color: var(--ink); cursor: pointer; font-weight: 850; text-decoration-line: underline; text-decoration-style: dotted; text-decoration-color: var(--accent); text-decoration-thickness: 1.5px; text-underline-offset: .12em; }
+    .term-btn:hover, .term-btn:focus-visible { outline: none; color: var(--accent); text-decoration-style: solid; }
+    .graph-term { font-size: inherit; }
+    .concept-popover { position: fixed; z-index: 1000; width: min(300px, calc(100vw - 24px)); padding: 13px; border: 1px solid var(--accent); border-radius: 12px; background: var(--panel); box-shadow: 0 18px 45px rgba(0,0,0,.25); }
+    .concept-popover::before { content: ""; position: absolute; left: var(--arrow-x, 22px); width: 10px; height: 10px; border-left: 1px solid var(--accent); border-top: 1px solid var(--accent); background: var(--panel); transform: rotate(45deg); }
+    .concept-popover[data-placement="bottom"]::before { top: -6px; }
+    .concept-popover[data-placement="top"]::before { bottom: -6px; transform: rotate(225deg); }
+    .concept-popover[hidden] { display: none; } .concept-popover small { display: block; margin-bottom: 3px; color: var(--muted); font-size: 7px; } .concept-popover strong { font-size: 11px; } .concept-popover p { margin: 5px 0 9px; color: var(--muted); font-size: 8px; line-height: 1.5; }
+    .concept-popover div { display: flex; gap: 6px; } .concept-popover button, .concept-popover a { flex: 1; padding: 7px; border-radius: 7px; background: var(--panel2); color: var(--ink); cursor: pointer; font-size: 8px; text-align: center; text-decoration: none; }
     .concept-popover .primary { background: var(--accent); color: white; }
     .media-box { position: relative; display: grid; place-items: center; height: 165px; margin-top: 13px; overflow: hidden; border-radius: 13px; background: linear-gradient(145deg, #1b2637, #51382f); color: white; }
     .media-box::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 35% 25%, rgba(125,157,255,.55), transparent 34%); }
@@ -320,27 +323,22 @@
     .phone-controls button { height: 38px; border-radius: 10px; background: var(--panel2); color: var(--muted); cursor: pointer; font-size: 10px; font-weight: 850; }
     .phone-controls .next { background: var(--accent); color: white; }
     .step-copy { text-align: center; } .step-copy strong, .step-copy span { display: block; } .step-copy strong { font-size: 8px; } .step-copy span { margin-top: 3px; color: var(--muted); font-size: 7px; }
-    .viewer-outline { padding: 14px; border: 1px solid var(--line); border-radius: 12px; background: color-mix(in srgb, var(--panel) 84%, transparent); }
-    .viewer-outline h3 { margin: 0 0 10px; font-size: 11px; }
-    .outline-step { display: grid; grid-template-columns: 22px 1fr; gap: 8px; padding: 8px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: 8px; line-height: 1.35; }
-    .outline-step:first-of-type { border-top: 0; } .outline-step b { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--panel2); color: var(--muted); font-size: 7px; }
-    .outline-step.active { color: var(--ink); } .outline-step.active b { background: var(--accent); color: white; }
-
     @media (max-width: 1160px) {
       .page { padding: 15px; } .editor-grid { grid-template-columns: 150px minmax(0, 1fr) 216px; }
-      .tool span { display: none; } .viewer-layout { grid-template-columns: minmax(150px, 1fr) 350px minmax(170px, 1fr); gap: 16px; padding: 22px 18px; }
-      .phone { width: 350px; }
+      .tool span { display: none; } .viewer-layout { padding: 22px 18px; }
     }
     @media (max-width: 900px) {
       .scenario-strip { display: flex; overflow-x: auto; padding-bottom: 3px; } .scenario-card { flex: 0 0 190px; }
-      .viewer-layout { grid-template-columns: 1fr 350px; } .viewer-outline { display: none; }
     }
     @media (max-width: 720px) {
       .page { padding: 10px; } .showcase-head { display: grid; gap: 12px; } .theme-switch { width: max-content; }
-      .appbar { gap: 7px; } .saved, .avatar, .appbar .icon-btn { display: none; } .document { max-width: 150px; }
+      .showcase-head h1 { font-size: 25px; }
+      .viewer-word { display: block; }
+      .appbar { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px; height: auto; min-height: 94px; padding: 10px; } .saved, .avatar, .appbar > .icon-btn, .appbar > .spacer { display: none; } .document { max-width: none; }
+      .role-switch { grid-column: 1 / -1; width: 100%; } .role-switch button { flex: 1; }
       .editor-grid { grid-template-columns: 132px minmax(520px, 1fr) 205px; overflow-x: auto; }
-      .viewer-layout { display: grid; grid-template-columns: 1fr; padding: 16px 8px 22px; } .viewer-context { padding: 0 8px; } .viewer-context .outcome-list { display: none; }
-      .phone { width: min(370px, calc(100vw - 36px)); justify-self: center; } .viewer-outline { display: none; }
+      .viewer-layout { padding: 16px 8px 22px; }
+      .phone { width: min(390px, calc(100vw - 36px)); justify-self: center; }
     }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; } }
   </style>
@@ -350,9 +348,8 @@
     <section class="showcase">
       <header class="showcase-head">
         <div>
-          <p class="eyebrow">Dotzari · Child node interaction & authoring lab</p>
-          <h1>하위 개념은 열어 보고,<br>복잡한 그래프는 앱이 먼저 묶습니다.</h1>
-          <p class="lead">Node.js 안의 npm·npx를 눌러 상세 내용을 확인해 보세요. 60%로 축소하면 앱이 연결 관계와 가까운 위치를 바탕으로 묶음을 먼저 제안하고, 제작자는 이름과 포함할 노드만 검토하거나 수정할 수 있습니다.</p>
+          <p class="eyebrow">Dotzari · Design exploration</p>
+          <h1>실제 강의 데이터로 검증하는 Editor와 <span class="viewer-word">Viewer</span></h1>
         </div>
         <div class="theme-switch" aria-label="테마 선택">
           <button class="active" data-theme-choice="paper">Paper</button>
@@ -412,74 +409,87 @@
 
         <section class="surface" id="learnerSurface" hidden>
           <div class="viewer-layout">
-            <div class="viewer-context"><span class="perspective-label">학습자 경험</span><h2 id="learnerGoal"></h2><p id="learnerDescription"></p><div class="outcome-list" id="outcomes"></div></div>
             <div class="phone" id="phone">
               <div class="phone-status"><span>9:41</span><span>●●● 100%</span></div>
               <div class="phone-head"><button aria-label="강의 닫기">×</button><div class="phone-title"><strong id="phoneTitle"></strong><span id="phoneMeta"></span></div><button aria-label="목차">☰</button></div>
               <div class="phone-progress" id="phoneProgress"></div>
               <article class="lesson-body" id="lessonBody"></article>
-              <div class="concept-popover" id="conceptPopover" hidden><strong>프로그램</strong><p>컴퓨터가 순서대로 실행할 수 있도록 작성된 명령의 묶음입니다. 1강에서 만든 긴 개념 설명과 예시를 필요한 만큼 펼쳐 볼 수 있습니다.</p><ul class="concept-examples"><li><b>앱</b> — 메모장처럼 사용자가 직접 실행합니다.</li><li><b>서버</b> — 요청을 기다리며 계속 실행됩니다.</li><li><b>스크립트</b> — 정해 둔 작업을 자동으로 처리합니다.</li></ul><div><button id="closeConcept">닫기</button><button class="primary">1강에서 다시 보기</button></div></div>
               <footer class="phone-controls"><button id="prevStep" aria-label="이전 단계">←</button><div class="step-copy"><strong id="phoneStepTitle"></strong><span id="phoneStepCount"></span></div><button class="next" id="nextStep" aria-label="다음 단계">→</button></footer>
             </div>
-            <aside class="viewer-outline"><span class="perspective-label">이 슬라이드의 흐름</span><h3 id="outlineTitle"></h3><div id="outlineSteps"></div></aside>
           </div>
         </section>
       </div>
     </section>
   </main>
 
+  <aside class="concept-popover" id="conceptPopover" role="dialog" aria-label="개념 미리보기" data-placement="bottom" hidden>
+    <small id="conceptPath"></small><strong id="conceptTitle"></strong><p id="conceptDescription"></p>
+    <ul class="concept-examples" id="conceptExamples"></ul>
+    <div><button id="closeConcept">닫기</button><a class="primary" id="conceptOrigin" href="#">전체 설명 보기</a></div>
+  </aside>
+
   <script>
     const scenarios = [
       {
         id: 'concept', title: '핵심 개념 설명', short: '부모·하위 노드를 함께 배치', audience: '관계를 따라 이해', document: 'Node.js는 어떻게 실행될까?', meta: '3강 · 슬라이드 2', mode: '개념 설명', hint: '100% · Node.js 안에 npm·npx 하위 노드가 보입니다',
-        producer: '개념을 배치하고 설명 순서를 정합니다.', learnerGoal: '복잡한 개념을 한 단계씩 이해합니다.', learnerDescription: '처음부터 모든 정보를 보여 주지 않고, 설명에 맞춰 Node.js와 실행 요소의 관계가 하나씩 나타납니다.',
+        producer: '개념을 배치하고 설명 순서를 정합니다.',
         slides: ['Node.js란?', '실행 구조', '이벤트 루프', '정리'],
         nodes: [
-          {id:'node', x:50, y:44, w:174, detailW:190, kind:'concept', variant:'container', kicker:'부모 노드 · 실행 환경', title:'Node.js', body:'JavaScript 실행 도구를 품는 상위 개념입니다.', children:['npm','npx'], foot:'하위 노드 2개', reuse:'8회 재사용'},
-          {id:'v8', x:19, y:23, w:128, detailW:140, kind:'concept', kicker:'실행 엔진', title:'V8', body:'JavaScript 코드를 기계어로 바꿉니다.', examples:['Chrome과 Node.js에서 사용'], foot:'2단계 등장', reuse:'개념'},
-          {id:'loop', x:81, y:23, w:136, detailW:148, kind:'concept', kicker:'실행 흐름', title:'Event Loop', body:'비동기 작업의 순서를 조율합니다.', examples:['Timer 완료','파일 읽기 완료'], foot:'3단계 등장', reuse:'개념'},
-          {id:'runtime', x:50, y:82, w:138, detailW:148, kind:'data', kicker:'결과', title:'Runtime', body:'실행에 필요한 기능이 한곳에 모입니다.', examples:['파일 시스템과 네트워크 API'], foot:'4단계 완성', reuse:'구성'}
-        ], edges:[['v8','node','실행'],['node','loop','위임'],['node','runtime','구성']],
-        assets:[['V8','JS','개념 · 5개 강의','5'],['Event Loop','∞','개념 · 3개 강의','3'],['Runtime','RT','용어 설명','2']],
+          {id:'source', x:12, y:20, w:118, detailW:132, kind:'code', kicker:'입력', title:'JavaScript 소스', body:'작성한 함수와 모듈이 실행의 출발점입니다.', examples:['import','async function'], foot:'개발자가 작성', reuse:'코드'},
+          {id:'v8', x:34, y:20, w:128, detailW:144, kind:'concept', kicker:'실행 엔진', title:'V8', body:'소스를 파싱하고 자주 실행되는 코드를 기계어로 최적화합니다.', examples:['Ignition · 바이트코드','TurboFan · 최적화'], foot:'동기 코드 실행', reuse:'개념'},
+          {id:'stack', x:66, y:20, w:132, detailW:146, kind:'data', kicker:'동기 실행', title:'Call Stack', body:'현재 실행 중인 함수의 순서를 한 프레임씩 쌓아 관리합니다.', examples:['마지막에 들어온 함수부터 종료'], foot:'한 번에 하나', reuse:'상태'},
+          {id:'loop', x:88, y:20, w:128, detailW:142, kind:'concept', kicker:'실행 조정', title:'Event Loop', body:'스택이 비었을 때 준비된 callback을 다음 실행으로 보냅니다.', examples:['timer','I/O callback'], foot:'반복 확인', reuse:'개념'},
+          {id:'api', x:13, y:76, w:132, detailW:146, kind:'data', kicker:'개발자 인터페이스', title:'Node API', body:'fs, http, process처럼 브라우저에는 없는 기능을 제공합니다.', examples:['fs.readFile','http.createServer'], foot:'운영체제 연결', reuse:'API'},
+          {id:'libuv', x:38, y:76, w:132, detailW:148, kind:'concept', kicker:'비동기 기반', title:'libuv', body:'파일과 네트워크 작업을 운영체제에 맡기고 완료 신호를 받습니다.', examples:['I/O polling','worker pool'], foot:'C 라이브러리', reuse:'개념'},
+          {id:'node', x:64, y:76, w:174, detailW:198, kind:'concept', variant:'container', kicker:'부모 노드 · 실행 환경', title:'Node.js', bodyHtml:'<button class="term-btn graph-term" data-concept-ref="node-runtime">V8과 운영체제 기능</button>을 하나의 JavaScript 실행 환경으로 묶습니다.', body:'V8과 운영체제 기능을 하나의 JavaScript 실행 환경으로 묶습니다.', children:['npm','npx'], foot:'하위 도구 2개', reuse:'8회 재사용'},
+          {id:'queue', x:89, y:76, w:136, detailW:150, kind:'data', kicker:'대기 상태', title:'Callback Queue', body:'완료된 비동기 작업의 callback이 실행 차례를 기다립니다.', examples:['파일 읽기 완료','timer 만료'], foot:'실행 대기', reuse:'상태'}
+        ], edges:[['source','v8','파싱'],['v8','node','실행 엔진'],['node','stack','함수 실행'],['node','api','기능 호출'],['api','libuv','작업 위임'],['libuv','queue','완료 전달'],['queue','loop','차례 확인'],['loop','stack','다음 callback']],
+        assets:[['V8','JS','파싱·컴파일·최적화','5'],['libuv','UV','I/O와 worker pool','4'],['Event Loop','∞','스택과 큐 조율','3'],['Call Stack','▤','동기 함수 실행 순서','4']],
         selected:['Node.js','중앙 개념을 선택했습니다. 모든 단계에서 같은 정체성을 유지하며 위치와 강조만 달라집니다.','개념 상세 열기'],
-        steps:[['중심 개념 제시','Node.js를 먼저 보여 줍니다.','등장'],['실행 엔진 연결','V8의 역할을 연결합니다.','노드·선'],['비동기 흐름','Event Loop를 강조합니다.','강조·이동'],['전체 구조 완성','Runtime 관계를 정리합니다.','카메라']],
-        outcomes:['한 번에 하나의 관계에 집중합니다.','앞뒤 단계로 돌아가며 구조를 다시 봅니다.'],
-        viewer:{kicker:'실행 구조 · 2/4', title:'Node.js는 무엇을<br>묶어 줄까요?', intro:'Node.js는 JavaScript를 실행하는 환경입니다. 다음을 눌러 구성 요소를 하나씩 살펴보세요.', type:'diagram', diagram:[['V8',23,28],['Node.js',50,50],['Event Loop',77,28],['Runtime',50,78]]}
+        steps:[['소스 실행 시작','JavaScript 소스를 V8이 파싱하고 바이트코드로 실행합니다.','등장'],['동기 함수 실행','실행 중인 함수는 Call Stack의 맨 위에서 처리됩니다.','노드·선'],['I/O 작업 위임','파일·네트워크 작업은 Node API를 거쳐 libuv에 맡겨집니다.','강조·이동'],['완료 신호 대기','작업이 끝나면 callback이 Queue에서 실행 차례를 기다립니다.','상태'],['다음 callback 실행','Event Loop가 빈 스택을 확인하고 callback을 올립니다.','카메라']],
+        viewer:{kicker:'실행 구조 · 2/5', title:'Node.js는 기다리는 동안<br>다른 코드를 실행합니다.', intro:'V8은 동기 코드를 실행하고, 오래 걸리는 I/O는 libuv가 맡습니다. 작업이 끝난 callback은 스택이 빌 때까지 Queue에서 기다립니다.', type:'diagram', diagram:[['V8',18,24],['Call Stack',50,24],['Node API',82,24],['libuv',82,72],['Queue',50,72],['Event Loop',18,72]]}
       },
       {
         id:'recall', title:'선행 개념 복습', short:'긴 뜻과 예시를 담기', audience:'필요한 만큼 펼쳐 보기', document:'npm에서 프로그램까지', meta:'5강 · 슬라이드 3', mode:'긴 개념 설명', hint:'140% · 긴 정의와 다양한 예시가 노드 안에서 펼쳐집니다',
-        producer:'본문 단어에 재사용 개념을 연결합니다.', learnerGoal:'모르는 단어만 잠깐 확인하고 돌아옵니다.', learnerDescription:'현재 강의를 벗어나지 않고 밑줄 친 개념을 열어 봅니다. 더 필요할 때만 처음 설명한 강의로 이동합니다.',
+        producer:'본문 단어에 재사용 개념을 연결합니다.',
         slides:['npm이 하는 일','Node.js와 npm','프로그램 복습','패키지 실행'],
         nodes:[
-          {id:'npm',x:17,y:50,w:126,detailW:138,kind:'concept',kicker:'현재 용어',title:'npm',body:'패키지를 찾고 실행합니다.',examples:['npm install','npm run dev'],foot:'5강',reuse:'현재'},
-          {id:'node',x:49,y:50,w:140,detailW:150,kind:'concept',kicker:'관련 개념',title:'Node.js',body:'npm이 동작하는 실행 환경입니다.',examples:['서버','명령줄 도구'],foot:'3강에서 생성',reuse:'8회'},
-          {id:'program',x:82,y:50,w:154,detailW:202,kind:'concept',variant:'definition',kicker:'긴 용어 설명',title:'프로그램',body:'컴퓨터가 목적에 맞는 일을 순서대로 수행하도록 만든 명령과 데이터의 묶음입니다.',examples:['메모장 · 사용자가 직접 실행','서버 · 요청을 기다리며 실행','스크립트 · 정해 둔 일을 자동 처리'],foot:'예시 3개',reuse:'12회'}
-        ], edges:[['npm','node','의존'],['node','program','종류']],
-        assets:[['프로그램','P','1강 · 개념','12'],['Node.js','JS','3강 · 개념','8'],['패키지','PK','4강 · 개념','6']],
-        selected:['프로그램','“Node.js는 프로그램입니다” 문장의 밑줄 친 단어에 연결됩니다. 미리보기와 원 강의 이동을 설정할 수 있습니다.','참조 설정 편집'],
-        steps:[['npm 제시','현재 배울 용어를 엽니다.','등장'],['Node.js 연결','실행 환경과 관계를 잇습니다.','연결'],['프로그램 참조','1강의 개념을 불러옵니다.','개념 참조'],['학습자 선택','미리보기와 이동을 허용합니다.','상호작용']],
-        outcomes:['밑줄 친 용어를 탭해 짧은 정의를 봅니다.','필요하면 원래 설명한 1강으로 이동합니다.'],
-        viewer:{kicker:'개념 연결 · 3/4',title:'npm도 결국<br><button class="term-btn" id="termButton">프로그램</button>을 실행합니다.',intro:'밑줄 친 단어가 낯설다면 눌러 보세요. 지금 보던 위치는 그대로 유지됩니다.',type:'recall'}
+          {id:'manifest',x:12,y:20,w:132,detailW:148,kind:'data',kicker:'프로젝트 정보',title:'package.json',body:'사용할 패키지와 npm run으로 시작할 명령을 기록합니다.',examples:['dependencies','scripts','engines'],foot:'프로젝트마다 1개',reuse:'구성'},
+          {id:'npm',x:34,y:20,w:124,detailW:140,kind:'concept',kicker:'명령 해석',title:'npm CLI',bodyHtml:'<button class="term-btn graph-term" data-concept-ref="package-json">package.json</button>을 읽어 설치할 패키지와 실행할 script를 결정합니다.',body:'package.json을 읽어 설치할 패키지와 실행할 script를 결정합니다.',examples:['npm install','npm run dev'],foot:'명령줄 도구',reuse:'현재'},
+          {id:'resolver',x:57,y:20,w:138,detailW:154,kind:'data',kicker:'버전 계산',title:'Dependency Resolver',body:'각 패키지의 버전 범위를 비교해 함께 설치 가능한 의존성 트리를 만듭니다.',examples:['^5.0.0','peerDependencies'],foot:'충돌 검사',reuse:'계산'},
+          {id:'registry',x:83,y:20,w:126,detailW:142,kind:'data',kicker:'패키지 저장소',title:'npm Registry',body:'패키지 파일과 버전·무결성 정보를 내려줍니다.',examples:['tarball','integrity hash'],foot:'registry.npmjs.org',reuse:'원격'},
+          {id:'modules',x:13,y:80,w:132,detailW:146,kind:'data',kicker:'설치 결과',title:'node_modules',body:'선택한 버전의 패키지 파일이 프로젝트에서 해석 가능한 구조로 놓입니다.',examples:['중복 버전 허용','package lock 기준'],foot:'로컬 파일',reuse:'결과'},
+          {id:'lock',x:38,y:80,w:138,detailW:154,kind:'data',kicker:'재현 기준',title:'package-lock.json',body:'실제로 선택된 정확한 버전과 무결성 값을 기록해 다음 설치를 재현합니다.',examples:['resolved','integrity'],foot:'자동 갱신',reuse:'기록'},
+          {id:'script',x:64,y:80,w:126,detailW:144,kind:'code',kicker:'실행 명령',title:'npm scripts',body:'scripts의 문자열을 운영체제 shell 명령으로 실행합니다.',examples:['vite --host','node server.js'],foot:'npm run',reuse:'자동화'},
+          {id:'node',x:89,y:80,w:126,detailW:142,kind:'concept',kicker:'실행 환경',title:'Node.js',bodyHtml:'JavaScript 파일은 <button class="term-btn graph-term" data-concept-ref="node-runtime">Node.js 런타임</button>의 새 프로세스에서 실행됩니다.',body:'JavaScript 파일은 Node.js 런타임의 새 프로세스에서 실행됩니다.',examples:['node server.js','process.env'],foot:'프로세스 시작',reuse:'8회'}
+        ], edges:[['manifest','npm','읽기'],['npm','resolver','버전 계산'],['resolver','registry','메타데이터 조회'],['registry','modules','패키지 내려받기'],['resolver','lock','정확한 버전 기록'],['npm','script','명령 선택'],['script','node','프로세스 실행']],
+        assets:[['package.json','{}','프로젝트 실행 기준','9'],['의존성 해석','◇','버전 범위와 충돌','4'],['npm Registry','R','패키지·무결성 정보','6'],['Node.js 런타임','JS','JavaScript 프로세스','8']],
+        selected:['프로그램','입력·처리·출력의 정의와 앱·서버·스크립트 예시를 1강의 개념 에셋에서 가져옵니다.','참조 내용 편집'],
+        steps:[['설정 읽기','npm CLI가 package.json의 dependencies와 scripts를 읽습니다.','등장'],['버전 결정','Resolver가 Registry의 메타데이터를 비교해 호환되는 버전을 고릅니다.','연결'],['설치 재현','패키지는 node_modules에 놓이고 정확한 결과는 package-lock.json에 기록됩니다.','개념 참조'],['명령 실행','npm run은 script를 골라 Node.js 프로세스로 JavaScript 파일을 시작합니다.','상호작용']],
+        viewer:{kicker:'설치와 실행 · 3/4',title:'npm은 <button class="term-btn" data-concept-ref="program">프로그램</button>을<br>설치하고 시작합니다.',intro:'설치할 때는 버전과 파일을 결정하고, 실행할 때는 package.json의 script를 Node.js 프로세스로 넘깁니다.',type:'recall'}
       },
       {
         id:'flow', title:'과정·데이터 흐름', short:'코드와 흐름을 함께 설명', audience:'코드 결과를 경로로 확인', document:'웹 요청은 어디로 갈까?', meta:'7강 · 슬라이드 4', mode:'코드와 데이터 흐름', hint:'140% · API 노드의 실제 코드가 읽기 좋게 펼쳐집니다',
-        producer:'방향, 순서, 강조 타이밍을 정합니다.', learnerGoal:'데이터가 오가는 길을 눈으로 따라갑니다.', learnerDescription:'각 단계에서 현재 이동 중인 요청만 선명해집니다. 이전 단계로 돌아가 경로를 반복해서 확인할 수 있습니다.',
+        producer:'방향, 순서, 강조 타이밍을 정합니다.',
         slides:['주소 입력','서버 요청','데이터 조회','응답 표시'],
         nodes:[
-          {id:'browser',x:17,y:34,w:118,detailW:130,kind:'concept',kicker:'출발',title:'Browser',body:'사용자의 요청을 보냅니다.',examples:['GET /users'],foot:'1단계',reuse:'화면'},
-          {id:'api',x:48,y:67,w:168,detailW:188,kind:'data',variant:'code',kicker:'코드 블록',title:'GET /users',body:'요청을 해석해 데이터 조회를 시작합니다.',code:'app.get("/users", async () => {\n  return db.users.findMany()\n})',foot:'2단계',reuse:'TypeScript'},
-          {id:'db',x:80,y:30,w:126,detailW:138,kind:'data',kicker:'데이터',title:'Database',body:'필요한 사용자 정보를 찾습니다.',examples:['users 테이블','id · name · role'],foot:'3단계',reuse:'저장소'},
-          {id:'response',x:81,y:76,w:126,detailW:142,kind:'data',kicker:'결과',title:'200 Response',body:'JSON 결과가 화면에 돌아옵니다.',examples:['[{ id: 1, name: "Mina" }]'],foot:'4단계',reuse:'응답'}
-        ], edges:[['browser','api','요청'],['api','db','조회'],['db','response','응답']],
-        assets:[['HTTP 요청','→','흐름 요소','4'],['Database','DB','데이터 노드','3'],['Response','200','응답 카드','5']],
+          {id:'browser',x:11,y:19,w:118,detailW:132,kind:'concept',kicker:'출발',title:'Browser',body:'URL, method, header를 HTTP 요청으로 조립합니다.',examples:['GET /users?active=true','Accept: application/json'],foot:'사용자 기기',reuse:'화면'},
+          {id:'dns',x:33,y:19,w:118,detailW:132,kind:'data',kicker:'주소 찾기',title:'DNS',body:'도메인 이름을 서버가 사용하는 IP 주소로 바꿉니다.',examples:['api.example.com → 203.0.113.7'],foot:'캐시 우선',reuse:'네트워크'},
+          {id:'tls',x:56,y:19,w:126,detailW:142,kind:'data',kicker:'연결 보호',title:'TCP + TLS',body:'서버와 연결하고 인증서를 확인한 뒤 요청 내용을 암호화합니다.',examples:['TLS handshake','암호화된 byte stream'],foot:'HTTPS',reuse:'보안'},
+          {id:'router',x:82,y:19,w:132,detailW:148,kind:'data',kicker:'경로 선택',title:'Router',body:'method와 path가 일치하는 handler를 찾습니다.',examples:['GET + /users'],foot:'서버 진입',reuse:'라우팅'},
+          {id:'middleware',x:18,y:81,w:132,detailW:148,kind:'concept',kicker:'공통 검사',title:'Middleware',body:'인증 토큰, 입력 형식, 요청 제한을 handler보다 먼저 검사합니다.',examples:['401 Unauthorized','400 Bad Request'],foot:'실패 시 즉시 응답',reuse:'검증'},
+          {id:'api',x:45,y:81,w:168,detailW:190,kind:'data',variant:'code',kicker:'업무 처리',title:'GET /users',body:'검증된 조건으로 사용자 조회를 시작합니다.',code:'app.get("/users", auth, async (req) => {\n  return users.find({ active: true })\n})',foot:'handler',reuse:'TypeScript'},
+          {id:'cache',x:69,y:81,w:126,detailW:142,kind:'data',kicker:'빠른 조회',title:'Cache',body:'같은 조건의 최신 결과가 있으면 데이터베이스 조회를 생략합니다.',examples:['cache hit','TTL 60초'],foot:'선택 경로',reuse:'성능'},
+          {id:'db',x:90,y:81,w:126,detailW:142,kind:'data',kicker:'영속 데이터',title:'Database',body:'조건과 index를 이용해 필요한 행만 찾아 반환합니다.',examples:['WHERE active = true','index scan'],foot:'원본 데이터',reuse:'저장소'}
+        ], edges:[['browser','dns','이름 조회'],['dns','tls','IP 연결'],['tls','router','HTTP 전달'],['router','middleware','검사'],['middleware','api','통과'],['api','cache','먼저 조회'],['cache','db','없으면 조회'],['db','api','결과 반환'],['api','browser','200 JSON']],
+        assets:[['HTTP 요청','→','method·path·header','4'],['Middleware','M','인증·검증·제한','5'],['Cache','C','hit·miss·TTL','4'],['Database','DB','조건·index·행','3']],
         selected:['HTTP 요청','연결선의 방향과 강조 시간을 편집합니다. 학습 화면에서는 현재 단계의 경로만 파란색으로 표시됩니다.','흐름 애니메이션 편집'],
-        steps:[['요청 시작','Browser에서 요청이 출발합니다.','강조'],['API 처리','서버가 요청을 해석합니다.','이동'],['데이터 조회','Database에서 정보를 찾습니다.','조회'],['응답 도착','결과가 화면으로 돌아옵니다.','완료']],
-        outcomes:['현재 이동 중인 데이터만 색으로 구분합니다.','이전·다음으로 요청과 응답을 반복 확인합니다.'],
-        viewer:{kicker:'요청의 여정 · 2/4',title:'브라우저의 요청은<br>어디를 거칠까요?',intro:'다음을 누르면 요청이 이동한 구간이 파란색으로 이어집니다.',type:'flow',diagram:[['Browser',13,50],['API',38,50],['DB',63,50],['Response',87,50]]}
+        steps:[['주소와 요청 조립','브라우저가 URL을 해석하고 GET 요청과 header를 만듭니다.','강조'],['연결과 암호화','DNS로 IP를 찾고 TCP·TLS 연결을 맺습니다.','이동'],['경로와 권한 확인','Router가 handler를 고르고 Middleware가 인증과 입력을 검사합니다.','검증'],['캐시 먼저 확인','같은 조건의 최신 결과가 있으면 데이터베이스 조회를 건너뜁니다.','분기'],['데이터 조회','캐시에 없으면 index를 이용해 필요한 사용자 행을 찾습니다.','조회'],['응답 도착','서버가 200 JSON을 만들고 암호화된 연결로 브라우저에 돌려줍니다.','완료']],
+        viewer:{kicker:'요청의 여정 · 2/6',title:'한 번의 GET 요청도<br>검사와 분기를 거칩니다.',intro:'브라우저는 서버에 바로 닿지 않습니다. 주소 확인과 암호화 뒤 Router·Middleware를 지나고, Cache 결과가 없을 때만 Database를 조회합니다.',type:'flow',diagram:[['Browser',10,50],['DNS',26,50],['TLS',42,50],['Router',58,50],['Cache',74,50],['DB',90,50]]}
       },
       {
         id:'media', title:'미디어 보충 설명', short:'음성·영상을 단계에 맞춤', audience:'보면서 듣고 확인', document:'이벤트 루프를 눈으로 보기', meta:'8강 · 슬라이드 2', mode:'미디어 보충', hint:'도형 설명에 짧은 영상과 자막을 동기화',
-        producer:'영상, 음성, 자막의 시작점을 맞춥니다.', learnerGoal:'다이어그램을 보며 짧은 설명을 듣습니다.', learnerDescription:'영상이 설명을 대신하지 않고 현재 다이어그램을 보충합니다. 음소거 상태에서도 자막으로 같은 내용을 이해할 수 있습니다.',
+        producer:'영상, 음성, 자막의 시작점을 맞춥니다.',
         slides:['호출 스택','Web API','작업 큐','이벤트 루프'],
         nodes:[
           {id:'stack',x:20,y:27,w:138,detailW:150,kind:'data',variant:'code',kicker:'코드 상태',title:'Call Stack',body:'현재 실행 중인 작업입니다.',code:'readFile()\nrender()',foot:'코드 노드',reuse:'실행 중'},
@@ -490,12 +500,11 @@
         assets:[['설명 영상','▶','42초 · 자막 있음','1'],['내레이션','♫','한국어 · 31초','1'],['Event Loop','∞','개념 · 3개 강의','3']],
         selected:['42초 설명 영상','3단계가 시작되는 00:18부터 재생됩니다. 자막과 대체 텍스트를 함께 편집할 수 있습니다.','미디어 타이밍 편집'],
         steps:[['스택 확인','현재 실행 상태를 봅니다.','도형'],['루프 연결','작업 이동 관계를 엽니다.','연결'],['영상 재생','00:18 구간을 재생합니다.','영상·자막'],['핵심 정리','영상 뒤 도형으로 돌아옵니다.','복귀']],
-        outcomes:['재생 버튼으로 필요한 설명만 봅니다.','자막을 켠 채 도형과 설명을 함께 확인합니다.'],
-        viewer:{kicker:'보충 설명 · 3/4',title:'작업이 이동하는<br>순간을 확인해 보세요.',intro:'짧은 영상이 Event Loop의 움직임을 보충합니다. 재생해도 강의 단계는 그대로 유지됩니다.',type:'media'}
+        viewer:{kicker:'보충 설명 · 3/4',title:'Event Loop는 스택이 빌 때<br>callback을 이동시킵니다.',intro:'파일 읽기는 libuv가 처리하고, 완료된 callback은 Queue에서 기다립니다. Event Loop는 Call Stack이 빈 순간에만 다음 callback을 올립니다.',type:'media'}
       },
       {
         id:'check', title:'복습·이해 확인', short:'질문과 피드백을 배치', audience:'답하고 개념으로 돌아가기', document:'Node.js 핵심 정리', meta:'9강 · 마지막 슬라이드', mode:'이해 확인', hint:'정답보다 다시 볼 개념을 연결',
-        producer:'질문, 선택지, 피드백 경로를 만듭니다.', learnerGoal:'직접 답하고 필요한 개념만 다시 봅니다.', learnerDescription:'짧은 질문으로 이해를 확인하고, 틀린 경우 정답만 보여 주는 대신 복습할 개념과 단계를 안내합니다.',
+        producer:'질문, 선택지, 피드백 경로를 만듭니다.',
         slides:['핵심 요약','관계 복습','이해 확인','다음 강의'],
         nodes:[
           {id:'question',x:27,y:48,w:170,kind:'question',kicker:'확인 질문',title:'npm은 어디서 실행될까요?',body:'학습자가 하나의 답을 고릅니다.',foot:'선택형',reuse:'필수'},
@@ -505,21 +514,74 @@
         assets:[['선택형 질문','?','상호작용','2'],['정답 피드백','✓','설명 카드','2'],['프로그램','P','1강 · 개념','12']],
         selected:['선택형 질문','정답과 오답 피드백을 각각 연결합니다. 오답에는 다시 볼 개념이나 강의 단계를 지정할 수 있습니다.','질문과 피드백 편집'],
         steps:[['핵심 요약','세 가지 개념을 다시 봅니다.','요약'],['질문 제시','선택지를 학습자에게 엽니다.','질문'],['즉시 피드백','선택에 맞는 설명을 보여 줍니다.','분기'],['다음 학습 안내','필요한 복습 경로를 제안합니다.','이동']],
-        outcomes:['선택 즉시 이유가 포함된 피드백을 봅니다.','오답이면 관련 개념으로 바로 돌아갑니다.'],
         viewer:{kicker:'이해 확인 · 3/4',title:'npm은 어디에서<br>실행될까요?',intro:'가장 알맞은 답을 하나 골라 보세요.',type:'quiz'}
       }
     ];
 
-    const state = {scenario:0, role:'producer', step:1, playing:false, zoom:100, childView:'inside', childPopover:false, childDetail:null, viewerChildOpen:false, viewerChildDetail:null, composedParts:[], lastComposeAction:'', selectedClusterId:null, clusterInspectId:null, clusterNames:{}, clusterMemberOverrides:{}, clusterStatus:''};
+    const previewParams = new URLSearchParams(location.search);
+    const initialScenario = Math.max(0,scenarios.findIndex(item=>item.id===previewParams.get('scenario')));
+    const initialRole = previewParams.get('role')==='learner'?'learner':'producer';
+    const initialZoom = [60,100,140].includes(Number(previewParams.get('zoom')))?Number(previewParams.get('zoom')):100;
+    const initialChildView = ['inside','around','popover','focus'].includes(previewParams.get('child'))?previewParams.get('child'):'inside';
+    const state = {scenario:initialScenario, role:initialRole, step:1, playing:false, zoom:initialZoom, childView:initialChildView, childPopover:false, childDetail:null, viewerChildOpen:false, viewerChildDetail:null, composedParts:[], lastComposeAction:'', selectedClusterId:null, clusterInspectId:null, clusterNames:{}, clusterMemberOverrides:{}, clusterStatus:''};
     const partLabels = {text:'설명 문단',child:'하위 노드',image:'이미지',code:'코드 블록',example:'예시 목록'};
     const partParticles = {text:'을',child:'를',image:'를',code:'을',example:'을'};
     const childDetails = {
       npm:{title:'npm',role:'Node.js / 패키지 관리',description:'Node.js 프로젝트가 사용하는 패키지를 설치하고, package.json에 적어 둔 명령을 실행합니다.',examples:['npm install · 패키지 설치','npm run dev · 개발 명령 실행']},
       npx:{title:'npx',role:'Node.js / 명령 실행',description:'패키지를 프로젝트에 계속 설치하지 않고도 필요한 명령을 한 번 실행할 수 있게 돕습니다.',examples:['npx vite · 개발 도구 실행','npx create-vite · 프로젝트 만들기']}
     };
+    const conceptCatalog = {
+      program:{title:'프로그램',path:'1강 · 컴퓨터가 일을 실행하는 방식',description:'입력을 받아 정해진 규칙에 따라 처리하고 결과를 내도록 작성한 명령과 데이터의 묶음입니다.',examples:['앱 · 사용자의 조작에 반응합니다.','서버 · 요청을 기다리며 계속 실행됩니다.','스크립트 · 정해 둔 작업을 자동화합니다.']},
+      'package-json':{title:'package.json',path:'4강 · Node.js 프로젝트의 구성',description:'프로젝트 이름, 사용할 패키지, 실행 명령을 JSON 형식으로 기록한 파일입니다. npm은 이 파일을 읽어 설치와 실행을 결정합니다.',examples:['dependencies · 실행에 필요한 패키지','scripts · npm run으로 시작할 명령','engines · 지원하는 Node.js 버전']},
+      'node-runtime':{title:'Node.js 런타임',path:'3강 · JavaScript가 브라우저 밖에서 실행되는 과정',description:'V8 엔진과 운영체제 기능을 연결해 JavaScript가 파일, 네트워크, 프로세스를 다룰 수 있게 하는 실행 환경입니다.',examples:['V8 · JavaScript 코드 실행','libuv · 파일·네트워크 작업 조율','Node API · fs, http, process 제공']}
+    };
     const $ = (selector) => document.querySelector(selector);
     const $$ = (selector) => [...document.querySelectorAll(selector)];
     const escapeHtml = (value) => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    let activeConceptTrigger = null;
+    let suppressConceptFocus = false;
+
+    function positionConceptPreview() {
+      const popover=$('#conceptPopover');
+      if(!activeConceptTrigger||popover.hidden) return;
+      const anchor=activeConceptTrigger.getBoundingClientRect(), gap=8, margin=12;
+      const width=popover.offsetWidth, height=popover.offsetHeight;
+      let placement='bottom', top=anchor.bottom+gap;
+      if(top+height>window.innerHeight-margin){placement='top';top=anchor.top-height-gap;}
+      top=Math.max(margin,Math.min(top,window.innerHeight-height-margin));
+      const left=Math.max(margin,Math.min(anchor.left,window.innerWidth-width-margin));
+      const arrow=Math.max(14,Math.min(anchor.left+anchor.width/2-left-5,width-24));
+      popover.dataset.placement=placement; popover.style.left=`${left}px`; popover.style.top=`${top}px`; popover.style.setProperty('--arrow-x',`${arrow}px`);
+    }
+
+    function closeConceptPreview(returnFocus=false) {
+      const popover=$('#conceptPopover');
+      popover.hidden=true;
+      const trigger=activeConceptTrigger;
+      if(trigger)trigger.setAttribute('aria-expanded','false');
+      activeConceptTrigger=null;
+      if(returnFocus&&trigger){suppressConceptFocus=true;trigger.focus({preventScroll:true});requestAnimationFrame(()=>suppressConceptFocus=false);}
+    }
+
+    function openConceptPreview(trigger) {
+      const concept=conceptCatalog[trigger.dataset.conceptRef];
+      if(!concept) return;
+      if(activeConceptTrigger&&activeConceptTrigger!==trigger) activeConceptTrigger.setAttribute('aria-expanded','false');
+      activeConceptTrigger=trigger; trigger.setAttribute('aria-expanded','true');
+      $('#conceptPath').textContent=concept.path; $('#conceptTitle').textContent=concept.title; $('#conceptDescription').textContent=concept.description;
+      $('#conceptExamples').innerHTML=concept.examples.map(example=>`<li>${escapeHtml(example)}</li>`).join('');
+      const popover=$('#conceptPopover'); popover.hidden=false; requestAnimationFrame(positionConceptPreview);
+    }
+
+    function bindConceptReferences(root=document) {
+      root.querySelectorAll('[data-concept-ref]').forEach(trigger=>{
+        trigger.setAttribute('aria-haspopup','dialog'); trigger.setAttribute('aria-expanded','false');
+        trigger.addEventListener('pointerdown',event=>event.stopPropagation());
+        trigger.addEventListener('click',event=>{event.stopPropagation();openConceptPreview(trigger);});
+        trigger.addEventListener('focus',()=>{if(!suppressConceptFocus)openConceptPreview(trigger);});
+        trigger.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse')openConceptPreview(trigger);});
+      });
+    }
 
     function renderScenarioStrip() {
       $('#scenarioStrip').innerHTML = scenarios.map((s,i) => `<button class="scenario-card ${i===state.scenario?'active':''}" data-scenario="${i}"><b class="scenario-no">0${i+1}</b><strong>${escapeHtml(s.title)}</strong><span>만들기 · ${escapeHtml(s.short)}</span><span class="audience">보기 · ${escapeHtml(s.audience)}</span></button>`).join('');
@@ -535,7 +597,7 @@
       if(n.variant==='video') html+=`<span class="node-media-preview video"><b>▶</b><small>00:42 · CC</small></span>`;
       if(n.variant==='image') html+=`<span class="node-media-preview image"><b>▧</b><small>PNG · 설명 포함</small></span>`;
       if(n.code) html+=`<pre class="node-code"><code>${escapeHtml(n.code)}</code></pre>`;
-      if(n.children && (state.scenario!==0 || state.childView==='inside')) html+=`<span class="node-children"><span class="node-children-label"><span>하위 도구 ${n.children.length}개</span><b>눌러서 자세히 보기</b></span>${n.children.map(child=>`<button class="child-node ${clusterIncludes(`child-${child}`)?'cluster-member-highlight':''}" data-child-detail="${escapeHtml(child)}" aria-label="${escapeHtml(child)} 상세 보기"><strong>${escapeHtml(child)}</strong><small>자세히 보기 →</small></button>`).join('')}</span>`;
+      if(n.children && (state.scenario!==0 || state.childView==='inside')) html+=`<span class="node-children"><span class="node-children-label"><span>하위 도구 ${n.children.length}개</span></span>${n.children.map(child=>`<button class="child-node ${clusterIncludes(`child-${child}`)?'cluster-member-highlight':''}" data-child-detail="${escapeHtml(child)}" aria-label="${escapeHtml(child)} 상세 보기"><strong>${escapeHtml(child)}</strong><small>역할 보기 →</small></button>`).join('')}</span>`;
       if(n.id==='node' && state.scenario===0 && state.childView==='popover') html+='<span class="child-trigger-badge">＋ 하위 노드 2개 · 호버/클릭</span>';
       if(n.id==='node' && state.scenario===0 && state.composedParts.length) html+=`<span class="composed-parts">${state.composedParts.map(part=>`<i>＋ ${escapeHtml(partLabels[part])}</i>`).join('')}</span>`;
       if(n.examples) html+=`<span class="node-detail"><strong>상세 내용과 예시</strong><span class="example-list">${n.examples.map(example=>`<i>${escapeHtml(example)}</i>`).join('')}</span></span>`;
@@ -604,9 +666,9 @@
     }
 
     function baseNodeMarkup(n,i,overrides={}) {
-      const x=overrides.x??n.x, y=overrides.y??n.y, width=overrides.w??(state.zoom===140?(n.detailW||n.w):n.w);
+      const x=overrides.x??n.x, y=overrides.y??(state.zoom===140&&n.y<40?n.y+12:n.y), width=overrides.w??(state.zoom===140?(n.detailW||n.w):n.w);
       const extraClass=(n.id==='node'&&state.scenario===0?' drop-target':'')+(clusterIncludes(n.id)?' cluster-member-highlight':'');
-      return `<article tabindex="0" role="button" aria-label="${escapeHtml(n.title)} 노드" class="node diagram-item${extraClass} ${i===state.step?'selected':i>state.step+1?'dimmed':''}" data-node-id="${n.id}" data-kind="${n.kind}" data-variant="${n.variant||'standard'}" style="left:${x}%;top:${y}%;--w:${width}px"><span class="node-kicker">${escapeHtml(n.kicker)}</span>${n.variant==='video'||n.variant==='image'?nodeExtras({...n,code:null,children:null,examples:null}):''}<h3>${escapeHtml(n.title)}</h3><p>${escapeHtml(n.body)}</p>${n.variant==='video'||n.variant==='image'?nodeExtras({...n,variant:null}):nodeExtras(n)}<span class="node-foot"><span>${escapeHtml(n.foot)}</span><b>${escapeHtml(n.reuse)}</b></span></article>`;
+      return `<article tabindex="0" role="button" aria-label="${escapeHtml(n.title)} 노드" class="node diagram-item${extraClass} ${i===state.step?'selected':i>state.step+1?'dimmed':''}" data-node-id="${n.id}" data-kind="${n.kind}" data-variant="${n.variant||'standard'}" style="left:${x}%;top:${y}%;--w:${width}px"><span class="node-kicker">${escapeHtml(n.kicker)}</span>${n.variant==='video'||n.variant==='image'?nodeExtras({...n,code:null,children:null,examples:null}):''}<h3>${escapeHtml(n.title)}</h3><p>${n.bodyHtml||escapeHtml(n.body)}</p>${n.variant==='video'||n.variant==='image'?nodeExtras({...n,variant:null}):nodeExtras(n)}<span class="node-foot"><span>${escapeHtml(n.foot)}</span><b>${escapeHtml(n.reuse)}</b></span></article>`;
     }
 
     function childNodeMarkup(id,title,description,x,y,w=88) {
@@ -624,9 +686,9 @@
         const parent=s.nodes.find(n=>n.id==='node');
         return `<div class="focus-frame"><div class="focus-frame-head"><span>실행 구조 / <b>Node.js 하위 구조</b></span><button id="closeFocus" aria-label="집중 보기 닫기">×</button></div></div>${baseNodeMarkup({...parent,children:null},1,{x:50,y:31,w:184})}${childNodeMarkup('child-npm','npm','패키지 설치·실행',35,69,112)}${childNodeMarkup('child-npx','npx','일회성 명령 실행',65,69,112)}${childDetailMarkup(state.childDetail)}`;
       }
-      let html=s.nodes.map((n,i)=>baseNodeMarkup(n,i,n.id==='node'&&state.childView==='inside'&&state.composedParts.length?{y:41}:{})).join('');
+      let html=s.nodes.map((n,i)=>baseNodeMarkup(n,i,n.id==='node'&&state.childView==='inside'&&state.composedParts.length?{y:70}:{})).join('');
       if(state.childView==='around') html+=childNodeMarkup('child-npm','npm','패키지 설치·실행',29,70)+childNodeMarkup('child-npx','npx','일회성 명령 실행',71,70);
-      if(state.childView==='popover'&&state.childPopover) html+=`<aside class="child-popover-panel" id="childPopoverPanel"><div class="child-popover-head"><strong>Node.js의 하위 노드</strong><button id="closeChildPopover" aria-label="하위 노드 닫기">×</button></div><p>각 항목을 누르면 설명과 예시를 볼 수 있습니다.</p><div class="child-popover-list"><button data-child-detail="npm">npm<br><small>패키지 관리 · 자세히 →</small></button><button data-child-detail="npx">npx<br><small>명령 실행 · 자세히 →</small></button></div></aside>`;
+      if(state.childView==='popover'&&state.childPopover) html+=`<aside class="child-popover-panel" id="childPopoverPanel"><div class="child-popover-head"><strong>Node.js의 하위 노드</strong><button id="closeChildPopover" aria-label="하위 노드 닫기">×</button></div><div class="child-popover-list"><button data-child-detail="npm">npm<br><small>패키지 관리 →</small></button><button data-child-detail="npx">npx<br><small>명령 실행 →</small></button></div></aside>`;
       html+=childDetailMarkup(state.childDetail);
       return html;
     }
@@ -725,7 +787,7 @@
       $('#assetList').innerHTML=s.assets.map((a,i)=>`<button class="asset ${i===0?'active':''}"><b class="asset-icon">${escapeHtml(a[1])}</b><span><strong>${escapeHtml(a[0])}</strong><small>${escapeHtml(a[2])}</small></span><i class="asset-count">${escapeHtml(a[3])}</i></button>`).join('');
       if(s.id==='concept'){
         const parts=[['text','T','설명'],['child','◇','하위 노드'],['image','▧','이미지'],['code','</>','코드'],['example','≡','예시']];
-        $('#selectedAsset').innerHTML=`<p class="label">Node.js 구성하기</p><h4>노드 부품을 끌어다 놓으세요</h4><p>내용을 먼저 조합한 뒤 위쪽에서 하위 노드 표현 방식을 고릅니다. 클릭으로도 추가할 수 있습니다.</p><div class="part-palette">${parts.map(part=>`<button class="part-item" data-part="${part[0]}"><b>${part[1]}</b>${part[2]}</button>`).join('')}</div><div class="compose-help">1. 부품을 Node.js로 드래그<br>2. 하위 노드 표현 방식 선택<br>3. 설명 순서에서 등장 시점 지정</div><div class="compose-list">${state.composedParts.map(part=>`<span class="compose-chip">${escapeHtml(partLabels[part])}<button data-remove-part="${part}" aria-label="${escapeHtml(partLabels[part])} 제거">×</button></span>`).join('')}</div><div class="compose-status">${escapeHtml(state.lastComposeAction||'Node.js 노드가 드롭 영역으로 동작합니다.')}</div>`;
+        $('#selectedAsset').innerHTML=`<p class="label">Node.js 구성</p><h4>내용 부품</h4><div class="part-palette">${parts.map(part=>`<button class="part-item" data-part="${part[0]}" title="Node.js에 추가"><b>${part[1]}</b>${part[2]}</button>`).join('')}</div><div class="compose-list">${state.composedParts.map(part=>`<span class="compose-chip">${escapeHtml(partLabels[part])}<button data-remove-part="${part}" aria-label="${escapeHtml(partLabels[part])} 제거">×</button></span>`).join('')}</div><div class="compose-status">${escapeHtml(state.lastComposeAction||'아직 추가한 부품이 없습니다.')}</div>`;
         $$('.part-item').forEach(item=>{
           item.addEventListener('pointerdown',event=>{
             if(event.button!==0) return;
@@ -766,9 +828,9 @@
     }
 
     function renderEditor(s) {
-      const childHints={inside:'하위 노드를 눌러 설명과 예시를 더 볼 수 있습니다',around:'npm·npx를 주변에 펼쳐 관계를 비교합니다',popover:'Node.js에 호버하거나 클릭해 필요한 순간에 엽니다',focus:'다른 관계를 접고 하위 구조만 집중해서 봅니다'};
+      const childHints={inside:'Node.js 안에 하위 도구 표시',around:'npm·npx를 주변 노드로 표시',popover:'하위 도구를 접은 상태',focus:'Node.js 하위 구조에 집중'};
       const hints={60:`60% · 앱이 ${s.nodes.length}개 노드에서 ${suggestedClusters(s).length}개 묶음을 제안했습니다`,100:s.id==='concept'?childHints[state.childView]:s.hint,140:s.id==='concept'?`${childHints[state.childView]} · 상세 정보 펼침`:'140% · 예시·코드·미디어 정보까지 펼쳤습니다'};
-      $('#canvasMode').textContent=`${s.mode} · ${state.zoom===60?'전체 보기':state.zoom===140?'상세 보기':'기본 보기'}`; $('#canvasHint').textContent=hints[state.zoom]; renderChildModeBar(s); renderSlides(s); renderNodes(s); renderAssets(s); renderSteps(s);
+      $('#canvasMode').textContent=`${s.mode} · ${state.zoom===60?'전체 보기':state.zoom===140?'상세 보기':'기본 보기'}`; $('#canvasHint').textContent=hints[state.zoom]; renderChildModeBar(s); renderSlides(s); renderNodes(s); renderAssets(s); renderSteps(s); bindConceptReferences($('#producerSurface'));
     }
 
     function setZoom(value) {
@@ -785,10 +847,10 @@
     }
 
     function conceptViewer(s) {
-      if(state.childView==='inside') return `<div class="viewer-diagram"><div class="viewer-parent-node"><strong>Node.js</strong><em>하위 도구 · 눌러서 자세히 보기</em><small><button class="viewer-nested-child" data-viewer-child-detail="npm"><b>npm</b><i>설명 열기 →</i></button><button class="viewer-nested-child" data-viewer-child-detail="npx"><b>npx</b><i>설명 열기 →</i></button></small></div>${viewerChildDetailMarkup(state.viewerChildDetail)}</div><div class="explain-card">하위 도구의 이름을 누르면 현재 화면에서 역할과 사용 예시를 더 볼 수 있습니다.</div>`;
-      if(state.childView==='around') return `<div class="viewer-diagram"><span class="v-node hot" style="left:50%;top:34%">Node.js</span><i class="v-line hot" style="left:41%;top:45%;width:18%;transform:rotate(125deg)"></i><i class="v-line hot" style="left:52%;top:47%;width:20%;transform:rotate(55deg)"></i><button class="v-node hot" data-viewer-child-detail="npm" style="left:28%;top:72%">npm<br><small>자세히 →</small></button><button class="v-node hot" data-viewer-child-detail="npx" style="left:72%;top:72%">npx<br><small>자세히 →</small></button>${viewerChildDetailMarkup(state.viewerChildDetail)}</div><div class="explain-card">주변에 펼친 하위 노드를 누르면 각각의 역할과 예시를 확인할 수 있습니다.</div>`;
-      if(state.childView==='popover') return `<div class="viewer-diagram"><button class="viewer-child-trigger" id="viewerChildTrigger">Node.js<br><small>탭해서 하위 노드 보기</small></button>${state.viewerChildOpen&&!state.viewerChildDetail?'<aside class="viewer-child-sheet"><header><b>Node.js의 하위 도구</b><button id="closeViewerChildren">×</button></header><div><button class="viewer-child-option" data-viewer-child-detail="npm">npm<br><small>패키지 관리 · 자세히 →</small></button><button class="viewer-child-option" data-viewer-child-detail="npx">npx<br><small>명령 실행 · 자세히 →</small></button></div></aside>':''}${viewerChildDetailMarkup(state.viewerChildDetail)}</div><div class="explain-card">필요한 순간에만 하위 정보를 열고, 원하는 항목을 눌러 더 자세히 봅니다.</div>`;
-      return `<div class="viewer-focus-wrap"><div class="viewer-focus-card"><small>실행 구조 / Node.js</small><h4>Node.js의 하위 도구</h4><div class="viewer-focus-children"><button data-viewer-child-detail="npm"><b>npm</b>패키지를 설치하고 실행합니다.<br><small>자세히 보기 →</small></button><button data-viewer-child-detail="npx"><b>npx</b>패키지 명령을 한 번 실행합니다.<br><small>자세히 보기 →</small></button></div></div>${viewerChildDetailMarkup(state.viewerChildDetail)}</div><div class="explain-card">상위 맥락을 잠시 접고 하위 구조에 집중합니다.</div>`;
+      if(state.childView==='inside') return `<div class="viewer-diagram"><span class="v-node compact hot" style="left:16%;top:16%">V8<br><small>코드 실행</small></span><span class="v-node compact hot" style="left:84%;top:16%">Call Stack<br><small>함수 순서</small></span><span class="v-node compact ${state.step>1?'hot':''}" style="left:16%;top:84%">libuv<br><small>I/O 처리</small></span><span class="v-node compact ${state.step>2?'hot':''}" style="left:84%;top:84%">Event Loop<br><small>다음 callback</small></span><i class="v-line hot" style="left:26%;top:18%;width:48%;transform:rotate(0deg)"></i><i class="v-line ${state.step>1?'hot':''}" style="left:22%;top:29%;width:46%;transform:rotate(57deg)"></i><i class="v-line ${state.step>2?'hot':''}" style="left:26%;top:84%;width:48%;transform:rotate(0deg)"></i><div class="viewer-parent-node"><strong>Node.js</strong><em>V8 + 운영체제 기능</em><small><button class="viewer-nested-child" data-viewer-child-detail="npm"><b>npm</b><i>패키지 관리 →</i></button><button class="viewer-nested-child" data-viewer-child-detail="npx"><b>npx</b><i>명령 실행 →</i></button></small></div>${viewerChildDetailMarkup(state.viewerChildDetail)}</div>`;
+      if(state.childView==='around') return `<div class="viewer-diagram"><span class="v-node hot" style="left:50%;top:34%">Node.js</span><i class="v-line hot" style="left:41%;top:45%;width:18%;transform:rotate(125deg)"></i><i class="v-line hot" style="left:52%;top:47%;width:20%;transform:rotate(55deg)"></i><button class="v-node hot" data-viewer-child-detail="npm" style="left:28%;top:72%">npm<br><small>패키지 관리 →</small></button><button class="v-node hot" data-viewer-child-detail="npx" style="left:72%;top:72%">npx<br><small>명령 실행 →</small></button>${viewerChildDetailMarkup(state.viewerChildDetail)}</div>`;
+      if(state.childView==='popover') return `<div class="viewer-diagram"><button class="viewer-child-trigger" id="viewerChildTrigger">Node.js<br><small>하위 도구 2개 ⌄</small></button>${state.viewerChildOpen&&!state.viewerChildDetail?'<aside class="viewer-child-sheet"><header><b>Node.js의 하위 도구</b><button id="closeViewerChildren">×</button></header><div><button class="viewer-child-option" data-viewer-child-detail="npm">npm<br><small>패키지 관리 →</small></button><button class="viewer-child-option" data-viewer-child-detail="npx">npx<br><small>명령 실행 →</small></button></div></aside>':''}${viewerChildDetailMarkup(state.viewerChildDetail)}</div>`;
+      return `<div class="viewer-focus-wrap"><div class="viewer-focus-card"><small>실행 구조 / Node.js</small><h4>Node.js의 하위 도구</h4><div class="viewer-focus-children"><button data-viewer-child-detail="npm"><b>npm</b>패키지의 버전을 결정하고 설치합니다.<br><small>구조 보기 →</small></button><button data-viewer-child-detail="npx"><b>npx</b>패키지의 실행 파일을 한 번 호출합니다.<br><small>구조 보기 →</small></button></div></div>${viewerChildDetailMarkup(state.viewerChildDetail)}</div>`;
     }
 
     function viewerDiagram(s) {
@@ -801,27 +863,24 @@
       const v=s.viewer;
       if(v.type==='diagram') return s.id==='concept'?conceptViewer(s):viewerDiagram(s);
       if(v.type==='flow') return viewerDiagram(s)+`<pre class="viewer-code">fetch('/users')\n  → GET /users\n  → 200 JSON</pre>`;
-      if(v.type==='recall') return `<div class="viewer-diagram"><span class="v-node hot" style="left:17%;top:52%">npm</span><i class="v-line hot" style="left:28%;top:52%;width:22%"></i><span class="v-node hot" style="left:51%;top:52%">Node.js</span><i class="v-line ${state.step>1?'hot':''}" style="left:62%;top:52%;width:19%"></i><span class="v-node ${state.step>1?'hot':''}" style="left:83%;top:52%">프로그램</span></div><div class="explain-card">Node.js는 <button class="term-btn" id="inlineTermButton">프로그램</button>의 한 종류입니다. 개념을 눌러 이전 설명을 잠깐 확인할 수 있습니다.</div>`;
-      if(v.type==='media') return `<div class="media-box"><button class="media-play" id="mediaPlay" aria-label="영상 재생">${state.playing?'Ⅱ':'▶'}</button><span class="media-caption">${state.playing?'작업 큐의 첫 항목을 비어 있는 호출 스택으로 옮깁니다.':'자막을 켜고 42초 설명을 재생해 보세요.'}</span></div><div class="media-track"><i style="width:${state.playing?'64':'36'}%"></i></div><div class="explain-card">영상이 끝나면 같은 단계의 다이어그램으로 돌아와 관계를 다시 확인합니다.</div>`;
+      if(v.type==='recall') return `<div class="viewer-diagram"><span class="v-node compact hot" style="left:50%;top:16%">package.json</span><i class="v-line hot" style="left:47%;top:23%;width:39%;transform:rotate(140deg)"></i><i class="v-line ${state.step>0?'hot':''}" style="left:53%;top:23%;width:39%;transform:rotate(40deg)"></i><span class="v-node compact hot" style="left:18%;top:47%">npm CLI</span><span class="v-node compact ${state.step>0?'hot':''}" style="left:82%;top:47%">Registry</span><i class="v-line ${state.step>1?'hot':''}" style="left:18%;top:55%;width:27%;transform:rotate(90deg)"></i><i class="v-line ${state.step>1?'hot':''}" style="left:82%;top:55%;width:27%;transform:rotate(90deg)"></i><span class="v-node compact ${state.step>1?'hot':''}" style="left:18%;top:82%">Node.js</span><span class="v-node compact ${state.step>1?'hot':''}" style="left:82%;top:82%">의존성 트리</span><i class="v-line ${state.step>2?'hot':''}" style="left:70%;top:82%;width:40%;transform:rotate(180deg)"></i><span class="v-node compact ${state.step>2?'hot':''}" style="left:50%;top:82%">node_modules</span></div><div class="explain-card">npm CLI는 <button class="term-btn" data-concept-ref="package-json">package.json</button>을 읽고 Registry에서 버전을 고른 뒤 패키지를 설치합니다. scripts에 적힌 명령은 <button class="term-btn" data-concept-ref="node-runtime">Node.js 런타임</button>에 전달합니다.</div>`;
+      if(v.type==='media') return `<div class="media-box"><button class="media-play" id="mediaPlay" aria-label="영상 재생">${state.playing?'Ⅱ':'▶'}</button><span class="media-caption">${state.playing?'Event Loop가 빈 스택을 확인한 뒤 Queue의 callback을 올립니다.':'파일 읽기는 libuv가 처리하고 JavaScript 실행은 멈추지 않습니다.'}</span></div><div class="media-track"><i style="width:${state.playing?'64':'36'}%"></i></div><div class="explain-card">비동기 작업의 완료와 callback의 실행은 같은 순간이 아닙니다. 완료된 callback도 Call Stack이 빌 때까지 Queue에서 기다립니다.</div>`;
       return `<div class="quiz"><button data-answer="wrong">① 브라우저 안에서만</button><button data-answer="correct">② Node.js 실행 환경에서</button><button data-answer="wrong">③ 데이터베이스 안에서</button></div><div class="feedback" id="feedback" hidden></div>`;
     }
 
     function renderViewer(s) {
-      $('#learnerGoal').textContent=s.learnerGoal; $('#learnerDescription').textContent=s.learnerDescription;
-      $('#outcomes').innerHTML=s.outcomes.map((o,i)=>`<div class="outcome"><b>${i+1}</b><span>${escapeHtml(o)}</span></div>`).join('');
+      closeConceptPreview();
       $('#phoneTitle').textContent=s.document; $('#phoneMeta').textContent=s.meta; $('#phoneStepTitle').textContent=s.steps[state.step][0]; $('#phoneStepCount').textContent=`${state.step+1} / ${s.steps.length} 단계`;
       $('#phoneProgress').innerHTML=s.steps.map((_,i)=>`<i class="${i<=state.step?'done':''}"></i>`).join('');
       $('#lessonBody').innerHTML=`<span class="lesson-kicker">${escapeHtml(s.viewer.kicker)}</span><h3>${s.viewer.title}</h3><p>${escapeHtml(s.viewer.intro)}</p>${learnerContent(s)}`;
-      $('#outlineTitle').textContent=s.title; $('#outlineSteps').innerHTML=s.steps.map((st,i)=>`<div class="outline-step ${i===state.step?'active':''}"><b>${i+1}</b><span><strong>${escapeHtml(st[0])}</strong><br>${escapeHtml(st[1])}</span></div>`).join('');
-      $('#conceptPopover').hidden=true;
-      const openConcept=()=>$('#conceptPopover').hidden=false; $('#termButton')?.addEventListener('click',openConcept); $('#inlineTermButton')?.addEventListener('click',openConcept);
+      bindConceptReferences($('#lessonBody'));
       $('#viewerChildTrigger')?.addEventListener('click',()=>{state.viewerChildOpen=true;renderViewer(s);});
       $('#closeViewerChildren')?.addEventListener('click',()=>{state.viewerChildOpen=false;renderViewer(s);});
       $$('[data-viewer-child-detail]').forEach(button=>button.addEventListener('click',()=>{state.viewerChildDetail=button.dataset.viewerChildDetail;renderViewer(s);}));
       $('#closeViewerChildDetail')?.addEventListener('click',()=>{state.viewerChildDetail=null;renderViewer(s);});
       $('#viewerChildFocus')?.addEventListener('click',()=>{state.childView='focus';state.viewerChildDetail=null;state.viewerChildOpen=false;renderViewer(s);});
       $('#mediaPlay')?.addEventListener('click',()=>{state.playing=!state.playing;renderViewer(s);});
-      $$('[data-answer]').forEach(btn=>btn.addEventListener('click',()=>{const correct=btn.dataset.answer==='correct';$$('[data-answer]').forEach(b=>b.classList.remove('correct','wrong'));btn.classList.add(correct?'correct':'wrong');const feedback=$('#feedback');feedback.hidden=false;feedback.textContent=correct?'맞았습니다. npm은 Node.js가 제공하는 실행 환경에서 동작합니다.':'한 번 더 생각해 보세요. “Node.js는 프로그램입니다” 개념을 다시 보면 도움이 됩니다.';}));
+      $$('[data-answer]').forEach(btn=>btn.addEventListener('click',()=>{const correct=btn.dataset.answer==='correct';$$('[data-answer]').forEach(b=>b.classList.remove('correct','wrong'));btn.classList.add(correct?'correct':'wrong');const feedback=$('#feedback');feedback.hidden=false;feedback.textContent=correct?'맞았습니다. npm CLI는 package.json의 명령을 읽어 Node.js 프로세스를 시작합니다.':'npm 자체가 JavaScript를 실행하지는 않습니다. package.json에서 명령을 고른 뒤 Node.js 프로세스에 전달합니다.';}));
     }
 
     function render() {
@@ -846,11 +905,22 @@
     $('#canvas').addEventListener('wheel',event=>{if(event.ctrlKey||event.metaKey){event.preventDefault();setZoom(event.deltaY>0?(state.zoom===140?100:60):(state.zoom===60?100:140));}},{passive:false});
     $('#prevStep').addEventListener('click',()=>{state.step=Math.max(0,state.step-1);renderViewer(scenarios[state.scenario]);});
     $('#nextStep').addEventListener('click',()=>{state.step=Math.min(scenarios[state.scenario].steps.length-1,state.step+1);renderViewer(scenarios[state.scenario]);});
-    $('#closeConcept').addEventListener('click',()=>$('#conceptPopover').hidden=true);
+    $('#closeConcept').addEventListener('click',()=>closeConceptPreview(true));
+    $('#conceptOrigin').addEventListener('click',event=>event.preventDefault());
+    document.addEventListener('pointerdown',event=>{if(!$('#conceptPopover').hidden&&!event.target.closest('#conceptPopover')&&!event.target.closest('[data-concept-ref]'))closeConceptPreview();});
+    document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!$('#conceptPopover').hidden)closeConceptPreview(true);});
     $('#playSteps').addEventListener('click',()=>{state.step=(state.step+1)%scenarios[state.scenario].steps.length;renderEditor(scenarios[state.scenario]);});
     new ResizeObserver(()=>requestAnimationFrame(drawEdges)).observe($('#canvas'));
-    window.addEventListener('resize',()=>requestAnimationFrame(drawEdges));
+    window.addEventListener('resize',()=>{requestAnimationFrame(drawEdges);positionConceptPreview();});
+    window.addEventListener('scroll',positionConceptPreview,true);
+    const initialTheme=previewParams.get('theme');
+    if(initialTheme==='paper'||initialTheme==='midnight'){
+      document.documentElement.dataset.theme=initialTheme;
+      $$('[data-theme-choice]').forEach(button=>button.classList.toggle('active',button.dataset.themeChoice===initialTheme));
+    }
     render();
+    const initialConcept=previewParams.get('concept');
+    if(initialConcept) requestAnimationFrame(()=>{const trigger=$$('[data-concept-ref]').find(item=>item.dataset.conceptRef===initialConcept);if(trigger)openConceptPreview(trigger);});
   </script>
 </body>
 </html>
