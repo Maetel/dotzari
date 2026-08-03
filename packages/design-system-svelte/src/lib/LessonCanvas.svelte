@@ -1,11 +1,12 @@
 <script lang="ts">
-  import { untrack } from 'svelte';
+  import { tick, untrack } from 'svelte';
   import {
     bezierEdgeGeometry,
     clamp,
     deriveLessonSnapshot,
     layoutLessonFlow,
     lessonNodeWidth,
+    shouldAutoFocusCanvas,
     worldBoundsToScrollOffset,
     type CanvasNodeModel,
     type Lesson,
@@ -36,7 +37,9 @@
   let measuredSizes = $state<ReadonlyMap<string, Size>>(new Map());
   let drag: { pointerId: number; x: number; y: number; left: number; top: number; moved: boolean } | null = null;
   let activePointers = new Set<number>();
-  let lastFocusedStepId = '';
+  let lastAutoFocus = $state<{ stepId: string; viewportWidth: number } | null>(null);
+  let userControlsCamera = $state(false);
+  let cameraStepId = '';
 
   let snapshot = $derived(deriveLessonSnapshot(lesson, stepId));
   let layout = $derived(layoutLessonFlow(snapshot, measuredSizes));
@@ -66,25 +69,35 @@
     };
     const observer = new ResizeObserver(update);
     observer.observe(element);
-    requestAnimationFrame(update);
+    update();
+    void tick().then(update);
     return {
-      update(nextId: string) { id = nextId; requestAnimationFrame(update); },
+      update(nextId: string) {
+        id = nextId;
+        update();
+        void tick().then(update);
+      },
       destroy() { observer.disconnect(); },
     };
   }
 
   function observeViewport(element: HTMLDivElement) {
     viewport = element;
+    const ownerWindow = element.ownerDocument.defaultView;
     const update = () => {
       const next = { width: element.clientWidth, height: element.clientHeight };
       if (next.width !== viewportSize.width || next.height !== viewportSize.height) viewportSize = next;
     };
     const observer = new ResizeObserver(update);
     observer.observe(element);
-    requestAnimationFrame(update);
+    ownerWindow?.addEventListener('resize', update, { passive: true });
+    ownerWindow?.visualViewport?.addEventListener('resize', update, { passive: true });
+    update();
     return {
       destroy() {
         observer.disconnect();
+        ownerWindow?.removeEventListener('resize', update);
+        ownerWindow?.visualViewport?.removeEventListener('resize', update);
         if (viewport === element) viewport = undefined;
       },
     };
@@ -96,8 +109,9 @@
     const previous = scale;
     const centerX = (element.scrollLeft + element.clientWidth / 2) / previous;
     const centerY = (element.scrollTop + element.clientHeight / 2) / previous;
+    userControlsCamera = true;
     scale = clamp(nextScale, .65, 1.6);
-    requestAnimationFrame(() => {
+    void tick().then(() => {
       if (!element.isConnected) return;
       element.scrollLeft = centerX * scale - element.clientWidth / 2;
       element.scrollTop = centerY * scale - element.clientHeight / 2;
@@ -121,6 +135,7 @@
     if (!drag.moved) return;
     event.preventDefault();
     dragging = true;
+    userControlsCamera = true;
     element.scrollLeft = drag.left - dx;
     element.scrollTop = drag.top - dy;
   }
@@ -139,7 +154,14 @@
     const currentStepId = snapshot.step.id;
     const width = viewportSize.width;
     const height = viewportSize.height;
-    if (!viewport || !layout.ready || width <= 0 || height <= 0 || currentStepId === lastFocusedStepId) return;
+    const focusSnapshot = { stepId: currentStepId, viewportWidth: width };
+    if (cameraStepId !== currentStepId) {
+      cameraStepId = currentStepId;
+      userControlsCamera = false;
+    }
+    const element = viewport;
+    if (!element || !layout.ready || width <= 0 || height <= 0) return;
+    if (!shouldAutoFocusCanvas(lastAutoFocus, focusSnapshot, userControlsCamera)) return;
 
     let targets = snapshot.activeNodeIds.flatMap((nodeId) => {
       const placement = placementById.get(nodeId);
@@ -160,12 +182,23 @@
       { width: cameraWorldWidth, height: layout.height },
       { padding: 16, alignX: 'center', alignY: 'start' },
     );
-    lastFocusedStepId = currentStepId;
-    requestAnimationFrame(() => {
-      if (!viewport || snapshot.step.id !== currentStepId) return;
-      viewport.scrollLeft = offset.x;
-      viewport.scrollTop = 0;
-    });
+    let attempts = 0;
+    const applyFocus = () => {
+      if (!element.isConnected || snapshot.step.id !== currentStepId || userControlsCamera) return;
+      if (Math.abs(element.clientWidth - width) >= 1 || Math.abs(element.clientHeight - height) >= 1) {
+        viewportSize = { width: element.clientWidth, height: element.clientHeight };
+        return;
+      }
+      element.scrollLeft = offset.x;
+      element.scrollTop = 0;
+      if (Math.abs(element.scrollLeft - offset.x) < 1 || attempts >= 2) {
+        lastAutoFocus = focusSnapshot;
+        return;
+      }
+      attempts += 1;
+      setTimeout(applyFocus, 0);
+    };
+    void tick().then(applyFocus);
   });
 </script>
 

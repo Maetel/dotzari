@@ -53,6 +53,24 @@ export function worldBoundsToScrollOffset(
   };
 }
 
+export interface CanvasAutoFocusSnapshot {
+  stepId: string;
+  viewportWidth: number;
+}
+
+/**
+ * Returns whether automatic step focus should run after a step or canvas-width change.
+ */
+export function shouldAutoFocusCanvas(
+  previous: CanvasAutoFocusSnapshot | null,
+  current: CanvasAutoFocusSnapshot,
+  userControlsCamera: boolean,
+): boolean {
+  if (userControlsCamera) return false;
+  if (!previous || previous.stepId !== current.stepId) return true;
+  return Math.abs(previous.viewportWidth - current.viewportWidth) >= 1;
+}
+
 export function zoomViewportAt(
   viewport: Viewport,
   screenPoint: Point,

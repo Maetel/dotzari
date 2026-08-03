@@ -4,6 +4,7 @@ import {
   canvasToScreen,
   keyboardNudge,
   screenToCanvas,
+  shouldAutoFocusCanvas,
   worldBoundsToScrollOffset,
   zoomViewportAt,
 } from './geometry.js';
@@ -45,6 +46,15 @@ describe('canvas geometry', () => {
       { width: 390, height: 786 },
       { width: 1040, height: 920 },
     ).x).toBe(0);
+  });
+
+  it('refocuses while a mobile viewport settles but preserves a user-controlled camera', () => {
+    const initial = { stepId: 'execute', viewportWidth: 590 };
+    const settled = { stepId: 'execute', viewportWidth: 390 };
+    expect(shouldAutoFocusCanvas(initial, settled, false)).toBe(true);
+    expect(shouldAutoFocusCanvas(initial, settled, true)).toBe(false);
+    expect(shouldAutoFocusCanvas(settled, { stepId: 'delegate', viewportWidth: 390 }, false)).toBe(true);
+    expect(shouldAutoFocusCanvas(settled, { stepId: 'delegate', viewportWidth: 390 }, true)).toBe(false);
   });
 
   it('attaches edge endpoints to node boundaries', () => {
