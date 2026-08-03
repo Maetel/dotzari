@@ -95,7 +95,7 @@
   .dz-canvas-node__eyebrow { margin-bottom: 3px; color: var(--dz-text-tertiary); font-size: var(--dz-font-size-1); font-weight: var(--dz-weight-semibold); letter-spacing: .06em; text-transform: uppercase; }
   .dz-canvas-node__handle { color: var(--dz-text-tertiary); font-size: 1.1rem; line-height: 1; }
   .dz-canvas-node__description { margin-top: var(--dz-space-3); color: var(--dz-text-secondary); font-size: var(--dz-font-size-2); }
-  pre { margin: var(--dz-space-3) 0 0; padding: var(--dz-space-3); overflow: hidden; border-radius: var(--dz-radius-sm); background: var(--dz-surface-code); color: #dce9f8; font: var(--dz-font-size-1)/1.55 var(--dz-font-mono); }
+  pre { margin: var(--dz-space-3) 0 0; padding: var(--dz-space-3); overflow: hidden; border-radius: var(--dz-radius-sm); background: var(--dz-surface-code); color: var(--dz-text-code); font: var(--dz-font-size-1)/1.55 var(--dz-font-mono); }
   .dz-canvas-node__children { display: grid; gap: var(--dz-space-2); margin-top: var(--dz-space-4); }
   .dz-canvas-node__children > p { color: var(--dz-text-tertiary); font-size: var(--dz-font-size-1); font-weight: var(--dz-weight-semibold); }
 </style>

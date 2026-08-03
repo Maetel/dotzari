@@ -1,11 +1,19 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import type { CanvasEdgeModel, CanvasInteractionState, CanvasNodeModel, Viewport } from '@dotzari/design-system';
-  import { Badge, Button, CanvasSurface, Field, IconButton, Panel, SegmentedControl } from '@dotzari/design-system-svelte';
+  import { Badge, Button, CanvasSurface, Field, IconButton, LessonViewer, Panel, SegmentedControl } from '@dotzari/design-system-svelte';
+  import { demoLesson } from './demoLesson';
 
   let theme = $state<'paper' | 'midnight'>('paper');
   let canvasState: CanvasInteractionState | undefined = $state();
   let viewport = $state<Viewport>({ x: 40, y: 40, zoom: 1 });
   let clusterMessage = $state('줌아웃하면 앱이 관계와 거리를 바탕으로 묶음을 제안합니다.');
+  let lessonStepId = $state(demoLesson.steps[0].id);
+  let openContentNodeId = $state<string | null>(null);
+
+  onMount(() => {
+    openContentNodeId = new URLSearchParams(location.search).get('code');
+  });
 
   const nodes: CanvasNodeModel[] = [
     {
@@ -56,7 +64,7 @@
       <span aria-hidden="true">D</span>
       <div><strong>Dotzari</strong><small>Design system · v0.1 draft</small></div>
     </a>
-    <nav aria-label="페이지 둘러보기"><a href="#canvas">Canvas lab</a><a href="#components">Components</a></nav>
+    <nav aria-label="페이지 둘러보기"><a href="#viewer">Lesson viewer</a><a href="#canvas">Canvas lab</a><a href="#components">Components</a></nav>
     <SegmentedControl
       label="테마"
       items={[{ value: 'paper', label: 'Paper' }, { value: 'midnight', label: 'Midnight' }]}
@@ -73,15 +81,25 @@
         <p>버튼의 모양뿐 아니라 선택, 드래그, 줌, 자동 묶음, 하위 개념 열기까지 같은 디자인 시스템에서 관리합니다.</p>
       </div>
       <div class="hero__facts" aria-label="디자인 시스템 구성">
-        <article><strong>14</strong><span>Svelte components</span></article>
+        <article><strong>18</strong><span>Svelte components</span></article>
         <article><strong>2</strong><span>semantic themes</span></article>
         <article><strong>1</strong><span>interaction core</span></article>
       </div>
     </section>
 
+    <section class="viewer-section" id="viewer">
+      <div class="section-heading">
+        <div><span>01 · REUSABLE VIEWER</span><h2>Lesson viewer</h2></div>
+        <p>앱은 3개 챕터, 7개 스텝, 24개 노드의 더미데이터만 제공합니다. 진행 상태와 측정 기반 배치, 캔버스 조작은 라이브러리가 담당합니다.</p>
+      </div>
+      <div class="viewer-demo" data-open-content={openContentNodeId}>
+        <LessonViewer lesson={demoLesson} bind:stepId={lessonStepId} {openContentNodeId} />
+      </div>
+    </section>
+
     <section class="canvas-section" id="canvas">
       <div class="section-heading">
-        <div><span>01 · INTERACTION SYSTEM</span><h2>Canvas lab</h2></div>
+        <div><span>02 · INTERACTION SYSTEM</span><h2>Canvas lab</h2></div>
         <p>Node.js를 옮기거나, npm의 상세 보기를 열거나, 72% 아래로 축소해 자동 묶음을 확인해 보세요.</p>
       </div>
 
@@ -119,7 +137,7 @@
 
     <section class="components-section" id="components">
       <div class="section-heading">
-        <div><span>02 · FOUNDATIONS</span><h2>Component shelf</h2></div>
+        <div><span>03 · FOUNDATIONS</span><h2>Component shelf</h2></div>
         <p>두 테마가 같은 의미 토큰을 공유하므로 화면의 역할과 상태가 바뀌지 않습니다.</p>
       </div>
       <div class="component-grid">

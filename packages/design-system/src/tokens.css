@@ -7,12 +7,15 @@
   --dz-surface-raised: #ffffff;
   --dz-surface-subtle: #f6f4ee;
   --dz-surface-canvas: #eeece6;
-  --dz-surface-code: #111821;
+  --dz-surface-code: #edf1f3;
+  --dz-surface-code-bar: #e1e7ea;
 
   --dz-text-primary: #171b21;
   --dz-text-secondary: #67717c;
   --dz-text-tertiary: #8b949e;
   --dz-text-inverse: #ffffff;
+  --dz-text-code: #18342a;
+  --dz-text-code-muted: #6c7b76;
 
   --dz-border-subtle: #d9d6cc;
   --dz-border-strong: #b9b6ad;
@@ -78,6 +81,7 @@
   --dz-layer-selection: 30;
   --dz-layer-overlay: 40;
   --dz-layer-popover: 50;
+  --dz-layer-modal: 1000;
 
   --dz-control-height-sm: 1.75rem;
   --dz-control-height-md: 2.25rem;
@@ -94,11 +98,14 @@
   --dz-surface-subtle: #0d141d;
   --dz-surface-canvas: #0b1119;
   --dz-surface-code: #05090e;
+  --dz-surface-code-bar: #111b27;
 
   --dz-text-primary: #f3f6fb;
   --dz-text-secondary: #9aa8b8;
   --dz-text-tertiary: #6d7a89;
   --dz-text-inverse: #07101b;
+  --dz-text-code: #c9f4df;
+  --dz-text-code-muted: #8fa3b8;
 
   --dz-border-subtle: #263242;
   --dz-border-strong: #3d4b5f;

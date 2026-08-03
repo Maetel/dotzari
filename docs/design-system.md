@@ -10,8 +10,8 @@
 | 계층 | 책임 | 프레임워크 의존성 |
 | --- | --- | --- |
 | Foundation | semantic color, typography, spacing, radius, shadow, motion, layer token | 없음 |
-| Interaction | canvas state transition, geometry, automatic cluster suggestion | 없음 |
-| Svelte UI | 일반 UI와 canvas component, DOM event와 ARIA 연결 | Svelte |
+| Interaction | canvas state transition, geometry, automatic cluster suggestion, 강의 평가와 측정 기반 배치 | 없음 |
+| Svelte UI | 일반 UI, canvas component, 학습 Viewer, DOM event와 ARIA 연결 | Svelte |
 | Catalog app | 실제 조합, 상태 비교, Editor·Viewer 관점 검증 | Svelte |
 
 Foundation과 Interaction은 DOM 또는 Svelte를 import하지 않는다. DOM에서 pointer capture,
@@ -61,6 +61,20 @@ Badge에는 문장을 넣지 않는다. 상태 설명은 Panel이나 일반 텍�
 | `NodeDetailPanel` | 부모 경로, 설명, 예시, 닫기·집중 보기 action |
 | `ClusterSuggestion` | 자동 묶음 상태, member 요약, review action |
 | `InteractionStatus` | 현재 tool·selection·gesture 상태를 문구와 live region으로 표시 |
+
+## 4.1 학습 Viewer component
+
+| Component | 책임 |
+| --- | --- |
+| `LessonViewer` | 강의 제목, 진행, 설명, 캔버스와 이전·다음 이동을 조합하는 학습 화면 |
+| `LessonProgress` | 챕터 제목과 챕터별 스텝 진행을 하나의 인디케이터로 표시 |
+| `LessonCanvas` | 실제 높이를 측정한 오른쪽 진행 배치, 챕터 경계, 연결선, 확대·축소와 드래그 |
+| `LessonNodeCard` | 요약, 수치, 아코디언, 시각 자료, 경로, 체크리스트, 표, 인용, 코드 콘텐츠 |
+| `CodeContentViewer` | 전체 파일, 설명과 코드, 구조 지도의 세 가지 긴 코드 보기 |
+
+`LessonViewer`는 Editor를 import하지 않는다. 앱은 `Lesson` 데이터와 선택적인 상태 변경
+callback만 제공하며, 현재 스텝 평가와 배치 계산은 각각 코어와 Svelte 패키지 안에서
+처리한다.
 
 ## 5. 개념 참조와 전역 Overlay
 
@@ -139,6 +153,8 @@ session을 정리한다.
 - DOM, SVG, canvas virtual anchor가 같은 ConceptPreview를 열고 어떤 overflow container에도 잘리지 않는다.
 - 화면의 안내 문구를 제거해도 참조·상세·이동 조작의 발견 가능성과 결과가 유지된다.
 - 대표 시안은 실제 학습 가능한 설명과 단순 직선보다 복잡한 노드 관계를 포함한다.
+- 더미 `Lesson` 객체를 다른 강의로 교체해도 Viewer component 코드를 수정할 필요가 없다.
+- 챕터·스텝 통합 인디케이터, 24개 노드의 단계별 등장, 측정 기반 재배치와 긴 코드 보기가 공식 데모에서 동작한다.
 
 ## 9. 검증 기록
 
@@ -169,3 +185,11 @@ session을 정리한다.
 - 안에 담기·주변에 펼치기·필요할 때 열기·하위 구조 집중의 Viewer 표현을 확인했다. 하위 상세와 popup은 실제로 열고 닫았다.
 - Editor에서 설명 부품을 Node.js로 실제 drag해 추가한 뒤에도 노드 겹침과 canvas 경계 이탈이 없었다.
 - 검증한 모든 상태에서 browser console error가 없었다.
+
+2026-08-03에는 학습 화면 기준안을 라이브러리로 옮기는 첫 세로 조각을 구현했다.
+
+- 코어 패키지에 `Lesson`, `Chapter`, `Step`, 풍부한 노드 콘텐츠와 연결 타입을 추가했다.
+- 참조 무결성 검사, 현재 스텝의 표시 그래프 평가, 실제 측정값 기반 오른쪽 진행 배치를 단위 테스트로 확인했다.
+- Svelte 패키지에 `LessonViewer`, `LessonProgress`, `LessonCanvas`, `LessonNodeCard`, `CodeContentViewer`를 추가했다.
+- 공식 데모는 3개 챕터, 7개 스텝, 24개 노드와 166줄 코드가 있는 더미 강의를 패키지에 전달한다.
+- 코어 테스트 13개, 코어 TypeScript 검사, Svelte 검사와 Vite 정적 빌드가 통과했다.
