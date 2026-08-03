@@ -190,7 +190,7 @@
 
 <style>
   .dz-lesson-canvas { position: relative; min-width: 0; height: 100%; min-height: 420px; }
-  .dz-lesson-canvas__viewport { width: 100%; height: 100%; min-height: 420px; overflow: auto; border: 1px solid var(--dz-border-subtle); border-radius: var(--dz-radius-lg); outline: none; scrollbar-width: none; overscroll-behavior: none; touch-action: pinch-zoom; cursor: grab; }
+  .dz-lesson-canvas__viewport { width: 100%; height: 100%; min-height: 420px; overflow: hidden; border: 1px solid var(--dz-border-subtle); border-radius: var(--dz-radius-lg); outline: none; overscroll-behavior: none; touch-action: pinch-zoom; cursor: grab; }
   .dz-lesson-canvas__viewport::-webkit-scrollbar { display: none; }.dz-lesson-canvas__viewport.dragging { cursor: grabbing; user-select: none; }
   .dz-lesson-canvas__viewport:focus-visible { box-shadow: inset var(--dz-focus-ring); }
   .dz-lesson-canvas__shell { position: relative; min-width: 100%; min-height: 100%; }

@@ -10,6 +10,7 @@
     openContentNodeId = $bindable(null),
     showHeader = true,
     showNavigation = true,
+    immersive = false,
     initialCanvasScale = 1,
     onstepchange,
     onopencontent,
@@ -19,6 +20,7 @@
     openContentNodeId?: string | null;
     showHeader?: boolean;
     showNavigation?: boolean;
+    immersive?: boolean;
     initialCanvasScale?: number;
     onstepchange?: (stepId: string) => void;
     onopencontent?: (nodeId: string) => void;
@@ -47,21 +49,23 @@
   }
 </script>
 
-<section class="dz-lesson-viewer" aria-label={lesson.title}>
+<section class="dz-lesson-viewer" class:immersive aria-label={lesson.title}>
   {#if showHeader}
     <header class="dz-lesson-viewer__header">
       <div><small>{lesson.subject ?? '학습 콘텐츠'} · {lesson.nodes.length}개 노드</small><strong>{lesson.title}</strong></div>
     </header>
   {/if}
 
-  <LessonProgress {lesson} {snapshot} onstepchange={setStep} />
+  {#if !immersive}<LessonProgress {lesson} {snapshot} onstepchange={setStep} />{/if}
 
-  <div class="dz-lesson-viewer__copy">
-    {#if snapshot.step.eyebrow}<span>{snapshot.step.eyebrow}</span>{/if}
-    <h2>{snapshot.step.title}</h2>
-    <p>{snapshot.step.description}</p>
-    <div><small><b>{snapshot.visibleNodes.length}</b> / {lesson.nodes.length}개 노드</small><small>{snapshot.activeNodeIds.length}개 생성</small><small>{snapshot.activeEdgeIds.length}개 새 연결</small></div>
-  </div>
+  {#if !immersive}
+    <div class="dz-lesson-viewer__copy">
+      {#if snapshot.step.eyebrow}<span>{snapshot.step.eyebrow}</span>{/if}
+      <h2>{snapshot.step.title}</h2>
+      <p>{snapshot.step.description}</p>
+      <div><small><b>{snapshot.visibleNodes.length}</b> / {lesson.nodes.length}개 노드</small><small>{snapshot.activeNodeIds.length}개 생성</small><small>{snapshot.activeEdgeIds.length}개 새 연결</small></div>
+    </div>
+  {/if}
 
   <div class="dz-lesson-viewer__canvas">
     <LessonCanvas
@@ -74,7 +78,7 @@
     />
   </div>
 
-  {#if selectedNode}
+  {#if selectedNode && !immersive}
     <div class="dz-lesson-viewer__explanation" aria-live="polite">
       <strong>{selectedNode.title}</strong>
       <p>{selectedNode.description}</p>
@@ -96,6 +100,8 @@
 
 <style>
   .dz-lesson-viewer { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto auto minmax(420px, 1fr) auto auto; gap: var(--dz-space-3); width: 100%; min-height: 760px; padding: var(--dz-space-4); overflow: hidden; border: 1px solid var(--dz-border-strong); border-radius: var(--dz-radius-xl); background: var(--dz-surface-panel); color: var(--dz-text-primary); box-shadow: var(--dz-shadow-panel); }
+  .dz-lesson-viewer.immersive { display: block; height: 100%; min-height: 0; padding: 0; border: 0; border-radius: 0; background: var(--dz-surface-canvas); box-shadow: none; }
+  .dz-lesson-viewer.immersive .dz-lesson-viewer__canvas { width: 100%; height: 100%; min-height: 0; }
   .dz-lesson-viewer__header { display: flex; align-items: center; min-width: 0; min-height: 2.75rem; border-bottom: 1px solid var(--dz-border-subtle); }
   .dz-lesson-viewer__header small, .dz-lesson-viewer__header strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }.dz-lesson-viewer__header small { color: var(--dz-text-secondary); font-size: var(--dz-font-size-1); }.dz-lesson-viewer__header strong { margin-top: 2px; font-size: var(--dz-font-size-4); }
   .dz-lesson-viewer__copy > span { color: var(--dz-accent); font-size: var(--dz-font-size-1); font-weight: var(--dz-weight-semibold); letter-spacing: .08em; }.dz-lesson-viewer__copy h2 { margin: var(--dz-space-2) 0; font-size: clamp(1.65rem, 4vw, 2.5rem); line-height: 1.08; letter-spacing: -.04em; }.dz-lesson-viewer__copy > p { max-width: 72ch; margin: 0; color: var(--dz-text-secondary); font-size: var(--dz-font-size-3); line-height: 1.55; }.dz-lesson-viewer__copy > div { display: flex; flex-wrap: wrap; gap: var(--dz-space-2); margin-top: var(--dz-space-3); }.dz-lesson-viewer__copy > div small { padding: 5px 7px; border-radius: var(--dz-radius-sm); background: var(--dz-surface-subtle); color: var(--dz-text-tertiary); font-size: var(--dz-font-size-1); }.dz-lesson-viewer__copy > div b { color: var(--dz-accent); }

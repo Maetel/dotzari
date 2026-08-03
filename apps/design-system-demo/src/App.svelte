@@ -52,6 +52,8 @@
 
   let currentStepIndex = $derived(Math.max(0, orderedSteps.findIndex((step) => step.id === lessonStepId)));
   let currentStep = $derived(orderedSteps[currentStepIndex]);
+  let currentChapter = $derived(demoLesson.chapters.find((chapter) => chapter.id === currentStep.chapterId));
+  let lessonProgress = $derived(((currentStepIndex + 1) / orderedSteps.length) * 100);
 
   function syncFromLocation() {
     const lessonRoute = location.pathname.replace(/\/+$/, '') === `${basePath}/lesson/node-request-flow`;
@@ -107,7 +109,6 @@
     lessonStepId = next.id;
     openSheet = null;
     history.replaceState({}, '', `${basePath}/lesson/node-request-flow?step=${next.id}`);
-    document.querySelector('.course-main')?.scrollTo({ top: 0, behavior: 'smooth' });
   }
 </script>
 
@@ -166,10 +167,13 @@
     <header class="course-bar">
       <button class="course-bar__icon" type="button" aria-label="데모 목록으로 돌아가기" onclick={goHome}>←</button>
       <div class="course-bar__title">
-        <strong>{demoLesson.title}</strong>
-        <span>{demoLesson.subject} · {currentStepIndex + 1}/{orderedSteps.length} 스텝</span>
+        <strong>{currentStep.title}</strong>
+        <span>{currentChapter?.title} · {currentStepIndex + 1}/{orderedSteps.length}</span>
       </div>
+      <button class="course-bar__icon compact" type="button" aria-label="이전 스텝" disabled={currentStepIndex === 0} onclick={() => goToStep(currentStepIndex - 1)}>←</button>
+      <button class="course-bar__icon compact next" type="button" aria-label="다음 스텝" disabled={currentStepIndex === orderedSteps.length - 1} onclick={() => goToStep(currentStepIndex + 1)}>→</button>
       <button class="course-bar__icon menu" type="button" aria-label="학습 메뉴 열기" onclick={() => openSheet = 'menu'}><i></i><i></i><i></i></button>
+      <div class="course-bar__progress" aria-hidden="true"><i style={`width:${lessonProgress}%`}></i></div>
     </header>
 
     <main class="course-main">
@@ -180,19 +184,11 @@
           bind:openContentNodeId
           showHeader={false}
           showNavigation={false}
+          immersive={true}
           initialCanvasScale={canvasScale}
         />
       </div>
     </main>
-
-    <nav class="course-navigation" aria-label="스텝 이동">
-      <button type="button" aria-label="이전 스텝" disabled={currentStepIndex === 0} onclick={() => goToStep(currentStepIndex - 1)}>←</button>
-      <button class="course-navigation__status" type="button" onclick={() => openSheet = 'menu'}>
-        <strong>{currentStep.title}</strong>
-        <span>{currentStepIndex + 1} / {orderedSteps.length} 스텝 · 전체 보기</span>
-      </button>
-      <button class="next" type="button" aria-label="다음 스텝" disabled={currentStepIndex === orderedSteps.length - 1} onclick={() => goToStep(currentStepIndex + 1)}>→</button>
-    </nav>
 
     {#if openSheet}
       <div class="app-sheet-backdrop" role="presentation" onclick={() => openSheet = null}></div>
