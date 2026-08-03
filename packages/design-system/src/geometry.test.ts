@@ -4,6 +4,7 @@ import {
   canvasToScreen,
   keyboardNudge,
   screenToCanvas,
+  worldBoundsToScrollOffset,
   zoomViewportAt,
 } from './geometry.js';
 import type { CanvasNodeModel } from './types.js';
@@ -21,6 +22,29 @@ describe('canvas geometry', () => {
     const before = screenToCanvas(cursor, viewport);
     const next = zoomViewportAt(viewport, cursor, 1.4);
     expect(screenToCanvas(cursor, next)).toEqual(before);
+  });
+
+  it('centers measured world bounds in a mobile viewport after scaling', () => {
+    const bounds = { x: 372, y: 92, width: 260, height: 540 };
+    const offset = worldBoundsToScrollOffset(
+      bounds,
+      0.72,
+      { width: 390, height: 786 },
+      { width: 1040, height: 920 },
+    );
+
+    const screenLeft = bounds.x * 0.72 - offset.x;
+    expect(screenLeft).toBeCloseTo((390 - bounds.width * 0.72) / 2);
+    expect(offset.x).toBeCloseTo(166.44);
+  });
+
+  it('clamps first-column focus at the world origin instead of creating a mobile-only origin', () => {
+    expect(worldBoundsToScrollOffset(
+      { x: 32, y: 92, width: 390, height: 500 },
+      0.72,
+      { width: 390, height: 786 },
+      { width: 1040, height: 920 },
+    ).x).toBe(0);
   });
 
   it('attaches edge endpoints to node boundaries', () => {

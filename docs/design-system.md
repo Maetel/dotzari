@@ -17,6 +17,10 @@
 Foundation과 Interaction은 DOM 또는 Svelte를 import하지 않는다. DOM에서 pointer capture,
 focus, `data-canvas-no-drag`를 해석하는 일은 Svelte component가 담당한다.
 
+캔버스의 월드·스크롤·viewport 좌표 변환은
+[`canvas-coordinate-system.md`](./canvas-coordinate-system.md)를 기준으로 한다. 모바일도 같은
+월드 좌표를 사용하며, 스텝 번호나 기기 폭으로 카메라 위치를 추정하지 않는다.
+
 ## 2. Semantic token
 
 Token은 실제 색상 이름이 아니라 사용 목적을 나타낸다. Paper와 Midnight는 같은 token key에

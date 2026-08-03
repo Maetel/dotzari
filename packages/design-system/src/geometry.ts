@@ -1,4 +1,4 @@
-import type { CanvasNodeModel, Point, Viewport } from './types.js';
+import type { CanvasNodeModel, Point, Size, Viewport } from './types.js';
 
 export const MIN_ZOOM = 0.5;
 export const MAX_ZOOM = 1.6;
@@ -18,6 +18,38 @@ export function canvasToScreen(point: Point, viewport: Viewport): Point {
   return {
     x: point.x * viewport.zoom + viewport.x,
     y: point.y * viewport.zoom + viewport.y,
+  };
+}
+
+/**
+ * Converts unscaled world bounds into clamped, zoomed scroll coordinates for a canvas viewport.
+ */
+export function worldBoundsToScrollOffset(
+  bounds: Point & Size,
+  zoom: number,
+  viewportSize: Size,
+  worldSize: Size,
+  options: { padding?: number; alignX?: 'start' | 'center'; alignY?: 'start' | 'center' } = {},
+): Point {
+  const padding = options.padding ?? 16;
+  const axisOffset = (
+    start: number,
+    length: number,
+    viewportLength: number,
+    worldLength: number,
+    alignment: 'start' | 'center',
+  ) => {
+    const scaledLength = length * zoom;
+    const targetStart = alignment === 'center'
+      ? Math.max(padding, (viewportLength - scaledLength) / 2)
+      : padding;
+    const maximum = Math.max(0, worldLength * zoom - viewportLength);
+    return clamp(start * zoom - targetStart, 0, maximum);
+  };
+
+  return {
+    x: axisOffset(bounds.x, bounds.width, viewportSize.width, worldSize.width, options.alignX ?? 'center'),
+    y: axisOffset(bounds.y, bounds.height, viewportSize.height, worldSize.height, options.alignY ?? 'start'),
   };
 }
 

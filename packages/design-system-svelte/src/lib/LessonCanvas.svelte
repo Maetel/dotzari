@@ -6,6 +6,7 @@
     deriveLessonSnapshot,
     layoutLessonFlow,
     lessonNodeWidth,
+    worldBoundsToScrollOffset,
     type CanvasNodeModel,
     type Lesson,
     type Size,
@@ -28,7 +29,8 @@
     onopencontent?: (nodeId: string) => void;
   } = $props();
 
-  let viewport: HTMLDivElement;
+  let viewport: HTMLDivElement | undefined;
+  let viewportSize = $state<Size>({ width: 0, height: 0 });
   let scale = $state(untrack(() => initialScale));
   let dragging = $state(false);
   let measuredSizes = $state<ReadonlyMap<string, Size>>(new Map());
@@ -38,6 +40,7 @@
 
   let snapshot = $derived(deriveLessonSnapshot(lesson, stepId));
   let layout = $derived(layoutLessonFlow(snapshot, measuredSizes));
+  let cameraWorldWidth = $derived(layout.width + (viewportSize.width > 0 ? viewportSize.width / scale / 2 : 0));
   let placementById = $derived(new Map(layout.nodes.map((node) => [node.id, node])));
   let chapterById = $derived(new Map(lesson.chapters.map((chapter) => [chapter.id, chapter])));
   let edgeItems = $derived.by(() => snapshot.visibleEdges.flatMap((edge) => {
@@ -70,41 +73,63 @@
     };
   }
 
+  function observeViewport(element: HTMLDivElement) {
+    viewport = element;
+    const update = () => {
+      const next = { width: element.clientWidth, height: element.clientHeight };
+      if (next.width !== viewportSize.width || next.height !== viewportSize.height) viewportSize = next;
+    };
+    const observer = new ResizeObserver(update);
+    observer.observe(element);
+    requestAnimationFrame(update);
+    return {
+      destroy() {
+        observer.disconnect();
+        if (viewport === element) viewport = undefined;
+      },
+    };
+  }
+
   function setScale(nextScale: number) {
-    if (!viewport) return;
+    const element = viewport;
+    if (!element) return;
     const previous = scale;
-    const centerX = (viewport.scrollLeft + viewport.clientWidth / 2) / previous;
-    const centerY = (viewport.scrollTop + viewport.clientHeight / 2) / previous;
+    const centerX = (element.scrollLeft + element.clientWidth / 2) / previous;
+    const centerY = (element.scrollTop + element.clientHeight / 2) / previous;
     scale = clamp(nextScale, .65, 1.6);
     requestAnimationFrame(() => {
-      viewport.scrollLeft = centerX * scale - viewport.clientWidth / 2;
-      viewport.scrollTop = centerY * scale - viewport.clientHeight / 2;
+      if (!element.isConnected) return;
+      element.scrollLeft = centerX * scale - element.clientWidth / 2;
+      element.scrollTop = centerY * scale - element.clientHeight / 2;
     });
   }
 
   function pointerDown(event: PointerEvent) {
+    const element = viewport;
     activePointers.add(event.pointerId);
-    if (activePointers.size > 1 || event.button !== 0 || (event.target as Element).closest('[data-lesson-interactive], [data-lesson-controls]')) return;
-    drag = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, left: viewport.scrollLeft, top: viewport.scrollTop, moved: false };
-    viewport.setPointerCapture(event.pointerId);
+    if (!element || activePointers.size > 1 || event.button !== 0 || (event.target as Element).closest('[data-lesson-interactive], [data-lesson-controls]')) return;
+    drag = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, left: element.scrollLeft, top: element.scrollTop, moved: false };
+    element.setPointerCapture(event.pointerId);
   }
 
   function pointerMove(event: PointerEvent) {
-    if (!drag || drag.pointerId !== event.pointerId || activePointers.size !== 1) return;
+    const element = viewport;
+    if (!element || !drag || drag.pointerId !== event.pointerId || activePointers.size !== 1) return;
     const dx = event.clientX - drag.x;
     const dy = event.clientY - drag.y;
     if (Math.hypot(dx, dy) > 3) drag.moved = true;
     if (!drag.moved) return;
     event.preventDefault();
     dragging = true;
-    viewport.scrollLeft = drag.left - dx;
-    viewport.scrollTop = drag.top - dy;
+    element.scrollLeft = drag.left - dx;
+    element.scrollTop = drag.top - dy;
   }
 
   function pointerEnd(event: PointerEvent) {
+    const element = viewport;
     activePointers.delete(event.pointerId);
     if (drag?.pointerId === event.pointerId) {
-      if (viewport.hasPointerCapture(event.pointerId)) viewport.releasePointerCapture(event.pointerId);
+      if (element?.hasPointerCapture(event.pointerId)) element.releasePointerCapture(event.pointerId);
       drag = null;
       dragging = false;
     }
@@ -112,17 +137,42 @@
 
   $effect(() => {
     const currentStepId = snapshot.step.id;
-    const stageIndex = snapshot.stepIndex;
-    if (!viewport || currentStepId === lastFocusedStepId) return;
+    const width = viewportSize.width;
+    const height = viewportSize.height;
+    if (!viewport || !layout.ready || width <= 0 || height <= 0 || currentStepId === lastFocusedStepId) return;
+
+    let targets = snapshot.activeNodeIds.flatMap((nodeId) => {
+      const placement = placementById.get(nodeId);
+      return placement ? [placement] : [];
+    });
+    if (!targets.length && layout.nodes.length) {
+      const lastStage = Math.max(...layout.nodes.map((node) => node.stageIndex));
+      targets = layout.nodes.filter((node) => node.stageIndex === lastStage);
+    }
+    if (!targets.length) return;
+
+    const left = Math.min(...targets.map((node) => node.x));
+    const right = Math.max(...targets.map((node) => node.x + node.width));
+    const offset = worldBoundsToScrollOffset(
+      { x: left, y: 0, width: right - left, height: 0 },
+      scale,
+      { width, height },
+      { width: cameraWorldWidth, height: layout.height },
+      { padding: 16, alignX: 'center', alignY: 'start' },
+    );
     lastFocusedStepId = currentStepId;
-    requestAnimationFrame(() => viewport.scrollTo({ left: Math.max(0, (stageIndex * 340 + 12) * scale), behavior: 'smooth' }));
+    requestAnimationFrame(() => {
+      if (!viewport || snapshot.step.id !== currentStepId) return;
+      viewport.scrollLeft = offset.x;
+      viewport.scrollTop = 0;
+    });
   });
 </script>
 
 <div class="dz-lesson-canvas">
   <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
   <div
-    bind:this={viewport}
+    use:observeViewport
     class="dz-lesson-canvas__viewport"
     class:dragging
     aria-label="학습 노드 캔버스"
@@ -134,11 +184,11 @@
     onpointercancel={pointerEnd}
     onwheel={(event) => { if (event.ctrlKey || event.metaKey) { event.preventDefault(); setScale(scale * Math.exp(-event.deltaY * .002)); } }}
   >
-    <div class="dz-lesson-canvas__shell" style={`width:${layout.width * scale}px;height:${layout.height * scale}px`}>
+    <div class="dz-lesson-canvas__shell" style={`width:${cameraWorldWidth * scale}px;height:${layout.height * scale}px`}>
       <div
         class="dz-lesson-canvas__world"
         class:ready={layout.ready}
-        style={`width:${layout.width}px;height:${layout.height}px;transform:scale(${scale})`}
+        style={`width:${cameraWorldWidth}px;height:${layout.height}px;transform:scale(${scale})`}
       >
         {#each layout.chapters as bounds (bounds.chapterId)}
           {@const chapter = chapterById.get(bounds.chapterId)}
