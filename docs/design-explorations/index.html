@@ -13,7 +13,7 @@
       --ink: #222721; --muted: #737a72; --line: #d6d9d2; --strong: #b9beb6;
       --accent: #315ee8; --accent-soft: #e7edff; --warm: #dc6844; --warm-soft: #fff0e9;
       --good: #2f846b; --good-soft: #e5f5ef; --canvas: #f5f4ef; --grid: rgba(47,57,49,.075);
-      --edge: #969f97; --shadow: 0 24px 70px rgba(30,38,31,.14), 0 2px 8px rgba(30,38,31,.08);
+      --edge: #969f97; --shadow: 0 24px 70px rgba(30,38,31,.14), 0 2px 8px rgba(30,38,31,.08); --code-bg: #edf1f3; --code-bar: #e1e7ea; --code-ink: #18342a; --code-muted: #6c7b76; --code-line: #cbd4d1;
       --node-shadow: 0 9px 24px rgba(30,38,31,.11), 0 1px 3px rgba(30,38,31,.08);
       font-family: Inter, Pretendard, "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
@@ -23,13 +23,14 @@
       --ink: #f1f4f8; --muted: #929dac; --line: #293340; --strong: #3d4a5b;
       --accent: #7d9dff; --accent-soft: #202b4a; --warm: #ff8b68; --warm-soft: #40251f;
       --good: #63d5ae; --good-soft: #16382f; --canvas: #0b1017; --grid: rgba(183,200,220,.07);
-      --edge: #586779; --shadow: 0 30px 90px rgba(0,0,0,.48), 0 2px 12px rgba(0,0,0,.34);
+      --edge: #586779; --shadow: 0 30px 90px rgba(0,0,0,.48), 0 2px 12px rgba(0,0,0,.34); --code-bg: #111821; --code-bar: #182331; --code-ink: #c9f4df; --code-muted: #8fa3b8; --code-line: #29384a;
       --node-shadow: 0 12px 28px rgba(0,0,0,.4), 0 1px 4px rgba(0,0,0,.35);
     }
     html, body { margin: 0; min-width: 320px; min-height: 100%; }
     body { overflow-x: hidden; background: var(--page); color: var(--ink); }
     button, input { font: inherit; color: inherit; }
     button { border: 0; }
+    button, a, [role="button"] { touch-action: manipulation; }
     .page { min-height: 100vh; padding: 22px; }
     .showcase { max-width: 1440px; margin: 0 auto; }
     .showcase-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 28px; margin-bottom: 14px; }
@@ -111,6 +112,18 @@
     .node p { margin: 5px 0 0; color: var(--muted); font-size: 8px; line-height: 1.4; }
     .node-foot { display: flex; justify-content: space-between; gap: 6px; margin-top: 7px; padding-top: 6px; border-top: 1px solid var(--line); color: var(--muted); font-size: 7px; }
     .node-foot b { color: var(--good); }
+    .canvas[data-dense="true"] .node { width: var(--w, 118px); min-height: var(--node-min-h, 64px); padding: 8px 9px; border-radius: 9px; box-shadow: 0 5px 14px rgba(30,38,31,.1); }
+    .canvas[data-dense="true"] .node-kicker { margin-bottom: 3px; font-size: 5.5px; letter-spacing: .03em; }
+    .canvas[data-dense="true"] .node-kicker::before { width: 5px; height: 5px; background: var(--node-color, var(--accent)); }
+    .canvas[data-dense="true"] .node h3 { font-size: 10px; line-height: 1.18; }
+    .canvas[data-dense="true"] .node p { display: block; margin-top: 4px; color: var(--muted); font-size: 6.7px; line-height: 1.38; }
+    .canvas[data-dense="true"] .node-foot { display: flex; margin-top: 5px; padding-top: 4px; font-size: 5.7px; }
+    .canvas[data-dense="true"] .node-detail { display: none; }
+    .canvas[data-dense="true"][data-zoom="detail"] .node { width: var(--w, 108px); min-height: 58px; }
+    .canvas[data-dense="true"][data-zoom="detail"] .node p { display: block; max-height: 28px; overflow: hidden; font-size: 6.5px; }
+    .canvas[data-dense="true"] .edge-label:not(.active) { display: none; }
+    .canvas[data-dense="true"] .edge-label.active { border-color: var(--accent); color: var(--accent); font-weight: 850; }
+    .node.stage-new { border-color: var(--node-color, var(--accent)); box-shadow: 0 0 0 2px color-mix(in srgb, var(--node-color, var(--accent)) 20%, transparent), var(--node-shadow); }
     .node-children { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; margin-top: 8px; padding: 7px; border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--line)); border-radius: 8px; background: var(--panel); }
     .node-children-label { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 6px; color: var(--muted); font-size: 6px; font-weight: 800; }
     .node-children-label b { color: var(--accent); font-size: 6px; }
@@ -176,7 +189,8 @@
     .node-media-preview.image::after { width: 78px; height: 78px; right: -18px; bottom: -34px; background: color-mix(in srgb, var(--good) 55%, transparent); }
     .node-media-preview b { position: relative; z-index: 2; display: grid; place-items: center; width: 27px; height: 27px; border-radius: 50%; background: rgba(255,255,255,.92); color: #1a2230; font-size: 9px; }
     .node-media-preview small { position: absolute; right: 6px; bottom: 5px; z-index: 2; padding: 3px 5px; border-radius: 4px; background: rgba(0,0,0,.58); color: white; font-size: 6px; }
-    .node-code { margin: 7px 0 0; padding: 8px; overflow: hidden; border-radius: 7px; background: #111821; color: #c9f4df; font: 6.5px/1.45 ui-monospace, SFMono-Regular, Consolas, monospace; text-align: left; white-space: pre; }
+    .node-code { margin: 7px 0 0; padding: 8px; overflow: hidden; border: 1px solid var(--code-line); border-radius: 7px; background: var(--code-bg); color: var(--code-ink); font: 6.5px/1.45 ui-monospace, SFMono-Regular, Consolas, monospace; text-align: left; white-space: pre; }
+    .canvas[data-dense="true"] .node-code { max-height: 120px; overflow: auto; }
     .node-detail { display: none; margin-top: 7px; padding-top: 7px; border-top: 1px dashed var(--line); color: var(--muted); font-size: 7px; line-height: 1.45; }
     .node-detail strong { display: block; margin-bottom: 4px; color: var(--ink); font-size: 7px; }
     .example-list { display: grid; gap: 3px; }
@@ -271,6 +285,130 @@
     .v-node { position: absolute; z-index: 2; display: grid; place-items: center; min-width: 78px; max-width: 110px; min-height: 48px; padding: 8px; border: 1px solid var(--strong); border-radius: 9px; background: var(--panel); box-shadow: var(--node-shadow); color: var(--ink); cursor: pointer; font-size: 9px; font-weight: 850; text-align: center; transform: translate(-50%, -50%); }
     .v-node.compact { min-width: 62px; max-width: 82px; min-height: 34px; padding: 5px 6px; border-radius: 8px; font-size: 7.5px; line-height: 1.2; }
     .v-node.hot { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+    .complex-viewport-wrap { position: relative; margin-top: 9px; }
+    .viewer-diagram.complex { height: 382px; margin-top: 0; overflow: auto; background-image: none; overscroll-behavior: none; scroll-behavior: auto; scroll-snap-type: none; scrollbar-width: none; touch-action: pinch-zoom; cursor: grab; }
+    .viewer-diagram.complex.is-dragging { cursor: grabbing; user-select: none; }
+    .viewer-diagram.complex::-webkit-scrollbar { display: none; }
+    .complex-world-shell { position: relative; min-width: 100%; min-height: 100%; }
+    .complex-world { position: absolute; left: 0; top: 0; background-color: var(--canvas); background-image: radial-gradient(var(--grid) 1px, transparent 1px); background-size: 12px 12px; transform-origin: 0 0; }
+    .complex-view-controls { position: absolute; right: 8px; top: 8px; z-index: 8; display: flex; align-items: center; gap: 3px; padding: 3px; border: 1px solid var(--line); border-radius: 8px; background: color-mix(in srgb, var(--panel) 92%, transparent); box-shadow: 0 4px 12px rgba(30,38,31,.12); backdrop-filter: blur(6px); }
+    .complex-view-controls button { display: grid; place-items: center; min-width: 23px; height: 23px; padding: 0 5px; border-radius: 5px; background: var(--panel2); color: var(--ink); cursor: pointer; font-size: 8px; font-weight: 850; }
+    .complex-view-controls output { min-width: 30px; color: var(--muted); font-size: 6px; font-weight: 850; text-align: center; }
+    .complex-node { display: block; width: var(--viewer-w, 112px); min-width: var(--viewer-w, 112px); max-width: var(--viewer-w, 112px); min-height: var(--viewer-h, 68px); padding: 9px 8px 8px 10px; overflow: hidden; border-color: color-mix(in srgb, var(--node-color) 58%, var(--line)); border-radius: 9px; box-shadow: 0 3px 9px rgba(30,38,31,.1); font-size: 6px; line-height: 1.25; text-align: left; overflow-wrap: anywhere; }
+    .complex-node::before { content: ""; position: absolute; left: 5px; top: 5px; width: 4px; height: 4px; border-radius: 50%; background: var(--node-color); }
+    .complex-node.stage-new { background: color-mix(in srgb, var(--node-color) 12%, var(--panel)); color: var(--ink); box-shadow: 0 0 0 2px color-mix(in srgb, var(--node-color) 22%, transparent); }
+    .complex-node.selected { outline: 2px solid var(--node-color); outline-offset: 1px; }
+    .complex-node-head { display: block; padding-left: 5px; }
+    .complex-node-head small { display: block; margin-bottom: 2px; color: var(--muted); font-size: 5.8px; font-weight: 800; }
+    .complex-node-head strong { display: block; color: var(--ink); font-size: 8.8px; line-height: 1.2; }
+    .complex-node-body { display: block; margin-top: 5px; color: var(--muted); font-size: 6.7px; font-weight: 650; line-height: 1.42; }
+    .complex-node-stat { display: flex; align-items: baseline; gap: 4px; margin-top: 6px; padding-top: 5px; border-top: 1px solid var(--line); }
+    .complex-node-stat b { color: var(--node-color); font-size: 12px; line-height: 1; }
+    .complex-node-stat small { color: var(--muted); font-size: 5.8px; }
+    .complex-node-routes { display: grid; gap: 2px; margin-top: 5px; }
+    .complex-node-routes span { overflow: hidden; color: var(--muted); font-size: 5.8px; line-height: 1.25; text-overflow: ellipsis; white-space: nowrap; }
+    .complex-node-routes b { color: var(--node-color); }
+    .complex-node-quote { display: block; margin-top: 5px; padding: 5px 6px; border-left: 2px solid var(--node-color); background: var(--panel2); color: var(--ink); font-size: 6.4px; font-weight: 700; line-height: 1.35; }
+    .complex-node-visual { position: relative; display: block; height: 27px; margin-top: 5px; overflow: hidden; border-radius: 6px; background: linear-gradient(135deg, color-mix(in srgb, var(--node-color) 22%, var(--panel2)), var(--panel2)); }
+    .complex-node-visual::before, .complex-node-visual::after { content: ""; position: absolute; border-radius: 50%; background: color-mix(in srgb, var(--node-color) 45%, transparent); }
+    .complex-node-visual::before { width: 30px; height: 30px; left: 9px; top: 7px; }
+    .complex-node-visual::after { width: 43px; height: 43px; right: -6px; top: -17px; }
+    .complex-node-visual i { position: absolute; left: 6px; bottom: 4px; z-index: 1; color: var(--ink); font-size: 5.7px; font-style: normal; font-weight: 850; }
+    .complex-node-code-frame { display: block; margin-top: 8px; overflow: hidden; border: 1px solid var(--code-line); border-radius: 8px; background: var(--code-bg); color: var(--code-ink); touch-action: pan-y pinch-zoom; }
+    .complex-node-code-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 7px 9px; border-bottom: 1px solid var(--code-line); background: var(--code-bar); color: var(--ink); font: 6.8px/1.2 ui-monospace, SFMono-Regular, Consolas, monospace; }
+    .complex-node-code-head b { color: var(--ink); }
+    .complex-node-code-head small { color: var(--code-muted); font-size: 6px; }
+    .complex-node-code-scroll { display: block; height: 164px; overflow: auto; overscroll-behavior: contain; scrollbar-color: var(--code-muted) var(--code-bg); scrollbar-width: thin; }
+    .complex-node-code { display: block; min-width: max-content; padding: 8px 0; counter-reset: code-line; font: 7.2px/1.5 ui-monospace, SFMono-Regular, Consolas, monospace; text-align: left; white-space: pre; }
+    .complex-node-code > span { position: relative; display: block; min-height: 1.5em; padding: 0 10px 0 37px; counter-increment: code-line; }
+    .complex-node-code > span::before { content: counter(code-line); position: absolute; width: 26px; margin-left: -34px; color: var(--code-muted); text-align: right; }
+    .complex-node-code-foot { display: flex; align-items: center; justify-content: space-between; gap: 5px; padding: 6px 9px; border-top: 1px solid var(--code-line); color: var(--code-muted); font: 5.8px/1.2 ui-monospace, SFMono-Regular, Consolas, monospace; }
+    .complex-node-code-foot button { padding: 4px 6px; border-radius: 5px; background: var(--accent); color: white; cursor: pointer; font: 6px/1 sans-serif; font-weight: 850; }
+    .complex-node-accordion { display: block; margin-top: 6px; border-top: 1px solid var(--line); }
+    .complex-node-accordion summary { padding: 6px 1px 3px; color: var(--node-color); cursor: pointer; font-size: 6.4px; font-weight: 850; list-style-position: inside; }
+    .complex-node-accordion p { margin: 3px 0 0; color: var(--muted); font-size: 6.1px; font-weight: 650; line-height: 1.4; }
+    .complex-node-accordion span { display: block; margin-top: 3px; color: var(--ink); font-size: 5.8px; font-weight: 750; }
+    .complex-node-accordion[open] { padding-bottom: 2px; }
+    .complex-node-checklist { display: grid; gap: 4px; margin-top: 6px; }
+    .complex-node-checklist span { position: relative; display: block; padding-left: 11px; color: var(--muted); font-size: 6.1px; font-weight: 650; line-height: 1.35; }
+    .complex-node-checklist span::before { content: "✓"; position: absolute; left: 0; top: 0; color: var(--node-color); font-weight: 950; }
+    .complex-node-table { display: grid; grid-template-columns: 1fr auto; margin-top: 6px; overflow: hidden; border: 1px solid var(--line); border-radius: 6px; }
+    .complex-node-table span, .complex-node-table b { padding: 4px 5px; border-bottom: 1px solid var(--line); font-size: 5.9px; }
+    .complex-node-table span { color: var(--muted); }
+    .complex-node-table b { color: var(--ink); text-align: right; }
+    .complex-node-table > :nth-last-child(-n+2) { border-bottom: 0; }
+    .chapter-bar { margin-top: 10px; padding: 7px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel2); }
+    .chapter-current { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; padding: 1px 2px 7px; background: transparent; cursor: pointer; text-align: left; }
+    .chapter-current span { min-width: 0; }
+    .chapter-current small, .chapter-current strong { display: block; }
+    .chapter-current small { color: var(--accent); font-size: 5.8px; font-weight: 900; }
+    .chapter-current strong { margin-top: 2px; overflow: hidden; font-size: 8px; text-overflow: ellipsis; white-space: nowrap; }
+    .chapter-current b { flex: 0 0 auto; color: var(--muted); font-size: 6px; }
+    .chapter-track { display: grid; grid-template-columns: repeat(3,1fr); gap: 4px; }
+    .chapter-track button { position: relative; min-width: 0; height: 28px; padding: 5px 4px 4px 18px; overflow: hidden; border: 1px solid var(--line); border-radius: 7px; background: var(--panel); color: var(--muted); cursor: pointer; font-size: 5.5px; font-weight: 800; text-align: left; text-overflow: ellipsis; white-space: nowrap; }
+    .chapter-track button::before { content: attr(data-number); position: absolute; left: 5px; top: 6px; display: grid; place-items: center; width: 9px; height: 9px; border-radius: 50%; background: var(--panel2); color: var(--muted); font-size: 4.8px; }
+    .chapter-track button.done { color: var(--ink); }
+    .chapter-track button.active { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+    .chapter-track button.active::before { background: var(--accent); color: white; }
+    .chapter-region { position: absolute; z-index: 0; border: 1px dashed color-mix(in srgb, var(--chapter-color) 45%, var(--line)); border-radius: 18px; background: color-mix(in srgb, var(--chapter-color) 5%, transparent); pointer-events: none; }
+    .chapter-region.active { border-style: solid; background: color-mix(in srgb, var(--chapter-color) 9%, transparent); }
+    .chapter-region-label { position: absolute; left: 12px; top: 10px; display: grid; gap: 1px; max-width: 210px; padding: 6px 8px; border-radius: 7px; background: color-mix(in srgb, var(--panel) 92%, transparent); box-shadow: 0 2px 8px rgba(30,38,31,.08); }
+    .chapter-region-label small { color: var(--chapter-color); font-size: 6px; font-weight: 900; }
+    .chapter-region-label strong { color: var(--ink); font-size: 8px; }
+    .chapter-sheet { position: absolute; inset: 76px 9px 63px; z-index: 45; padding: 13px; overflow-y: auto; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); box-shadow: 0 24px 50px rgba(0,0,0,.28); }
+    .chapter-sheet-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+    .chapter-sheet-head small, .chapter-sheet-head strong { display: block; }
+    .chapter-sheet-head small { color: var(--accent); font-size: 6px; font-weight: 900; }
+    .chapter-sheet-head strong { margin-top: 2px; font-size: 12px; }
+    .chapter-sheet-head button { width: 25px; height: 25px; border-radius: 7px; background: var(--panel2); color: var(--muted); cursor: pointer; }
+    .chapter-sheet-list { display: grid; gap: 7px; margin-top: 12px; }
+    .chapter-sheet-card { display: grid; grid-template-columns: 28px 1fr auto; align-items: center; gap: 8px; padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel2); cursor: pointer; text-align: left; }
+    .chapter-sheet-card.active { border-color: var(--accent); background: var(--accent-soft); }
+    .chapter-sheet-card > b { display: grid; place-items: center; width: 27px; height: 27px; border-radius: 8px; background: var(--panel); color: var(--accent); font-size: 8px; }
+    .chapter-sheet-card span strong, .chapter-sheet-card span small { display: block; }
+    .chapter-sheet-card span strong { font-size: 8px; }
+    .chapter-sheet-card span small { margin-top: 3px; color: var(--muted); font-size: 6px; line-height: 1.4; }
+    .chapter-sheet-card > small { color: var(--muted); font-size: 6px; }
+    .code-viewer { position: absolute; inset: 70px 7px 61px; z-index: 50; display: grid; grid-template-rows: auto auto 1fr; min-height: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 15px; background: var(--panel); box-shadow: 0 26px 60px rgba(0,0,0,.32); }
+    .code-viewer-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 11px 8px; border-bottom: 1px solid var(--line); }
+    .code-viewer-head span { min-width: 0; }
+    .code-viewer-head small, .code-viewer-head strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .code-viewer-head small { color: var(--muted); font-size: 6px; }
+    .code-viewer-head strong { margin-top: 2px; font-size: 9px; }
+    .code-viewer-head button { width: 26px; height: 26px; border-radius: 7px; background: var(--panel2); color: var(--muted); cursor: pointer; }
+    .code-viewer-tabs { display: grid; grid-template-columns: repeat(3,1fr); gap: 3px; padding: 6px; background: var(--panel2); }
+    .code-viewer-tabs button { min-width: 0; padding: 7px 3px; border-radius: 6px; background: transparent; color: var(--muted); cursor: pointer; font-size: 6px; font-weight: 850; }
+    .code-viewer-tabs button.active { background: var(--panel); color: var(--accent); box-shadow: inset 0 0 0 1px var(--line); }
+    .code-viewer-body { min-height: 0; overflow: hidden; }
+    .code-viewer-file { display: grid; grid-template-rows: auto 1fr; height: 100%; background: var(--code-bg); color: var(--code-ink); }
+    .code-viewer-filebar { display: flex; justify-content: space-between; padding: 7px 10px; border-bottom: 1px solid var(--code-line); background: var(--code-bar); color: var(--code-muted); font: 6px/1.2 ui-monospace, monospace; }
+    .code-viewer-lines { height: 100%; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+    .code-viewer-lines code { display: block; min-width: max-content; padding: 8px 0; counter-reset: full-code-line; font: 7.3px/1.55 ui-monospace, SFMono-Regular, Consolas, monospace; white-space: pre; }
+    .code-viewer-lines code > span { position: relative; display: block; min-height: 1.55em; padding: 0 12px 0 42px; counter-increment: full-code-line; }
+    .code-viewer-lines code > span::before { content: counter(full-code-line); position: absolute; left: 6px; width: 27px; color: var(--code-muted); text-align: right; }
+    .code-viewer-lines code > span.mark { background: color-mix(in srgb, var(--accent) 15%, transparent); box-shadow: inset 2px 0 var(--accent); }
+    .code-viewer-split { display: grid; grid-template-rows: auto minmax(0,1fr); height: 100%; }
+    .code-guide { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 4px; padding: 7px; overflow: hidden; border-bottom: 1px solid var(--line); background: var(--panel2); }
+    .code-guide small { color: var(--accent); font-size: 5.5px; font-weight: 900; }
+    .code-guide h5 { grid-column: 2 / -1; margin: 0; font-size: 7px; line-height: 1.25; text-align: right; }
+    .code-guide button { width: 100%; min-width: 0; padding: 6px; border-radius: 6px; background: var(--panel); color: var(--muted); cursor: pointer; font-size: 5.8px; line-height: 1.3; text-align: left; }
+    .code-guide button.active { color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+    .code-viewer-map { position: relative; height: 100%; }
+    .code-viewer-map .code-viewer-file { padding-right: 46px; }
+    .code-minimap { position: absolute; right: 0; top: 28px; bottom: 0; width: 46px; overflow: hidden; border-left: 1px solid var(--code-line); background: var(--code-bar); }
+    .code-minimap i { display: block; height: 1px; margin: 2px 5px; background: var(--code-muted); opacity: .62; }
+    .code-minimap-window { position: absolute; left: 2px; right: 2px; top: 16%; height: 54px; border: 1px solid var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); }
+    .code-symbols { position: absolute; left: 7px; top: 34px; z-index: 3; display: flex; gap: 3px; max-width: calc(100% - 60px); overflow-x: auto; }
+    .code-symbols span { flex: 0 0 auto; padding: 4px 6px; border: 1px solid var(--code-line); border-radius: 5px; background: color-mix(in srgb, var(--code-bar) 94%, transparent); color: var(--code-muted); font: 5.5px/1 monospace; }
+    .complex-graph-meta { display: flex; align-items: center; gap: 5px; margin-top: 9px; overflow-x: auto; color: var(--muted); font-size: 6.5px; white-space: nowrap; }
+    .complex-graph-meta span { padding: 4px 6px; border-radius: 6px; background: var(--panel2); }
+    .complex-graph-meta b { color: var(--accent); }
+    .complex-legend { display: flex; justify-content: center; gap: 5px; margin-top: 5px; pointer-events: none; }
+    .complex-legend span { display: inline-flex; align-items: center; gap: 2px; color: var(--muted); font-size: 4.8px; }
+    .complex-legend i { width: 4px; height: 4px; border-radius: 50%; background: var(--legend-color); }
+    .complex-explanation { margin-top: 7px; padding: 8px 9px; }
+    .complex-explanation strong { display: block; margin-bottom: 3px; font-size: 8px; }
+    .complex-explanation p { margin: 0; color: var(--muted); font-size: 7.5px; line-height: 1.42; }
     .explain-card { margin-top: 10px; padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel2); font-size: 9px; line-height: 1.45; }
     .term-btn { padding: 0; background: transparent; color: var(--ink); cursor: pointer; font-weight: 850; text-decoration-line: underline; text-decoration-style: dotted; text-decoration-color: var(--accent); text-decoration-thickness: 1.5px; text-underline-offset: .12em; }
     .term-btn:hover, .term-btn:focus-visible { outline: none; color: var(--accent); text-decoration-style: solid; }
@@ -291,7 +429,7 @@
     .quiz button.correct { border-color: var(--good); background: var(--good-soft); } .quiz button.wrong { border-color: var(--warm); background: var(--warm-soft); }
     .feedback { margin-top: 9px; padding: 9px; border-radius: 9px; background: var(--good-soft); color: var(--good); font-size: 8px; line-height: 1.45; }
     .feedback[hidden] { display: none; }
-    .viewer-code { margin: 9px 0 0; padding: 10px; overflow-x: auto; border-radius: 9px; background: #111821; color: #c9f4df; font: 8px/1.5 ui-monospace, SFMono-Regular, Consolas, monospace; white-space: pre; }
+    .viewer-code { margin: 9px 0 0; padding: 10px; overflow-x: auto; border: 1px solid var(--code-line); border-radius: 9px; background: var(--code-bg); color: var(--code-ink); font: 8px/1.5 ui-monospace, SFMono-Regular, Consolas, monospace; white-space: pre; }
     .viewer-parent-node { position: absolute; left: 50%; top: 46%; z-index: 2; display: grid; place-items: center; width: 154px; min-height: 104px; padding: 9px; border: 1px solid var(--accent); border-radius: 11px; background: var(--accent-soft); color: var(--accent); font-size: 10px; font-weight: 900; text-align: center; transform: translate(-50%, -50%); }
     .viewer-parent-node > em { margin-top: 4px; color: var(--muted); font-size: 6px; font-style: normal; font-weight: 750; }
     .viewer-parent-node > small { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; width: 100%; margin-top: 7px; }
@@ -332,14 +470,15 @@
       .scenario-strip { display: flex; overflow-x: auto; padding-bottom: 3px; } .scenario-card { flex: 0 0 190px; }
     }
     @media (max-width: 720px) {
-      .page { padding: 10px; } .showcase-head { display: grid; gap: 12px; } .theme-switch { width: max-content; }
+      .page { width: 100%; padding: 10px; } .showcase { width: 100%; min-width: 0; } .showcase-head { display: grid; gap: 12px; } .theme-switch { width: max-content; }
       .showcase-head h1 { font-size: 25px; }
       .viewer-word { display: block; }
-      .appbar { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px; height: auto; min-height: 94px; padding: 10px; } .saved, .avatar, .appbar > .icon-btn, .appbar > .spacer { display: none; } .document { max-width: none; }
-      .role-switch { grid-column: 1 / -1; width: 100%; } .role-switch button { flex: 1; }
+      .scenario-strip, .app-shell { width: 100%; max-width: calc(100vw - 20px); }
+      .appbar { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px; height: auto; min-height: 94px; padding: 10px; overflow: hidden; } .saved, .avatar, .appbar > .icon-btn, .appbar > .spacer { display: none; } .document { min-width: 0; max-width: 100%; }
+      .role-switch { grid-column: 1 / -1; width: 100%; min-width: 0; } .role-switch button { min-width: 0; flex: 1; }
       .editor-grid { grid-template-columns: 132px minmax(520px, 1fr) 205px; overflow-x: auto; }
-      .viewer-layout { padding: 16px 8px 22px; }
-      .phone { width: min(390px, calc(100vw - 36px)); justify-self: center; }
+      .viewer-layout { width: 100%; min-width: 0; padding: 16px 8px 22px; overflow: hidden; }
+      .phone { width: min(370px, calc(100vw - 52px)); max-width: 100%; justify-self: center; }
     }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; } }
   </style>
@@ -430,7 +569,505 @@
   </aside>
 
   <script>
-    const scenarios = [
+const complexScenarios = (() => {
+  const columns = [8, 25, 42, 59, 76, 93];
+  const rows = [16, 39, 62, 85];
+  const origins = [[12, 18], [50, 12], [88, 18], [88, 82], [50, 88], [12, 82]];
+  const colors = ['#315ee8', '#2f846b', '#d46a45', '#8b5cc7', '#bd8b22', '#16869b'];
+
+  function buildScenario(config) {
+    const nodes = config.nodes.map((item, index) => {
+      const [id, title, group, appear, kind, body] = item;
+      const origin = origins[appear] || [50, 50];
+      const offset = (index % 4) - 1.5;
+      const codeExamples={
+        source:`import { createServer } from 'node:http';
+import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const here = dirname(fileURLToPath(import.meta.url));
+const dataDirectory = join(here, 'data');
+const userFile = join(dataDirectory, 'users.json');
+const port = Number(process.env.PORT || 3000);
+
+const metrics = {
+  requests: 0,
+  failures: 0,
+  startedAt: Date.now(),
+};
+
+function sendJson(response, status, value) {
+  const body = JSON.stringify(value, null, 2);
+  response.writeHead(status, {
+    'content-type': 'application/json; charset=utf-8',
+    'content-length': Buffer.byteLength(body),
+    'cache-control': 'no-store',
+  });
+  response.end(body);
+}
+
+function sendError(response, status, message) {
+  metrics.failures += 1;
+  sendJson(response, status, {
+    error: message,
+    status,
+  });
+}
+
+async function readRequestBody(request) {
+  const chunks = [];
+  let size = 0;
+
+  for await (const chunk of request) {
+    size += chunk.length;
+    if (size > 100_000) {
+      throw new Error('요청 본문이 너무 큽니다.');
+    }
+    chunks.push(chunk);
+  }
+
+  if (chunks.length === 0) return {};
+  const text = Buffer.concat(chunks).toString('utf8');
+  return JSON.parse(text);
+}
+
+async function loadUsers() {
+  try {
+    const text = await readFile(userFile, 'utf8');
+    return JSON.parse(text);
+  } catch (error) {
+    if (error.code === 'ENOENT') return [];
+    throw error;
+  }
+}
+
+async function saveUsers(users) {
+  await mkdir(dataDirectory, { recursive: true });
+  const body = JSON.stringify(users, null, 2);
+  await writeFile(userFile, body, 'utf8');
+}
+
+function validateUser(input) {
+  const name = String(input.name || '').trim();
+  const email = String(input.email || '').trim();
+
+  if (name.length < 2) {
+    return { ok: false, message: '이름은 두 글자 이상이어야 합니다.' };
+  }
+  if (!email.includes('@')) {
+    return { ok: false, message: '올바른 이메일을 입력해 주세요.' };
+  }
+  return { ok: true, value: { name, email } };
+}
+
+async function listUsers(response) {
+  const users = await loadUsers();
+  sendJson(response, 200, { users, count: users.length });
+}
+
+async function createUser(request, response) {
+  const input = await readRequestBody(request);
+  const validation = validateUser(input);
+
+  if (!validation.ok) {
+    sendError(response, 422, validation.message);
+    return;
+  }
+
+  const users = await loadUsers();
+  const user = {
+    id: crypto.randomUUID(),
+    ...validation.value,
+    createdAt: new Date().toISOString(),
+  };
+
+  users.push(user);
+  await saveUsers(users);
+  sendJson(response, 201, { user });
+}
+
+async function findUser(response, id) {
+  const users = await loadUsers();
+  const user = users.find((item) => item.id === id);
+
+  if (!user) {
+    sendError(response, 404, '사용자를 찾을 수 없습니다.');
+    return;
+  }
+  sendJson(response, 200, { user });
+}
+
+async function route(request, response) {
+  const url = new URL(request.url, 'http://localhost');
+  const parts = url.pathname.split('/').filter(Boolean);
+
+  if (request.method === 'GET' && url.pathname === '/health') {
+    sendJson(response, 200, {
+      ok: true,
+      uptime: Date.now() - metrics.startedAt,
+      requests: metrics.requests,
+      failures: metrics.failures,
+    });
+    return;
+  }
+
+  if (request.method === 'GET' && url.pathname === '/users') {
+    await listUsers(response);
+    return;
+  }
+
+  if (request.method === 'POST' && url.pathname === '/users') {
+    await createUser(request, response);
+    return;
+  }
+
+  if (request.method === 'GET' && parts[0] === 'users' && parts[1]) {
+    await findUser(response, parts[1]);
+    return;
+  }
+
+  sendError(response, 404, '요청한 경로가 없습니다.');
+}
+
+const server = createServer(async (request, response) => {
+  metrics.requests += 1;
+
+  try {
+    await route(request, response);
+  } catch (error) {
+    console.error(error);
+    sendError(response, 500, '서버에서 요청을 처리하지 못했습니다.');
+  }
+});
+
+server.listen(port, () => {
+  console.log('Server listening on port ' + port);
+});
+
+function shutdown(signal) {
+  console.log(signal + ' received. Closing server.');
+  server.close((error) => {
+    if (error) {
+      console.error(error);
+      process.exitCode = 1;
+    }
+  });
+}
+
+process.on('SIGINT', () => shutdown('SIGINT'));
+process.on('SIGTERM', () => shutdown('SIGTERM'));`,
+        handler:`const body = JSON.stringify(result);\nres.writeHead(200, { 'content-type': 'application/json' });\nres.end(body);`
+      };
+      const code=config.id==='runtime-system'?codeExamples[id]:null;
+      const cardType = code?'code':kind==='media'?'visual':kind==='question'?'quote':['summary','metric','accordion','visual','routes','checklist','table','quote'][index%8];
+      const cardProfile = {
+        summary:{viewerW:132,viewerH:88,editorW:150,editorH:96},
+        metric:{viewerW:122,viewerH:92,editorW:138,editorH:100},
+        accordion:{viewerW:156,viewerH:82,editorW:176,editorH:92},
+        visual:{viewerW:146,viewerH:108,editorW:166,editorH:116},
+        routes:{viewerW:158,viewerH:112,editorW:180,editorH:120},
+        checklist:{viewerW:154,viewerH:122,editorW:176,editorH:128},
+        table:{viewerW:148,viewerH:112,editorW:170,editorH:120},
+        quote:{viewerW:158,viewerH:112,editorW:180,editorH:120},
+        code:{viewerW:274,viewerH:286,editorW:286,editorH:298}
+      }[cardType];
+      return {
+        id, title, group, appear, kind,
+        cardType,
+        kicker: config.groups[group],
+        body, code,
+        examples: [body],
+        foot: `${appear + 1}단계에 생성`,
+        reuse: config.groups[group],
+        x: columns[index % columns.length],
+        y: rows[Math.floor(index / columns.length)],
+        from: [origin[0] + offset * 4, origin[1] + ((index % 2) ? 4 : -4)],
+        w: cardProfile.editorW,
+        detailW: cardProfile.editorW + 18,
+        editorH: cardProfile.editorH,
+        viewerW: cardProfile.viewerW,
+        viewerH: cardProfile.viewerH,
+        color: colors[group]
+      };
+    });
+    const nodeById = new Map(nodes.map(node => [node.id, node]));
+    const edges = config.edges.map(([source, target, label]) => [
+      source,
+      target,
+      label,
+      Math.max(nodeById.get(source)?.appear || 0, nodeById.get(target)?.appear || 0)
+    ]);
+    nodes.forEach(node=>{
+      node.incoming=edges.filter(edge=>edge[1]===node.id).map(edge=>({title:nodeById.get(edge[0])?.title,label:edge[2]}));
+      node.outgoing=edges.filter(edge=>edge[0]===node.id).map(edge=>({title:nodeById.get(edge[1])?.title,label:edge[2]}));
+      const inbound=node.incoming[0], outbound=node.outgoing[0];
+      node.detail=`${node.body}${inbound?` ${inbound.title}에서 ‘${inbound.label}’ 관계로 들어옵니다.`:' 이 흐름의 출발점으로 사용됩니다.'}${outbound?` 다음에는 ${outbound.title}로 이어져 ‘${outbound.label}’ 역할을 합니다.`:' 이후 결과를 모으는 지점에서 흐름이 끝납니다.'}`;
+    });
+    const groupNames=Object.values(config.groups);
+    const chapterRanges=[[0,1],[2,3],[4,5,6]];
+    const chapters=chapterRanges.map((steps,index)=>{
+      const available=steps.filter(step=>step<config.steps.length), first=available[0], last=available[available.length-1];
+      return {
+        id:`chapter-${index+1}`,
+        number:index+1,
+        title:`${groupNames[index*2]} · ${groupNames[index*2+1]}`,
+        summary:`${config.steps[first][0]}부터 ${config.steps[last][0]}까지 이어지는 흐름입니다.`,
+        steps:available
+      };
+    });
+    return {
+      ...config,
+      nodes,
+      edges,
+      chapters,
+      dense: true,
+      assets: Object.entries(config.groups).map(([group, label]) => [label, String(Number(group) + 1).padStart(2, '0'), `${nodes.filter(node => String(node.group) === group).length}개 개념`, '4']),
+      selected: [nodes[0].title, nodes[0].body, '노드 설명 열기'],
+      viewer: {
+        type: 'complex',
+        kicker: config.viewer.kicker,
+        title: config.viewer.title,
+        intro: config.viewer.intro
+      }
+    };
+  }
+
+  return [
+    buildScenario({
+      id: 'runtime-system', title: 'Node.js 비동기 실행', short: '24개 노드 · 큐와 실행 경로', audience: '생성·이동·합류 추적', document: 'Node.js 요청은 어떻게 완료될까?', meta: '소프트웨어 · 24개 노드', mode: '실행 시스템', hint: '단계마다 실행 요소가 생성되고 큐와 처리기로 이동합니다.',
+      producer: '소스가 실행되고 I/O 결과가 응답으로 합류하는 전체 경로를 구성합니다.',
+      slides: ['코드 읽기', '동기 실행', 'I/O 위임', '큐 대기', '응답 합류'],
+      groups: {0:'입력',1:'동기 실행',2:'비동기 위임',3:'대기열',4:'재진입',5:'결과'},
+      nodes: [
+        ['source','JavaScript 소스',0,0,'code','함수와 모듈이 실행의 출발점입니다.'],
+        ['loader','모듈 로더',0,0,'data','import와 require의 의존성을 찾습니다.'],
+        ['parser','파서',0,0,'concept','소스를 문법 구조로 해석합니다.'],
+        ['config','환경 설정',0,0,'data','실행 인자와 환경 변수를 제공합니다.'],
+        ['bytecode','V8 바이트코드',1,1,'code','Ignition이 실행할 명령으로 변환합니다.'],
+        ['stack','Call Stack',1,1,'data','현재 실행 중인 함수 순서를 쌓습니다.'],
+        ['microtask','Microtask Queue',1,1,'data','Promise 후속 작업이 대기합니다.'],
+        ['sync-result','동기 결과',1,1,'data','즉시 계산된 값을 다음 함수에 넘깁니다.'],
+        ['timer-api','Timer API',2,2,'concept','지정한 시간이 지난 뒤 신호를 만듭니다.'],
+        ['fs-api','File System API',2,2,'concept','파일 읽기와 쓰기를 요청합니다.'],
+        ['net-api','Network API',2,2,'concept','소켓 연결과 패킷 입출력을 요청합니다.'],
+        ['libuv','libuv',2,2,'concept','운영체제와 작업 스레드에 I/O를 배분합니다.'],
+        ['timer-heap','Timer Heap',3,3,'data','만료 시각 순으로 timer를 관리합니다.'],
+        ['kernel','OS Kernel',3,3,'data','네트워크와 비동기 파일 신호를 처리합니다.'],
+        ['worker-pool','Worker Pool',3,3,'data','일부 파일·DNS·암호화 작업을 실행합니다.'],
+        ['io-ready','완료된 I/O',3,3,'data','끝난 작업의 결과와 callback을 묶습니다.'],
+        ['nexttick','nextTick Queue',4,4,'data','현재 작업 직후 실행할 callback이 모입니다.'],
+        ['callback-q','Callback Queue',4,4,'data','완료된 I/O callback이 차례를 기다립니다.'],
+        ['event-loop','Event Loop',4,4,'concept','스택과 각 대기열을 확인해 다음 작업을 고릅니다.'],
+        ['handler','응답 Handler',4,4,'code','준비된 데이터로 응답 내용을 조립합니다.'],
+        ['buffer','Response Buffer',5,5,'data','전송할 header와 body를 모읍니다.'],
+        ['socket','Client Socket',5,5,'data','완성된 byte를 클라이언트에 보냅니다.'],
+        ['metrics','로그와 지표',5,5,'data','지연 시간과 오류를 기록합니다.'],
+        ['client','브라우저 응답',5,5,'concept','클라이언트가 결과를 받아 화면을 갱신합니다.']
+      ],
+      edges: [
+        ['source','loader','의존성 찾기'],['loader','parser','소스 전달'],['config','loader','경로 제공'],['parser','bytecode','변환'],['bytecode','stack','함수 실행'],['stack','sync-result','즉시 계산'],['stack','microtask','Promise 예약'],['stack','timer-api','timer 호출'],['stack','fs-api','파일 요청'],['stack','net-api','네트워크 요청'],['timer-api','libuv','시간 등록'],['fs-api','libuv','작업 위임'],['net-api','libuv','감시 등록'],['libuv','timer-heap','만료 관리'],['libuv','kernel','I/O 감시'],['libuv','worker-pool','작업 배분'],['kernel','io-ready','완료 신호'],['worker-pool','io-ready','결과 반환'],['timer-heap','callback-q','만료 callback'],['io-ready','callback-q','I/O callback'],['microtask','event-loop','우선 확인'],['nexttick','event-loop','먼저 확인'],['callback-q','event-loop','다음 callback'],['event-loop','stack','스택에 올리기'],['stack','handler','응답 계산'],['sync-result','handler','값 합류'],['handler','buffer','직렬화'],['buffer','socket','전송'],['socket','client','수신'],['handler','metrics','처리 기록'],['metrics','event-loop','부하 신호']
+      ],
+      steps: [
+        ['실행 재료 모으기','소스·모듈·환경 설정이 파서 앞에서 하나의 실행 입력으로 모입니다.','4개 생성'],
+        ['동기 실행 시작','V8 바이트코드와 Call Stack이 생기고 Promise 작업은 별도 대기열로 갈라집니다.','4개 생성·이동'],
+        ['오래 걸리는 일 위임','Timer·파일·네트워크 요청이 libuv로 모여 JavaScript 실행과 분리됩니다.','4개 생성·분기'],
+        ['운영체제에서 처리','Timer Heap·Kernel·Worker Pool이 작업을 나눠 처리한 뒤 완료 신호를 만듭니다.','4개 생성·합류'],
+        ['실행 흐름으로 복귀','여러 대기열의 callback을 Event Loop가 골라 Stack과 응답 Handler로 돌려보냅니다.','4개 생성·재연결'],
+        ['응답과 관찰 결과 생성','응답은 Socket으로 전송되고 로그와 지표는 다음 실행 판단에 남습니다.','4개 생성·분기'],
+        ['전체 실행 경로 정렬','24개 요소가 입력·실행·위임·대기·재진입·결과의 여섯 층으로 정렬됩니다.','24개 정렬']
+      ],
+      viewer:{kicker:'소프트웨어 시스템 · 24개 노드',title:'한 요청은 여러 실행 경로로<br>갈라졌다가 다시 합류합니다.',intro:'다음을 누르면 새 실행 요소가 생기고, 이전에 생긴 요소는 역할에 맞는 위치로 이동합니다.'}
+    }),
+
+    buildScenario({
+      id:'tidal-carbon', title:'갯벌의 탄소 순환', short:'24개 노드 · 생태계 순환', audience:'먹이망·저장 경로 추적', document:'갯벌은 탄소를 어떻게 붙잡을까?', meta:'생태학 · 24개 노드', mode:'생태계 순환', hint:'생산자·소비자·분해자·퇴적층이 순환 구조를 만듭니다.',
+      producer:'탄소가 생물과 퇴적층 사이를 이동하고 일부가 장기 저장되는 과정을 구성합니다.',
+      slides:['탄소 유입', '일차 생산', '먹이망', '분해', '퇴적과 이동'],
+      groups:{0:'환경 입력',1:'일차 생산',2:'먹이망',3:'분해',4:'저장·이동',5:'변화와 결과'},
+      nodes:[
+        ['sun','햇빛',0,0,'concept','광합성에 필요한 에너지를 제공합니다.'],
+        ['co2','대기 CO₂',0,0,'data','물과 식물이 흡수할 탄소의 출발점입니다.'],
+        ['tide','밀물과 썰물',0,0,'concept','물질을 갯벌 안팎으로 운반합니다.'],
+        ['nutrient','하천 영양염',0,0,'data','질소와 인이 생산자의 성장을 돕습니다.'],
+        ['phytoplankton','식물플랑크톤',1,1,'concept','물속 탄소를 유기물로 바꿉니다.'],
+        ['benthic-algae','저서미세조류',1,1,'concept','퇴적물 표면에서 광합성합니다.'],
+        ['seagrass','잘피',1,1,'concept','잎과 뿌리에 탄소를 고정합니다.'],
+        ['marsh-plant','염생식물',1,1,'concept','조간대 식생과 뿌리층을 만듭니다.'],
+        ['clam','조개',2,2,'concept','물을 거르며 플랑크톤을 먹습니다.'],
+        ['worm','갯지렁이',2,2,'concept','퇴적물 속 유기물을 섭취합니다.'],
+        ['crab','게',2,2,'concept','식물 잔해와 작은 동물을 먹습니다.'],
+        ['shorebird','도요새',2,2,'concept','조개와 갯지렁이를 먹이로 삼습니다.'],
+        ['detritus','유기물 잔해',3,3,'data','죽은 생물과 배설물이 한곳에 모입니다.'],
+        ['aerobic-microbe','호기성 미생물',3,3,'concept','산소가 있는 표면에서 유기물을 분해합니다.'],
+        ['anaerobic-microbe','혐기성 미생물',3,3,'concept','산소가 적은 퇴적층에서 분해를 이어갑니다.'],
+        ['respiration','호흡 CO₂',3,3,'data','생물의 호흡과 분해로 탄소가 다시 방출됩니다.'],
+        ['sediment','퇴적 입자',4,4,'data','미세한 입자가 유기물을 붙잡아 가라앉힙니다.'],
+        ['root-zone','뿌리 퇴적층',4,4,'data','식물 뿌리가 퇴적물을 안정시킵니다.'],
+        ['buried-carbon','매몰 유기탄소',4,4,'data','깊은 층에 묻혀 분해 속도가 느려집니다.'],
+        ['tidal-export','연안으로 이동',4,4,'data','용존·입자성 탄소 일부가 바다로 나갑니다.'],
+        ['erosion','침식',5,5,'question','파도와 개발이 저장된 퇴적물을 다시 드러냅니다.'],
+        ['restoration','식생 복원',5,5,'concept','잘피와 염생식물의 정착을 돕습니다.'],
+        ['foodweb-carbon','먹이망 탄소',5,5,'data','생물체 사이를 이동하는 탄소를 나타냅니다.'],
+        ['blue-carbon','장기 저장 탄소',5,5,'concept','퇴적층에 오래 남는 탄소 저장 결과입니다.']
+      ],
+      edges:[
+        ['sun','phytoplankton','광합성'],['sun','benthic-algae','광합성'],['sun','seagrass','광합성'],['sun','marsh-plant','광합성'],['co2','phytoplankton','탄소 흡수'],['co2','seagrass','탄소 흡수'],['nutrient','phytoplankton','성장 지원'],['nutrient','benthic-algae','성장 지원'],['tide','phytoplankton','운반'],['phytoplankton','clam','섭식'],['benthic-algae','worm','섭식'],['seagrass','crab','먹이·서식처'],['worm','shorebird','섭식'],['clam','shorebird','섭식'],['phytoplankton','detritus','사멸'],['seagrass','detritus','잎 탈락'],['marsh-plant','detritus','식물 잔해'],['crab','detritus','배설물'],['detritus','aerobic-microbe','표면 분해'],['detritus','anaerobic-microbe','깊은 층 분해'],['aerobic-microbe','respiration','탄소 방출'],['clam','respiration','호흡'],['detritus','sediment','입자 결합'],['seagrass','root-zone','뿌리 고정'],['marsh-plant','root-zone','퇴적 안정'],['sediment','buried-carbon','매몰'],['root-zone','buried-carbon','장기 보존'],['tide','tidal-export','외해 이동'],['detritus','foodweb-carbon','유기물 공급'],['foodweb-carbon','respiration','호흡'],['erosion','buried-carbon','재노출'],['restoration','seagrass','서식지 회복'],['restoration','marsh-plant','식생 회복'],['buried-carbon','blue-carbon','장기 저장']
+      ],
+      steps:[
+        ['환경 조건 놓기','햇빛·대기 탄소·조석·영양염이 갯벌의 물질 이동 조건을 만듭니다.','4개 생성'],
+        ['탄소를 생물체로 고정','네 종류의 생산자가 탄소를 흡수해 잎·뿌리·세포에 저장합니다.','4개 생성·이동'],
+        ['먹이망으로 확산','조개·갯지렁이·게를 거쳐 탄소가 상위 소비자인 도요새까지 이동합니다.','4개 생성·분기'],
+        ['죽은 유기물 분해','잔해가 모이고 미생물 분해와 생물 호흡을 통해 일부 탄소가 다시 방출됩니다.','4개 생성·순환'],
+        ['퇴적층에 붙잡기','입자와 뿌리층이 유기물을 매몰하며 일부 탄소는 연안으로 이동합니다.','4개 생성·합류'],
+        ['교란과 복원 비교','침식은 저장 탄소를 드러내고 식생 복원은 매몰 경로를 강화합니다.','4개 생성·되먹임'],
+        ['전체 탄소 순환 정렬','24개 요소가 생산·섭식·분해·이동·장기 저장의 순환으로 정렬됩니다.','24개 정렬']
+      ],
+      viewer:{kicker:'생태학 · 24개 노드',title:'갯벌의 탄소는 먹이망을 돌고<br>일부만 퇴적층에 남습니다.',intro:'생물 사이의 이동과 장기 저장은 같은 경로가 아닙니다. 단계별 분기와 합류를 따라가 보세요.'}
+    }),
+
+    buildScenario({
+      id:'urban-flood', title:'도시의 폭우 대응', short:'24개 노드 · 위험과 대응', audience:'분기·경보·피드백 추적', document:'폭우가 도시 침수로 이어지는 경로', meta:'도시 방재 · 24개 노드', mode:'위험 대응 시스템', hint:'빗물이 여러 경로로 갈라지고 관측 결과가 대응 시설을 제어합니다.',
+      producer:'강우가 지표와 배수망을 거쳐 침수 위험이 되고, 관측·제어가 위험을 낮추는 과정을 구성합니다.',
+      slides:['강우 관측', '지표 유출', '배수망', '병목', '대응과 경보'],
+      groups:{0:'관측·예보',1:'도시 표면',2:'배수 경로',3:'병목 조건',4:'대응 제어',5:'영향·피드백'},
+      nodes:[
+        ['radar','기상 레이더',0,0,'data','비구름의 위치와 강도를 관측합니다.'],
+        ['forecast','강우 예보',0,0,'concept','시간대별 강우량과 지속 시간을 예상합니다.'],
+        ['gauge','우량계',0,0,'data','지상에서 실제 강우량을 측정합니다.'],
+        ['warning','사전 경보',0,0,'data','예상 위험을 담당 기관에 전달합니다.'],
+        ['roof','건물 지붕',1,1,'concept','빗물이 빠르게 홈통과 도로로 이동합니다.'],
+        ['road','불투수 도로',1,1,'concept','물이 땅으로 스며들지 못하고 흐릅니다.'],
+        ['park','공원 녹지',1,1,'concept','일부 빗물을 흡수하고 흐름을 늦춥니다.'],
+        ['soil','포화된 토양',1,1,'data','더 이상 물을 흡수하기 어려운 상태입니다.'],
+        ['runoff','지표 유출수',2,2,'data','지붕과 도로의 물이 낮은 곳으로 모입니다.'],
+        ['inlet','빗물받이',2,2,'concept','지표의 물을 하수관으로 받아들입니다.'],
+        ['storm-pipe','우수관',2,2,'concept','빗물을 하천이나 저류 시설로 보냅니다.'],
+        ['river','도시 하천',2,2,'concept','배수된 물을 하류로 운반합니다.'],
+        ['litter','쓰레기 막힘',3,3,'question','빗물받이 유입량을 크게 줄일 수 있습니다.'],
+        ['pipe-limit','관로 용량 초과',3,3,'question','들어오는 물이 관로 처리량을 넘습니다.'],
+        ['high-tide','높은 조위',3,3,'data','하천과 바다로 빠져나갈 물길을 막습니다.'],
+        ['low-point','저지대',3,3,'data','넘친 물이 지형적으로 모이는 곳입니다.'],
+        ['level-sensor','수위 센서',4,4,'data','관로·저류조·하천 수위를 실시간 측정합니다.'],
+        ['control-room','통합 관제',4,4,'concept','예보와 센서 정보를 함께 판단합니다.'],
+        ['basin','빗물 저류조',4,4,'concept','첨두 유량을 잠시 저장해 흐름을 늦춥니다.'],
+        ['pump','배수 펌프',4,4,'concept','하천 수위와 관로 상태에 맞춰 물을 이동시킵니다.'],
+        ['road-flood','도로 침수',5,5,'question','차량과 보행자의 이동을 막습니다.'],
+        ['sewer-overflow','하수 역류',5,5,'question','관로의 물이 낮은 배수구로 되돌아옵니다.'],
+        ['resident-alert','주민 알림',5,5,'data','우회·대피·차량 이동 정보를 전달합니다.'],
+        ['recovery-data','복구 데이터',5,5,'data','침수 깊이와 대응 시간을 다음 계획에 반영합니다.']
+      ],
+      edges:[
+        ['radar','forecast','관측 입력'],['gauge','forecast','실측 보정'],['forecast','warning','위험 판단'],['warning','control-room','사전 전달'],['forecast','roof','강우'],['forecast','road','강우'],['forecast','park','강우'],['forecast','soil','강우'],['roof','runoff','빠른 유출'],['road','runoff','표면 흐름'],['park','soil','침투'],['soil','runoff','포화 후 유출'],['runoff','inlet','유입'],['inlet','storm-pipe','관로 진입'],['storm-pipe','river','배수'],['litter','inlet','유입 방해'],['runoff','low-point','지형 집중'],['storm-pipe','pipe-limit','용량 비교'],['high-tide','river','배출 방해'],['pipe-limit','low-point','넘침'],['level-sensor','control-room','수위 전달'],['river','level-sensor','하천 수위'],['storm-pipe','level-sensor','관로 수위'],['control-room','basin','유입 제어'],['control-room','pump','가동 결정'],['basin','storm-pipe','유량 완화'],['pump','river','강제 배수'],['low-point','road-flood','침수 발생'],['pipe-limit','sewer-overflow','역류 발생'],['control-room','resident-alert','경보 발송'],['road-flood','recovery-data','피해 기록'],['sewer-overflow','recovery-data','피해 기록'],['recovery-data','forecast','모형 개선'],['recovery-data','control-room','대응 개선']
+      ],
+      steps:[
+        ['비구름을 먼저 읽기','레이더와 우량계가 예보를 보정하고 위험이 커지면 사전 경보를 만듭니다.','4개 생성'],
+        ['도시 표면에서 갈라지기','지붕·도로의 물은 빠르게 흐르고 녹지와 토양은 일부를 늦춥니다.','4개 생성·분기'],
+        ['배수 경로로 모이기','지표 유출수가 빗물받이와 우수관을 거쳐 하천으로 이동합니다.','4개 생성·합류'],
+        ['병목에서 넘치기','막힘·관로 한계·높은 조위가 겹치면 물이 저지대로 방향을 바꿉니다.','4개 생성·재연결'],
+        ['센서로 시설 제어','수위 정보와 예보를 관제가 합쳐 저류조와 펌프의 작동을 조절합니다.','4개 생성·되먹임'],
+        ['피해와 경보 연결','침수·역류 정보가 주민 알림과 복구 데이터로 이어지고 다음 예보를 개선합니다.','4개 생성·순환'],
+        ['전체 대응망 정렬','24개 요소가 관측·유출·배수·병목·대응·학습의 구조로 정렬됩니다.','24개 정렬']
+      ],
+      viewer:{kicker:'도시 방재 · 24개 노드',title:'침수는 비의 양만이 아니라<br>경로의 병목에서 만들어집니다.',intro:'관측 정보와 빗물의 이동을 함께 보면 어디서 위험이 커지고 대응이 개입하는지 알 수 있습니다.'}
+    }),
+
+    buildScenario({
+      id:'exhibition', title:'박물관 전시 만들기', short:'24개 노드 · 협업과 검토', audience:'의사결정·수정 흐름 추적', document:'하나의 전시는 어떻게 완성될까?', meta:'전시 기획 · 24개 노드', mode:'협업 제작 과정', hint:'연구·보존·공간·콘텐츠 작업이 병렬로 진행된 뒤 설치 단계에서 합류합니다.',
+      producer:'서로 다른 전문 작업이 병렬로 진행되고 검토 결과가 앞 단계로 돌아가는 제작 구조를 구성합니다.',
+      slides:['질문 정하기', '자료와 서사', '공간 설계', '콘텐츠 제작', '설치와 개선'],
+      groups:{0:'기획 기준',1:'자료·서사',2:'공간·보존',3:'콘텐츠 제작',4:'설치·검증',5:'운영·개선'},
+      nodes:[
+        ['question','핵심 질문',0,0,'concept','관람객이 전시 뒤에 답할 질문을 정합니다.'],
+        ['audience','주요 관람객',0,0,'concept','연령·배경지식·관람 목적을 구체화합니다.'],
+        ['budget','예산과 일정',0,0,'data','대여·제작·인력의 현실적 범위를 정합니다.'],
+        ['collection-scan','소장품 조사',0,0,'data','질문과 관련된 실제 자료를 찾습니다.'],
+        ['research','학술 조사',1,1,'concept','자료의 맥락과 최신 해석을 검토합니다.'],
+        ['loan-list','대여 후보',1,1,'data','외부 기관에서 빌릴 작품과 조건을 정리합니다.'],
+        ['narrative','전시 서사',1,1,'concept','관람 순서에 맞는 주장과 근거를 연결합니다.'],
+        ['section-plan','섹션 구성',1,1,'data','서사를 여러 공간 단위로 나눕니다.'],
+        ['condition','보존 상태',2,2,'data','빛·온습도·진동 허용 범위를 확인합니다.'],
+        ['floorplan','동선 설계',2,2,'concept','관람객 흐름과 정체 지점을 배치합니다.'],
+        ['case-design','전시 케이스',2,2,'concept','작품을 보호하면서 보이게 설계합니다.'],
+        ['lighting','조명 계획',2,2,'concept','가독성과 보존 기준을 함께 맞춥니다.'],
+        ['label','레이블 초안',3,3,'data','작품의 의미를 짧고 정확하게 설명합니다.'],
+        ['translation','번역',3,3,'data','언어별 정보와 말투를 일관되게 맞춥니다.'],
+        ['accessibility','접근성 콘텐츠',3,3,'concept','쉬운 글·음성·촉각·자막을 준비합니다.'],
+        ['media','영상·인터랙션',3,3,'media','움직임과 맥락이 필요한 내용을 보충합니다.'],
+        ['fabrication','구조물 제작',4,4,'data','벽체·그래픽·케이스를 실제 크기로 제작합니다.'],
+        ['installation','작품 설치',4,4,'concept','보존 담당자와 함께 작품을 안전하게 배치합니다.'],
+        ['condition-check','상태 점검',4,4,'data','설치 전후 작품 상태를 기록합니다.'],
+        ['rehearsal','관람 동선 리허설',4,4,'concept','실제 속도로 이동하며 막힘과 이해도를 확인합니다.'],
+        ['opening','전시 공개',5,5,'concept','검증을 마친 공간을 관람객에게 엽니다.'],
+        ['observation','관람 행동 관찰',5,5,'data','머문 시간·건너뛴 구간·질문을 기록합니다.'],
+        ['feedback','관람객 피드백',5,5,'data','이해하기 어려운 설명과 접근 문제를 수집합니다.'],
+        ['revision','운영 중 수정',5,5,'concept','레이블·동선·미디어를 실제 반응에 맞게 고칩니다.']
+      ],
+      edges:[
+        ['question','research','조사 방향'],['audience','narrative','설명 수준'],['budget','loan-list','범위 제한'],['collection-scan','research','자료 제공'],['research','narrative','근거 제공'],['loan-list','section-plan','작품 배치'],['narrative','section-plan','서사 분할'],['section-plan','floorplan','공간 변환'],['loan-list','condition','상태 확인'],['condition','case-design','보존 조건'],['condition','lighting','조도 제한'],['floorplan','case-design','위치 결정'],['floorplan','lighting','시선 계획'],['narrative','label','핵심 문장'],['audience','label','읽기 수준'],['label','translation','언어 확장'],['label','accessibility','쉬운 설명'],['research','media','자료 제공'],['floorplan','media','설치 위치'],['case-design','fabrication','도면 전달'],['lighting','fabrication','설비 반영'],['fabrication','installation','현장 준비'],['condition','installation','취급 기준'],['installation','condition-check','설치 후 기록'],['section-plan','rehearsal','순서 검증'],['label','rehearsal','가독성 검증'],['accessibility','rehearsal','접근성 검증'],['media','rehearsal','작동 검증'],['condition-check','opening','안전 승인'],['rehearsal','opening','운영 승인'],['opening','observation','행동 데이터'],['opening','feedback','의견 수집'],['observation','revision','동선 수정'],['feedback','revision','내용 수정'],['revision','label','문구 개선'],['revision','floorplan','배치 개선']
+      ],
+      steps:[
+        ['전시의 기준 세우기','핵심 질문·관람객·예산·소장품이 이후 모든 결정의 기준이 됩니다.','4개 생성'],
+        ['자료를 이야기로 묶기','연구와 대여 후보가 전시 서사와 섹션 구성으로 합류합니다.','4개 생성·합류'],
+        ['공간과 보존 함께 설계','작품 상태가 케이스와 조명을 제한하고 섹션 구성이 동선을 결정합니다.','4개 생성·분기'],
+        ['여러 형식의 설명 제작','레이블·번역·접근성 콘텐츠·미디어가 같은 서사를 서로 다른 방식으로 전달합니다.','4개 생성·병렬'],
+        ['현장에서 합치고 검증','제작물과 작품이 설치되고 상태 점검과 동선 리허설을 거칩니다.','4개 생성·합류'],
+        ['관람 반응으로 다시 수정','관찰과 피드백이 운영 중 수정으로 모여 문구와 동선에 되돌아갑니다.','4개 생성·되먹임'],
+        ['전체 제작 구조 정렬','24개 작업이 기획·연구·공간·콘텐츠·설치·개선의 협업망으로 정렬됩니다.','24개 정렬']
+      ],
+      viewer:{kicker:'전시 기획 · 24개 노드',title:'전시는 직선으로 만들어지지 않고<br>검토 결과가 앞 단계로 돌아갑니다.',intro:'보존·공간·글·미디어 작업이 병렬로 진행된 뒤 현장에서 합류하고, 관람 반응으로 다시 바뀝니다.'}
+    }),
+
+    buildScenario({
+      id:'stellar-life', title:'별의 탄생과 마지막', short:'24개 노드 · 질량별 분기', audience:'분기·순환 구조 추적', document:'별은 어떻게 태어나고 원소를 남길까?', meta:'천문학 · 24개 노드', mode:'생애 분기', hint:'같은 성간 구름에서 출발한 별이 질량에 따라 다른 경로로 갈라집니다.',
+      producer:'성간 구름에서 별이 태어나고 질량에 따라 다른 마지막을 거쳐 다음 세대 물질로 순환하는 구조를 구성합니다.',
+      slides:['성간 구름', '원시별', '주계열성', '질량별 진화', '물질 순환'],
+      groups:{0:'탄생 조건',1:'원시별',2:'안정된 별',3:'질량별 진화',4:'별의 마지막',5:'다음 세대'},
+      nodes:[
+        ['cloud','분자 구름',0,0,'concept','차갑고 밀도가 높은 가스와 먼지가 모여 있습니다.'],
+        ['dust','성간 먼지',0,0,'data','복잡한 분자가 붙고 빛을 가려 온도를 낮춥니다.'],
+        ['shock','충격파',0,0,'concept','구름 일부를 압축해 붕괴를 촉발할 수 있습니다.'],
+        ['gravity','중력 수축',0,0,'concept','밀도가 높은 부분이 스스로 안쪽으로 무너집니다.'],
+        ['fragment','구름 조각',1,1,'data','수축하는 구름이 여러 별의 씨앗으로 나뉩니다.'],
+        ['protostar','원시별',1,1,'concept','중력 에너지로 뜨거워지는 어린 별입니다.'],
+        ['disk','강착 원반',1,1,'concept','가스와 먼지가 회전하며 원시별로 떨어집니다.'],
+        ['jet','쌍극 제트',1,1,'data','일부 물질과 각운동량을 양극 방향으로 내보냅니다.'],
+        ['core-heat','핵 온도 상승',2,2,'data','수축하며 중심 온도와 압력이 높아집니다.'],
+        ['fusion','수소 핵융합',2,2,'concept','수소가 헬륨으로 바뀌며 에너지를 냅니다.'],
+        ['balance','정역학적 평형',2,2,'concept','중력과 내부 압력이 균형을 이룹니다.'],
+        ['main-sequence','주계열성',2,2,'concept','수소 핵융합을 하며 생애 대부분을 보냅니다.'],
+        ['low-mass','태양급 별',3,3,'concept','비교적 천천히 연료를 사용합니다.'],
+        ['high-mass','고질량 별',3,3,'concept','훨씬 빠르게 연료를 쓰고 더 무거운 원소를 만듭니다.'],
+        ['red-giant','적색거성',3,3,'concept','태양급 별의 바깥층이 크게 팽창합니다.'],
+        ['red-supergiant','적색초거성',3,3,'concept','고질량 별이 여러 핵융합 껍질을 만듭니다.'],
+        ['planetary-nebula','행성상 성운',4,4,'concept','태양급 별이 바깥층을 우주로 방출합니다.'],
+        ['white-dwarf','백색왜성',4,4,'concept','남은 뜨거운 핵이 천천히 식습니다.'],
+        ['supernova','초신성 폭발',4,4,'concept','고질량 별의 중심 붕괴가 바깥층을 날려 보냅니다.'],
+        ['compact-remnant','중성자별·블랙홀',4,4,'concept','붕괴한 중심 질량에 따라 치밀한 잔해가 남습니다.'],
+        ['heavy-elements','무거운 원소',5,5,'data','별 내부와 폭발 과정에서 만들어진 원소가 퍼집니다.'],
+        ['enriched-cloud','풍부해진 성간 구름',5,5,'data','이전 세대 별의 원소가 새 구름에 섞입니다.'],
+        ['planet-disk','행성 형성 원반',5,5,'concept','새 별 주변의 먼지가 행성 재료로 뭉칩니다.'],
+        ['next-star','다음 세대 별',5,5,'concept','풍부해진 물질로 새로운 별이 태어납니다.']
+      ],
+      edges:[
+        ['dust','cloud','냉각 지원'],['shock','cloud','압축'],['cloud','gravity','밀도 증가'],['gravity','fragment','조각화'],['fragment','protostar','중심 수축'],['fragment','disk','회전 물질'],['disk','protostar','질량 공급'],['disk','jet','자기장과 회전'],['jet','protostar','각운동량 감소'],['protostar','core-heat','수축 가열'],['core-heat','fusion','점화'],['fusion','balance','내부 압력'],['gravity','balance','안쪽 중력'],['balance','main-sequence','안정 단계'],['main-sequence','low-mass','낮은 질량 경로'],['main-sequence','high-mass','높은 질량 경로'],['low-mass','red-giant','수소 고갈'],['high-mass','red-supergiant','연속 핵융합'],['red-giant','planetary-nebula','바깥층 방출'],['red-giant','white-dwarf','핵 잔해'],['red-supergiant','supernova','중심 붕괴'],['supernova','compact-remnant','중심 잔해'],['planetary-nebula','heavy-elements','원소 방출'],['supernova','heavy-elements','원소 방출'],['heavy-elements','enriched-cloud','성간 혼합'],['enriched-cloud','planet-disk','먼지 공급'],['enriched-cloud','next-star','중력 수축'],['planet-disk','next-star','새 항성계'],['next-star','fusion','다음 핵융합'],['supernova','shock','새 충격파']
+      ],
+      steps:[
+        ['차가운 구름 압축','먼지로 냉각된 분자 구름이 충격파와 중력의 영향을 받아 수축합니다.','4개 생성'],
+        ['여러 원시별로 나뉘기','구름 조각마다 원시별과 원반이 생기고 제트가 각운동량을 내보냅니다.','4개 생성·분기'],
+        ['핵융합으로 균형 잡기','중심이 뜨거워져 수소 핵융합이 시작되고 중력과 압력이 균형을 이룹니다.','4개 생성·합류'],
+        ['질량에 따라 갈라지기','태양급 별은 적색거성으로, 고질량 별은 적색초거성으로 서로 다른 길을 갑니다.','4개 생성·분기'],
+        ['서로 다른 마지막 남기기','태양급 별은 성운과 백색왜성을, 고질량 별은 초신성과 치밀한 잔해를 남깁니다.','4개 생성·분기'],
+        ['원소를 다음 세대로 돌려주기','방출된 원소가 새 구름과 원반에 섞여 다음 세대 별과 행성의 재료가 됩니다.','4개 생성·순환'],
+        ['전체 별의 생애 정렬','24개 요소가 탄생·안정·질량별 진화·죽음·물질 순환의 구조로 정렬됩니다.','24개 정렬']
+      ],
+      viewer:{kicker:'천문학 · 24개 노드',title:'별의 마지막은 질량에 따라 갈리고<br>남은 물질은 다음 별로 이어집니다.',intro:'한 줄의 생애가 아니라 두 갈래의 진화와 다시 성간 구름으로 돌아가는 순환을 따라가 보세요.'}
+    })
+  ];
+})();
+  </script>
+  <script>
+    const legacyScenarios = [
       {
         id: 'concept', title: '핵심 개념 설명', short: '부모·하위 노드를 함께 배치', audience: '관계를 따라 이해', document: 'Node.js는 어떻게 실행될까?', meta: '3강 · 슬라이드 2', mode: '개념 설명', hint: '100% · Node.js 안에 npm·npx 하위 노드가 보입니다',
         producer: '개념을 배치하고 설명 순서를 정합니다.',
@@ -519,12 +1156,20 @@
       }
     ];
 
+    const scenarios = complexScenarios;
     const previewParams = new URLSearchParams(location.search);
     const initialScenario = Math.max(0,scenarios.findIndex(item=>item.id===previewParams.get('scenario')));
-    const initialRole = previewParams.get('role')==='learner'?'learner':'producer';
+    const requestedStep = Number(previewParams.get('step'));
+    const initialStep = Number.isInteger(requestedStep)?Math.max(0,Math.min(scenarios[initialScenario].steps.length-1,requestedStep)):1;
     const initialZoom = [60,100,140].includes(Number(previewParams.get('zoom')))?Number(previewParams.get('zoom')):100;
     const initialChildView = ['inside','around','popover','focus'].includes(previewParams.get('child'))?previewParams.get('child'):'inside';
-    const state = {scenario:initialScenario, role:initialRole, step:1, playing:false, zoom:initialZoom, childView:initialChildView, childPopover:false, childDetail:null, viewerChildOpen:false, viewerChildDetail:null, composedParts:[], lastComposeAction:'', selectedClusterId:null, clusterInspectId:null, clusterNames:{}, clusterMemberOverrides:{}, clusterStatus:''};
+    const previewHash=location.hash.slice(1);
+    const requestedCodeViewer=previewParams.get('codeView')||previewHash;
+    const initialCodeViewer=['focus','split','map'].includes(requestedCodeViewer)?requestedCodeViewer:null;
+    const initialChaptersOpen=previewParams.get('chapters')==='open'||previewHash==='chapters';
+    const initialRole = previewParams.get('role')==='producer'?'producer':'learner';
+    const state = {scenario:initialScenario, role:initialRole, step:initialStep, playing:false, zoom:initialZoom, viewerScale:1, viewerFocusKey:'', viewerPositions:{}, chapterMenuOpen:initialChaptersOpen, codeViewerMode:initialCodeViewer, codeViewerNodeId:initialCodeViewer?'source':null, childView:initialChildView, childPopover:false, childDetail:null, viewerChildOpen:false, viewerChildDetail:null, activeNodeId:null, composedParts:[], lastComposeAction:'', selectedClusterId:null, clusterInspectId:null, clusterNames:{}, clusterMemberOverrides:{}, clusterStatus:''};
+    const renderedGraphSteps = {editor:{scenario:null,step:null},viewer:{scenario:null,step:null}};
     const partLabels = {text:'설명 문단',child:'하위 노드',image:'이미지',code:'코드 블록',example:'예시 목록'};
     const partParticles = {text:'을',child:'를',image:'를',code:'을',example:'을'};
     const childDetails = {
@@ -539,6 +1184,52 @@
     const $ = (selector) => document.querySelector(selector);
     const $$ = (selector) => [...document.querySelectorAll(selector)];
     const escapeHtml = (value) => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const stageNodes = (scenario, step=state.step) => scenario.nodes.filter(node => node.appear===undefined || node.appear<=step);
+    const coordinateCss = (value, unit='%') => typeof value==='string'?value:`${value}${unit}`;
+    const fixedFlowPosition = (node, step, scenario, surface) => {
+      const stageNodesInColumn=scenario.nodes.filter(item=>item.appear===node.appear);
+      const row=Math.max(0,stageNodesInColumn.findIndex(item=>item.id===node.id));
+      const lastNodeStage=Math.max(...scenario.nodes.map(item=>item.appear));
+      const cameraStage=Math.min(step,lastNodeStage);
+      const columnGap=surface==='viewer'?320:220;
+      const center=surface==='viewer'?170:58;
+      const heightKey=surface==='viewer'?'viewerH':'editorH';
+      const top=surface==='viewer'?66:58, rowGap=surface==='viewer'?8:12;
+      const y=top+stageNodesInColumn.slice(0,row).reduce((sum,item)=>sum+(item[heightKey]||68)+rowGap,0)+(node[heightKey]||68)/2;
+      const laneOffset=node.cardType==='code'?0:([ -62,58,-48,68][row]||0);
+      const x=surface==='viewer'?center+node.appear*columnGap+laneOffset:`calc(${center}% + ${(node.appear-cameraStage)*columnGap}px)`;
+      return {x,y,unit:'px'};
+    };
+    const stagePosition = (node, step=state.step, scenario=scenarios[state.scenario]) => fixedFlowPosition(node,step,scenario,'editor');
+    const viewerStagePosition = (node, step=state.step, scenario=scenarios[state.scenario]) => fixedFlowPosition(node,step,scenario,'viewer');
+    function animateGraphTransition(s, surface) {
+      if(s.viewer.type!=='complex') return;
+      const tracker=renderedGraphSteps[surface], current={scenario:s.id,step:state.step};
+      const root=surface==='editor'?$('#canvas'):$('#lessonBody');
+      const draw=surface==='editor'?drawEdges:drawViewerEdges;
+      if(!root || (surface==='editor'&&$('#producerSurface').hidden) || (surface==='viewer'&&$('#learnerSurface').hidden)){
+        renderedGraphSteps[surface]=current;
+        return;
+      }
+      if(tracker.scenario===s.id && tracker.step!==null && tracker.step!==state.step){
+        stageNodes(s).forEach(node=>{
+          const element=root.querySelector(surface==='editor'?`[data-node-id="${node.id}"]`:`[data-viewer-node-id="${node.id}"]`);
+          if(!element)return;
+          const previousVisible=node.appear<=tracker.step;
+          const positionForSurface=surface==='viewer'?viewerStagePosition:stagePosition;
+          const before=positionForSurface(node,tracker.step,s), after=positionForSurface(node,state.step,s);
+          if(!previousVisible){
+            element.animate([{opacity:0,transform:'translate(-50%, -50%) scale(.58)'},{opacity:1,transform:'translate(-50%, -50%) scale(1)'}],{duration:420,easing:'cubic-bezier(.2,.8,.2,1)'});
+          } else if(before.x!==after.x||before.y!==after.y){
+            element.animate([{left:coordinateCss(before.x,before.unit),top:coordinateCss(before.y,before.unit)},{left:coordinateCss(after.x,after.unit),top:coordinateCss(after.y,after.unit)}],{duration:560,easing:'cubic-bezier(.2,.75,.2,1)'});
+          }
+        });
+        const started=performance.now();
+        const followEdges=now=>{draw();if(now-started<600)requestAnimationFrame(followEdges);};
+        requestAnimationFrame(followEdges);
+      }
+      renderedGraphSteps[surface]=current;
+    }
     let activeConceptTrigger = null;
     let suppressConceptFocus = false;
 
@@ -586,7 +1277,7 @@
 
     function renderScenarioStrip() {
       $('#scenarioStrip').innerHTML = scenarios.map((s,i) => `<button class="scenario-card ${i===state.scenario?'active':''}" data-scenario="${i}"><b class="scenario-no">0${i+1}</b><strong>${escapeHtml(s.title)}</strong><span>만들기 · ${escapeHtml(s.short)}</span><span class="audience">보기 · ${escapeHtml(s.audience)}</span></button>`).join('');
-      $$('[data-scenario]').forEach(btn => btn.addEventListener('click', () => { state.scenario=Number(btn.dataset.scenario); state.step=1; state.zoom=100; state.childPopover=false; state.childDetail=null; state.viewerChildOpen=false; state.viewerChildDetail=null; state.selectedClusterId=null; state.clusterInspectId=null; render(); }));
+      $$('[data-scenario]').forEach(btn => btn.addEventListener('click', () => { state.scenario=Number(btn.dataset.scenario); state.step=1; state.zoom=100; state.viewerScale=1; state.viewerFocusKey=''; state.viewerPositions={}; state.chapterMenuOpen=false; state.codeViewerMode=null; state.codeViewerNodeId=null; state.activeNodeId=null; state.childPopover=false; state.childDetail=null; state.viewerChildOpen=false; state.viewerChildDetail=null; state.selectedClusterId=null; state.clusterInspectId=null; render(); }));
     }
 
     function renderSlides(s) {
@@ -668,8 +1359,10 @@
 
     function baseNodeMarkup(n,i,overrides={}) {
       const x=overrides.x??n.x, y=overrides.y??(state.zoom===140&&n.y<40?n.y+12:n.y), width=overrides.w??(state.zoom===140?(n.detailW||n.w):n.w);
+      const unit=overrides.unit??n.unit??'%';
       const extraClass=(n.id==='node'&&state.scenario===0?' drop-target':'')+(clusterIncludes(n.id)?' cluster-member-highlight':'');
-      return `<article tabindex="0" role="button" aria-label="${escapeHtml(n.title)} 노드" class="node diagram-item${extraClass} ${i===state.step?'selected':i>state.step+1?'dimmed':''}" data-node-id="${n.id}" data-kind="${n.kind}" data-variant="${n.variant||'standard'}" style="left:${x}%;top:${y}%;--w:${width}px"><span class="node-kicker">${escapeHtml(n.kicker)}</span>${n.variant==='video'||n.variant==='image'?nodeExtras({...n,code:null,children:null,examples:null}):''}<h3>${escapeHtml(n.title)}</h3><p>${n.bodyHtml||escapeHtml(n.body)}</p>${n.variant==='video'||n.variant==='image'?nodeExtras({...n,variant:null}):nodeExtras(n)}<span class="node-foot"><span>${escapeHtml(n.foot)}</span><b>${escapeHtml(n.reuse)}</b></span></article>`;
+      const staged=n.appear!==undefined, selected=staged?(state.activeNodeId===n.id):(i===state.step), dimmed=!staged&&i>state.step+1;
+      return `<article tabindex="0" role="button" aria-label="${escapeHtml(n.title)} 노드" class="node diagram-item${extraClass} ${selected?'selected':''} ${dimmed?'dimmed':''} ${staged&&n.appear===state.step?'stage-new':''}" data-node-id="${n.id}" data-kind="${n.kind}" data-variant="${n.variant||'standard'}" style="left:${coordinateCss(x,unit)};top:${coordinateCss(y,unit)};--w:${width}px;--node-min-h:${n.editorH||64}px;--node-color:${n.color||'var(--accent)'}"><span class="node-kicker">${escapeHtml(n.kicker)}</span>${n.variant==='video'||n.variant==='image'?nodeExtras({...n,code:null,children:null,examples:null}):''}<h3>${escapeHtml(n.title)}</h3><p>${n.bodyHtml||escapeHtml(n.body)}</p>${n.variant==='video'||n.variant==='image'?nodeExtras({...n,variant:null}):nodeExtras(n)}<span class="node-foot"><span>${escapeHtml(n.foot)}</span><b>${escapeHtml(n.reuse)}</b></span></article>`;
     }
 
     function childNodeMarkup(id,title,description,x,y,w=88) {
@@ -711,7 +1404,7 @@
 
     function wireNodeInteractions(s) {
       $$('.node').forEach((node,i) => {
-        const select=()=>{state.step=Math.min(i,s.steps.length-1);if(s.id==='concept'&&node.dataset.nodeId==='node'&&state.childView==='popover')state.childPopover=true;renderEditor(s);};
+        const select=()=>{if(s.viewer.type==='complex'){state.activeNodeId=node.dataset.nodeId;}else{state.step=Math.min(i,s.steps.length-1);}if(s.id==='concept'&&node.dataset.nodeId==='node'&&state.childView==='popover')state.childPopover=true;renderEditor(s);};
         node.addEventListener('click',select);
         node.addEventListener('keydown',event=>{if(event.target!==node)return;if(event.key==='Enter'||event.key===' '){event.preventDefault();select();}});
         if(s.id==='concept'&&node.dataset.nodeId==='node'&&state.childView==='popover') node.addEventListener('mouseenter',()=>{if(!state.childPopover){state.childPopover=true;renderEditor(s);}});
@@ -728,14 +1421,16 @@
     function renderNodes(s) {
       const canvas=$('#canvas'), zoomName=state.zoom===60?'overview':state.zoom===140?'detail':'normal';
       canvas.dataset.zoom=zoomName;
+      canvas.dataset.dense=s.dense?'true':'false';
       if(state.zoom===60){renderClusters(s);}else{
-        $('#nodeLayer').innerHTML=s.id==='concept'?conceptArrangement(s):s.nodes.map((n,i)=>baseNodeMarkup(n,i)).join('');
+        const visible=s.viewer.type==='complex'?stageNodes(s).map(node=>({...node,...stagePosition(node,state.step,s)})):s.nodes;
+        $('#nodeLayer').innerHTML=s.id==='concept'?conceptArrangement(s):visible.map((n,i)=>baseNodeMarkup(n,i)).join('');
         if(state.clusterInspectId){const cluster=suggestedClusters(s).find(item=>item.id===state.clusterInspectId);if(cluster)$('#nodeLayer').insertAdjacentHTML('beforeend',`<div class="cluster-inspect-guide"><b>“${escapeHtml(cluster.title)}” 구성 확인 중</b><span>제안된 노드를 강조했습니다.</span><button id="returnToClusters">묶음으로 돌아가기</button></div>`);}
         wireNodeInteractions(s);
       }
       $('#zoomReset').textContent=`${state.zoom}%`;
       $('#zoomMode').textContent=state.zoom===60?'앱이 제안한 묶음':state.zoom===140?'상세 내용 펼침':s.id==='concept'?({inside:'부모 안에 담기',around:'주변에 펼치기',popover:'필요할 때 열기',focus:'하위 구조 집중'}[state.childView]):'개별 노드';
-      requestAnimationFrame(drawEdges);
+      requestAnimationFrame(()=>{drawEdges();animateGraphTransition(s,'editor');});
     }
 
     function anchorPoint(rect, target, canvasRect) {
@@ -746,6 +1441,7 @@
 
     function canvasEdges(s) {
       if(state.zoom===60){const clusters=suggestedClusters(s);return clusters.slice(0,-1).map((cluster,index)=>[cluster.id,clusters[index+1].id,'자동 요약']);}
+      if(s.viewer.type==='complex') return s.edges.filter(edge=>(edge[3]??0)<=state.step);
       if(s.id==='concept'&&state.childView==='focus') return [['node','child-npm','포함'],['node','child-npx','포함']];
       if(s.id==='concept'&&state.childView==='around') return [...s.edges,['node','child-npm','도구'],['node','child-npx','도구']];
       return s.edges;
@@ -759,8 +1455,9 @@
       canvasEdges(s).forEach((edge,i) => {
         const a=$(`[data-node-id="${edge[0]}"]`), b=$(`[data-node-id="${edge[1]}"]`); if(!a||!b)return;
         const ar=a.getBoundingClientRect(), br=b.getBoundingClientRect(), p1=anchorPoint(ar,br,cr), p2=anchorPoint(br,ar,cr), bend=Math.max(20,Math.abs(p2.x-p1.x)*.35);
-        const path=document.createElementNS('http://www.w3.org/2000/svg','path'); path.setAttribute('d',`M ${p1.x} ${p1.y} C ${p1.x+bend} ${p1.y}, ${p2.x-bend} ${p2.y}, ${p2.x} ${p2.y}`); path.setAttribute('class',`edge-line ${i<state.step?'active':''}`); path.dataset.source=edge[0]; path.dataset.target=edge[1]; path.dataset.x1=p1.x; path.dataset.y1=p1.y; path.dataset.x2=p2.x; path.dataset.y2=p2.y; svg.appendChild(path);
-        const label=document.createElement('span'); label.className='edge-label'; label.textContent=edge[2]; label.style.left=`${(p1.x+p2.x)/2}px`; label.style.top=`${(p1.y+p2.y)/2}px`; canvas.appendChild(label);
+        const isActive=s.viewer.type==='complex'?(edge[3]===state.step):(i<state.step);
+        const path=document.createElementNS('http://www.w3.org/2000/svg','path'); path.setAttribute('d',`M ${p1.x} ${p1.y} C ${p1.x+bend} ${p1.y}, ${p2.x-bend} ${p2.y}, ${p2.x} ${p2.y}`); path.setAttribute('class',`edge-line ${isActive?'active':''}`); path.dataset.source=edge[0]; path.dataset.target=edge[1]; path.dataset.x1=p1.x; path.dataset.y1=p1.y; path.dataset.x2=p2.x; path.dataset.y2=p2.y; svg.appendChild(path);
+        const label=document.createElement('span'); label.className=`edge-label ${isActive?'active':''}`; label.textContent=edge[2]; label.style.left=`${(p1.x+p2.x)/2}px`; label.style.top=`${(p1.y+p2.y)/2}px`; canvas.appendChild(label);
       });
     }
 
@@ -812,7 +1509,8 @@
         });
         $$('[data-remove-part]').forEach(button=>button.addEventListener('click',()=>{state.composedParts=state.composedParts.filter(part=>part!==button.dataset.removePart);state.lastComposeAction=`${partLabels[button.dataset.removePart]}${partParticles[button.dataset.removePart]} 제거했습니다.`;renderEditor(s);}));
       } else {
-        $('#selectedAsset').innerHTML=`<p class="label">현재 선택</p><h4>${escapeHtml(s.selected[0])}</h4><p>${escapeHtml(s.selected[1])}</p><button class="asset-action">${escapeHtml(s.selected[2])}</button>`;
+        const selected=s.nodes.find(node=>node.id===state.activeNodeId);
+        $('#selectedAsset').innerHTML=`<p class="label">현재 선택</p><h4>${escapeHtml(selected?.title||s.selected[0])}</h4><p>${escapeHtml(selected?.body||s.selected[1])}</p><button class="asset-action">${escapeHtml(s.selected[2])}</button>`;
       }
     }
 
@@ -831,7 +1529,7 @@
     function renderEditor(s) {
       const childHints={inside:'Node.js 안에 하위 도구 표시',around:'npm·npx를 주변 노드로 표시',popover:'하위 도구를 접은 상태',focus:'Node.js 하위 구조에 집중'};
       const hints={60:`60% · 앱이 ${s.nodes.length}개 노드에서 ${suggestedClusters(s).length}개 묶음을 제안했습니다`,100:s.id==='concept'?childHints[state.childView]:s.hint,140:s.id==='concept'?`${childHints[state.childView]} · 상세 정보 펼침`:'140% · 예시·코드·미디어 정보까지 펼쳤습니다'};
-      $('#canvasMode').textContent=`${s.mode} · ${state.zoom===60?'전체 보기':state.zoom===140?'상세 보기':'기본 보기'}`; $('#canvasHint').textContent=hints[state.zoom]; renderChildModeBar(s); renderSlides(s); renderNodes(s); renderAssets(s); renderSteps(s); bindConceptReferences($('#producerSurface'));
+      $('#canvasMode').textContent=`${s.mode} · ${state.zoom===60?'전체 보기':state.zoom===140?'상세 보기':'기본 보기'}`; $('#canvasHint').textContent=s.viewer.type==='complex'?`${stageNodes(s).length}/${s.nodes.length}개 노드 · ${s.steps[state.step][2]}`:hints[state.zoom]; renderChildModeBar(s); renderSlides(s); renderNodes(s); renderAssets(s); renderSteps(s); bindConceptReferences($('#producerSurface'));
     }
 
     function setZoom(value) {
@@ -855,6 +1553,22 @@
       $$('.viewer-diagram').forEach(diagram=>{
         const svg=diagram.querySelector('.viewer-edge-layer');
         if(!svg)return;
+        const world=diagram.querySelector('.complex-world');
+        if(world){
+          const worldW=parseFloat(world.style.width), worldH=parseFloat(world.style.height);
+          svg.setAttribute('viewBox',`0 0 ${worldW} ${worldH}`);
+          const worldRect={left:0,top:0};
+          svg.querySelectorAll('[data-viewer-edge-source]').forEach(path=>{
+            const source=world.querySelector(`[data-viewer-node-id="${path.dataset.viewerEdgeSource}"]`);
+            const target=world.querySelector(`[data-viewer-node-id="${path.dataset.viewerEdgeTarget}"]`);
+            if(!source||!target)return;
+            const nodeRect=element=>{const cx=parseFloat(element.style.left),cy=parseFloat(element.style.top);return {left:cx-element.offsetWidth/2,top:cy-element.offsetHeight/2,width:element.offsetWidth,height:element.offsetHeight};};
+            const sourceRect=nodeRect(source), targetRect=nodeRect(target);
+            const start=anchorPoint(sourceRect,targetRect,worldRect), end=anchorPoint(targetRect,sourceRect,worldRect);
+            path.setAttribute('d',`M ${start.x} ${start.y} L ${end.x} ${end.y}`);
+          });
+          return;
+        }
         const diagramRect=diagram.getBoundingClientRect();
         svg.setAttribute('viewBox',`0 0 ${diagramRect.width} ${diagramRect.height}`);
         svg.querySelectorAll('[data-viewer-edge-source]').forEach(path=>{
@@ -866,6 +1580,88 @@
           path.setAttribute('d',`M ${start.x} ${start.y} L ${end.x} ${end.y}`);
           path.dataset.x1=start.x; path.dataset.y1=start.y; path.dataset.x2=end.x; path.dataset.y2=end.y;
         });
+      });
+    }
+
+    function layoutComplexNodes(s) {
+      const world=$('#complexWorld'), shell=$('#complexWorldShell');
+      if(!world||!shell)return;
+      let maxBottom=0;
+      [...new Set(stageNodes(s).map(node=>node.appear))].forEach(stage=>{
+        let top=66;
+        s.nodes.filter(node=>node.appear===stage&&node.appear<=state.step).forEach(node=>{
+          const card=world.querySelector(`[data-complex-node="${node.id}"]`);
+          if(!card)return;
+          const height=card.offsetHeight;
+          card.style.top=`${top+height/2}px`;
+          top+=height+8;
+        });
+        maxBottom=Math.max(maxBottom,top);
+      });
+      const height=Math.max(410,maxBottom+26);
+      world.style.height=`${height}px`;
+      shell.style.height=`${height*state.viewerScale}px`;
+      world.querySelectorAll('[data-chapter-region]').forEach(region=>region.style.height=`${height-16}px`);
+      drawViewerEdges();
+    }
+
+    function bindComplexViewport(s) {
+      const viewport=$('#complexViewport'), shell=$('#complexWorldShell'), world=$('#complexWorld');
+      if(!viewport||!shell||!world)return;
+      const worldW=parseFloat(world.style.width);
+      const focusStage=Math.min(state.step,Math.max(...s.nodes.map(node=>node.appear))), focusKey=`${s.id}:${focusStage}`;
+      const applyScale=next=>{
+        const previous=state.viewerScale, centerX=(viewport.scrollLeft+viewport.clientWidth/2)/previous, centerY=(viewport.scrollTop+viewport.clientHeight/2)/previous;
+        state.viewerScale=Math.max(.65,Math.min(1.6,next));
+        shell.style.width=`${worldW*state.viewerScale}px`; shell.style.height=`${parseFloat(world.style.height)*state.viewerScale}px`;
+        world.style.transform=`scale(${state.viewerScale})`;
+        $('#viewerZoomValue').textContent=`${Math.round(state.viewerScale*100)}%`;
+        viewport.scrollLeft=centerX*state.viewerScale-viewport.clientWidth/2;
+        viewport.scrollTop=centerY*state.viewerScale-viewport.clientHeight/2;
+      };
+      $('#viewerZoomOut')?.addEventListener('click',()=>applyScale(state.viewerScale-.15));
+      $('#viewerZoomIn')?.addEventListener('click',()=>applyScale(state.viewerScale+.15));
+      $('#viewerZoomReset')?.addEventListener('click',()=>applyScale(1));
+      let drag=null, suppressClick=false;
+      const activePointers=new Set();
+      const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
+      viewport.addEventListener('pointerdown',event=>{
+        activePointers.add(event.pointerId);
+        if(activePointers.size>1){
+          if(drag&&viewport.hasPointerCapture(drag.pointerId))viewport.releasePointerCapture(drag.pointerId);
+          drag=null; viewport.classList.remove('is-dragging'); return;
+        }
+        if(event.button!==undefined&&event.button!==0)return;
+        if(event.target.closest('.complex-view-controls, details, summary, .complex-node-code-frame'))return;
+        suppressClick=false;
+        drag={pointerId:event.pointerId,x:event.clientX,y:event.clientY,left:viewport.scrollLeft,top:viewport.scrollTop,moved:false};
+        viewport.setPointerCapture(event.pointerId);
+      });
+      viewport.addEventListener('pointermove',event=>{
+        if(!drag||drag.pointerId!==event.pointerId||activePointers.size!==1)return;
+        const dx=event.clientX-drag.x, dy=event.clientY-drag.y, distance=Math.hypot(dx,dy);
+        if(distance>3){drag.moved=true;viewport.classList.add('is-dragging');event.preventDefault();}
+        const acceleration=1+Math.min(.28,distance/420);
+        const maxLeft=Math.max(0,viewport.scrollWidth-viewport.clientWidth), maxTop=Math.max(0,viewport.scrollHeight-viewport.clientHeight);
+        viewport.scrollLeft=clamp(drag.left-dx*acceleration,0,maxLeft);
+        viewport.scrollTop=clamp(drag.top-dy*acceleration,0,maxTop);
+      },{passive:false});
+      const finishDrag=event=>{
+        activePointers.delete(event.pointerId);
+        if(!drag||drag.pointerId!==event.pointerId)return;
+        suppressClick=drag.moved;
+        if(viewport.hasPointerCapture(event.pointerId))viewport.releasePointerCapture(event.pointerId);
+        drag=null; viewport.classList.remove('is-dragging');
+      };
+      viewport.addEventListener('pointerup',finishDrag);
+      viewport.addEventListener('pointercancel',finishDrag);
+      viewport.addEventListener('click',event=>{if(!suppressClick)return;suppressClick=false;event.preventDefault();event.stopPropagation();},{capture:true});
+      viewport.addEventListener('scroll',()=>{state.viewerPositions[focusKey]={left:viewport.scrollLeft,top:viewport.scrollTop};},{passive:true});
+      requestAnimationFrame(()=>{
+        const saved=state.viewerPositions[focusKey];
+        state.viewerFocusKey=focusKey;
+        if(saved){viewport.scrollLeft=saved.left;viewport.scrollTop=saved.top;}
+        else {viewport.scrollLeft=(170+focusStage*320)*state.viewerScale-viewport.clientWidth*.5;viewport.scrollTop=0;state.viewerPositions[focusKey]={left:viewport.scrollLeft,top:viewport.scrollTop};}
       });
     }
 
@@ -882,8 +1678,96 @@
       return `<div class="viewer-diagram">${viewerEdgeMarkup(edges)}${items.map((n,i)=>`<span class="v-node ${compact} ${i<=state.step?'hot':''}" data-viewer-node-id="viewer-seq-${i}" style="left:${n[1]}%;top:${n[2]}%">${escapeHtml(n[0])}</span>`).join('')}</div><div class="explain-card">${escapeHtml(s.steps[state.step][1])}</div>`;
     }
 
+    function complexNodeContent(node) {
+      const head=`<span class="complex-node-head"><small>${escapeHtml(node.kicker)}</small><strong>${escapeHtml(node.title)}</strong></span>`;
+      const bodyText=node.cardType==='summary'?node.detail:node.body;
+      const body=`<span class="complex-node-body">${escapeHtml(bodyText)}</span>`;
+      if(node.cardType==='code') {
+        const lines=node.code.split('\n'), filename=node.id==='source'?'server.mjs':'response-handler.js';
+        return `${head}${body}<span class="complex-node-code-frame" tabindex="0" aria-label="${escapeHtml(filename)} 코드 ${lines.length}줄"><span class="complex-node-code-head"><b>${escapeHtml(filename)}</b><small>${lines.length}줄</small></span><span class="complex-node-code-scroll"><code class="complex-node-code">${lines.map(line=>`<span>${escapeHtml(line)||'&nbsp;'}</span>`).join('')}</code></span><span class="complex-node-code-foot"><span>UTF-8 · JavaScript</span><button type="button" data-open-code-viewer="${escapeHtml(node.id)}">크게 보기</button></span></span>`;
+      }
+      if(node.cardType==='metric') {
+        const count=node.incoming.length+node.outgoing.length;
+        return `${head}${body}<span class="complex-node-stat"><b>${count}</b><small>직접 연결 · 유입 ${node.incoming.length} / 유출 ${node.outgoing.length}</small></span>`;
+      }
+      if(node.cardType==='routes') {
+        const incoming=node.incoming[0], outgoing=node.outgoing[0];
+        return `${head}${body}<span class="complex-node-routes">${incoming?`<span><b>←</b> ${escapeHtml(incoming.title)} · ${escapeHtml(incoming.label)}</span>`:'<span><b>●</b> 이 흐름에서 시작</span>'}${outgoing?`<span><b>→</b> ${escapeHtml(outgoing.title)} · ${escapeHtml(outgoing.label)}</span>`:'<span><b>■</b> 이 흐름에서 마침</span>'}</span>`;
+      }
+      if(node.cardType==='accordion') {
+        const incoming=node.incoming[0], outgoing=node.outgoing[0];
+        return `${head}${body}<details class="complex-node-accordion"><summary>연결 근거 펼치기</summary><p>${escapeHtml(node.detail)}</p>${incoming?`<span>들어옴 · ${escapeHtml(incoming.title)}에서 ${escapeHtml(incoming.label)}</span>`:''}${outgoing?`<span>이어짐 · ${escapeHtml(outgoing.title)}로 ${escapeHtml(outgoing.label)}</span>`:''}</details>`;
+      }
+      if(node.cardType==='checklist') {
+        const incoming=node.incoming[0], outgoing=node.outgoing[0];
+        return `${head}<span class="complex-node-checklist"><span>${escapeHtml(node.body)}</span><span>${incoming?`${escapeHtml(incoming.title)}에서 ${escapeHtml(incoming.label)}`:'이 단계에서 흐름 시작'}</span><span>${outgoing?`${escapeHtml(outgoing.title)}로 ${escapeHtml(outgoing.label)}`:'이 단계에서 흐름 마침'}</span></span>`;
+      }
+      if(node.cardType==='table') return `${head}${body}<span class="complex-node-table"><span>들어오는 연결</span><b>${node.incoming.length}개</b><span>나가는 연결</span><b>${node.outgoing.length}개</b></span>`;
+      if(node.cardType==='quote') return `${head}<span class="complex-node-quote">${escapeHtml(node.detail)}</span>`;
+      if(node.cardType==='visual') return `${head}<span class="complex-node-visual"><i>시각 자료 · ${escapeHtml(node.kicker)}</i></span>${body}`;
+      return `${head}${body}`;
+    }
+
+    function activeChapterIndex(s) {
+      const index=s.chapters.findIndex(chapter=>chapter.steps.includes(state.step));
+      return index<0?s.chapters.length-1:index;
+    }
+
+    function chapterNavigationMarkup(s) {
+      const activeIndex=activeChapterIndex(s), active=s.chapters[activeIndex];
+      const track=s.chapters.map((chapter,index)=>`<button type="button" class="${index<activeIndex?'done':''} ${index===activeIndex?'active':''}" data-viewer-chapter="${index}" data-number="${chapter.number}" aria-label="${escapeHtml(chapter.title)} 챕터로 이동">${escapeHtml(chapter.title)}</button>`).join('');
+      const sheet=state.chapterMenuOpen?`<aside class="chapter-sheet" aria-label="전체 챕터"><header class="chapter-sheet-head"><span><small>${s.chapters.length}개 챕터 · ${s.steps.length}개 스텝</small><strong>${escapeHtml(s.document)}</strong></span><button type="button" id="closeChapterMenu" aria-label="챕터 목록 닫기">×</button></header><div class="chapter-sheet-list">${s.chapters.map((chapter,index)=>{const done=chapter.steps.filter(step=>step<state.step).length;return `<button type="button" class="chapter-sheet-card ${index===activeIndex?'active':''}" data-viewer-chapter="${index}"><b>${chapter.number}장</b><span><strong>${escapeHtml(chapter.title)}</strong><small>${escapeHtml(chapter.summary)}</small></span><small>${done}/${chapter.steps.length}</small></button>`;}).join('')}</div></aside>`:'';
+      return `<nav class="chapter-bar" aria-label="챕터 이동"><button type="button" class="chapter-current" id="openChapterMenu"><span><small>${active.number}장 · 스텝 ${active.steps.indexOf(state.step)+1}/${active.steps.length}</small><strong>${escapeHtml(active.title)}</strong></span><b>전체 보기 ›</b></button><div class="chapter-track">${track}</div></nav>${sheet}`;
+    }
+
+    function chapterRegionsMarkup(s,worldH) {
+      const lastNodeStage=Math.max(...s.nodes.map(node=>node.appear)), activeIndex=activeChapterIndex(s);
+      return s.chapters.map((chapter,index)=>{
+        const stages=chapter.steps.filter(step=>step<=lastNodeStage), first=Math.min(...stages), last=Math.max(...stages);
+        const left=20+first*320, width=(last-first)*320+300;
+        const chapterColor=s.nodes.find(node=>node.group===index*2)?.color||'var(--accent)';
+        return `<section class="chapter-region ${index===activeIndex?'active':''}" data-chapter-region="${index}" style="left:${left}px;top:8px;width:${width}px;height:${worldH-16}px;--chapter-color:${chapterColor}"><span class="chapter-region-label"><small>${chapter.number}장 · 스텝 ${chapter.steps[0]+1}–${chapter.steps[chapter.steps.length-1]+1}</small><strong>${escapeHtml(chapter.title)}</strong></span></section>`;
+      }).join('');
+    }
+
+    function fullCodeLinesMarkup(lines,markStart=-1,markEnd=-1) {
+      return `<code>${lines.map((line,index)=>`<span class="${index+1>=markStart&&index+1<=markEnd?'mark':''}" data-full-code-line="${index+1}">${escapeHtml(line)||'&nbsp;'}</span>`).join('')}</code>`;
+    }
+
+    function codeViewerMarkup(s) {
+      if(!state.codeViewerMode)return '';
+      const node=s.nodes.find(item=>item.id===state.codeViewerNodeId&&item.code)||s.nodes.find(item=>item.code);
+      if(!node)return '';
+      const lines=node.code.split('\n'), filename=node.id==='source'?'server.mjs':'response-handler.js', mode=state.codeViewerMode;
+      const tabs=[['focus','전체 파일'],['split','설명과 코드'],['map','구조 지도']].map(([id,label])=>`<button type="button" class="${mode===id?'active':''}" data-code-view-mode="${id}">${label}</button>`).join('');
+      let body='';
+      if(mode==='focus') body=`<div class="code-viewer-file"><div class="code-viewer-filebar"><span>${escapeHtml(filename)}</span><span>${lines.length}줄 · 줄 번호로 이동</span></div><div class="code-viewer-lines">${fullCodeLinesMarkup(lines)}</div></div>`;
+      if(mode==='split') body=`<div class="code-viewer-split"><aside class="code-guide"><small>시안 2</small><h5>설명과 코드를 함께 읽기</h5><button type="button" class="active" data-code-line="36">요청 본문 읽기<br>36–52줄</button><button type="button" data-code-line="68">입력 확인<br>68–82줄</button><button type="button" data-code-line="116">경로 선택<br>116–151줄</button></aside><div class="code-viewer-file"><div class="code-viewer-filebar"><span>${escapeHtml(filename)}</span><span>관련 줄 강조</span></div><div class="code-viewer-lines">${fullCodeLinesMarkup(lines,36,52)}</div></div></div>`;
+      if(mode==='map') body=`<div class="code-viewer-map"><div class="code-symbols"><span>readRequestBody()</span><span>loadUsers()</span><span>route()</span></div><div class="code-viewer-file"><div class="code-viewer-filebar"><span>${escapeHtml(filename)} › route()</span><span>현재 범위 고정</span></div><div class="code-viewer-lines">${fullCodeLinesMarkup(lines,112,151)}</div></div><aside class="code-minimap" aria-label="코드 전체 위치">${lines.map((line,index)=>index%2===0?`<i style="width:${Math.max(8,Math.min(34,line.length*.55))}px"></i>`:'').join('')}<b class="code-minimap-window"></b></aside></div>`;
+      return `<aside class="code-viewer" aria-label="긴 코드 보기"><header class="code-viewer-head"><span><small>시안 ${mode==='focus'?1:mode==='split'?2:3} · ${lines.length}줄</small><strong>${escapeHtml(filename)}</strong></span><button type="button" id="closeCodeViewer" aria-label="코드 보기 닫기">×</button></header><div class="code-viewer-tabs">${tabs}</div><div class="code-viewer-body">${body}</div></aside>`;
+    }
+
+    function complexViewer(s) {
+      const visible=stageNodes(s), visibleIds=new Set(visible.map(node=>node.id));
+      const edges=s.edges.filter(edge=>(edge[3]??0)<=state.step&&visibleIds.has(edge[0])&&visibleIds.has(edge[1]));
+      const activeEdges=edges.filter(edge=>edge[3]===state.step).length;
+      const newNodes=visible.filter(node=>node.appear===state.step).length;
+      const movingNodes=state.step>0?visible.filter(node=>{
+        if(node.appear>=state.step)return false;
+        const before=viewerStagePosition(node,state.step-1,s), after=viewerStagePosition(node,state.step,s);
+        return before.x!==after.x||before.y!==after.y;
+      }).length:0;
+      const selected=s.nodes.find(node=>node.id===state.activeNodeId);
+      const legend=Object.entries(s.groups).map(([group,label])=>`<span><i style="--legend-color:${visible.find(node=>String(node.group)===group)?.color||'var(--muted)'}"></i>${escapeHtml(label)}</span>`).join('');
+      const stageHeights=[...new Set(s.nodes.map(node=>node.appear))].map(stage=>s.nodes.filter(node=>node.appear===stage).reduce((sum,node)=>sum+node.viewerH,0)+Math.max(0,s.nodes.filter(node=>node.appear===stage).length-1)*8+94);
+      const worldW=Math.max(620,(Math.max(...s.nodes.map(node=>node.appear))+1)*320+300), worldH=Math.max(410,...stageHeights), scaledW=worldW*state.viewerScale, scaledH=worldH*state.viewerScale;
+      const nodes=visible.map(node=>{const position=viewerStagePosition(node,state.step,s);return `<article class="v-node complex-node ${node.appear===state.step?'stage-new':''} ${state.activeNodeId===node.id?'selected':''}" tabindex="0" role="button" aria-label="${escapeHtml(node.title)} 노드" data-viewer-node-id="${escapeHtml(node.id)}" data-complex-node="${escapeHtml(node.id)}" title="${escapeHtml(node.body)}" style="left:${coordinateCss(position.x,position.unit)};top:${coordinateCss(position.y,position.unit)};--viewer-w:${node.viewerW}px;--viewer-h:${node.viewerH}px;--node-color:${node.color}">${complexNodeContent(node)}</article>`;}).join('');
+      return `${chapterNavigationMarkup(s)}<div class="complex-graph-meta"><span><b>${visible.length}</b> / ${s.nodes.length}개 노드</span><span>${newNodes}개 생성</span><span>${movingNodes}개 이동</span><span>${activeEdges}개 새 연결</span></div><div class="complex-viewport-wrap"><div class="complex-view-controls" aria-label="캔버스 확대 및 축소"><button type="button" id="viewerZoomOut" aria-label="축소">−</button><output id="viewerZoomValue">${Math.round(state.viewerScale*100)}%</output><button type="button" id="viewerZoomIn" aria-label="확대">＋</button><button type="button" id="viewerZoomReset" aria-label="100%로 보기">↺</button></div><div class="viewer-diagram complex" id="complexViewport"><div class="complex-world-shell" id="complexWorldShell" style="width:${scaledW}px;height:${scaledH}px"><div class="complex-world" id="complexWorld" style="width:${worldW}px;height:${worldH}px;transform:scale(${state.viewerScale})">${chapterRegionsMarkup(s,worldH)}${viewerEdgeMarkup(edges.map(edge=>[edge[0],edge[1],edge[3]===state.step]))}${nodes}</div></div></div><div class="complex-legend">${legend}</div></div><div class="explain-card complex-explanation"><strong>${escapeHtml(selected?.title||s.steps[state.step][0])}</strong><p>${escapeHtml(selected?.body||s.steps[state.step][1])}</p></div>${codeViewerMarkup(s)}`;
+    }
+
     function learnerContent(s) {
       const v=s.viewer;
+      if(v.type==='complex') return complexViewer(s);
       if(v.type==='diagram') return s.id==='concept'?conceptViewer(s):viewerDiagram(s);
       if(v.type==='flow') return viewerDiagram(s)+`<pre class="viewer-code">fetch('/users')\n  → GET /users\n  → 200 JSON</pre>`;
       if(v.type==='recall') return `<div class="viewer-diagram">${viewerEdgeMarkup([['recall-package','recall-cli',true],['recall-package','recall-registry',state.step>0],['recall-cli','recall-node',state.step>1],['recall-registry','recall-tree',state.step>1],['recall-tree','recall-modules',state.step>2]])}<span class="v-node compact hot" data-viewer-node-id="recall-package" style="left:50%;top:16%">package.json</span><span class="v-node compact hot" data-viewer-node-id="recall-cli" style="left:18%;top:47%">npm CLI</span><span class="v-node compact ${state.step>0?'hot':''}" data-viewer-node-id="recall-registry" style="left:82%;top:47%">Registry</span><span class="v-node compact ${state.step>1?'hot':''}" data-viewer-node-id="recall-node" style="left:18%;top:82%">Node.js</span><span class="v-node compact ${state.step>1?'hot':''}" data-viewer-node-id="recall-tree" style="left:82%;top:82%">의존성 트리</span><span class="v-node compact ${state.step>2?'hot':''}" data-viewer-node-id="recall-modules" style="left:50%;top:82%">node_modules</span></div><div class="explain-card">npm CLI는 <button class="term-btn" data-concept-ref="package-json">package.json</button>을 읽고 Registry에서 버전을 고른 뒤 패키지를 설치합니다. scripts에 적힌 명령은 <button class="term-btn" data-concept-ref="node-runtime">Node.js 런타임</button>에 전달합니다.</div>`;
@@ -896,8 +1780,49 @@
       $('#phoneTitle').textContent=s.document; $('#phoneMeta').textContent=s.meta; $('#phoneStepTitle').textContent=s.steps[state.step][0]; $('#phoneStepCount').textContent=`${state.step+1} / ${s.steps.length} 단계`;
       $('#phoneProgress').innerHTML=s.steps.map((_,i)=>`<i class="${i<=state.step?'done':''}"></i>`).join('');
       $('#lessonBody').innerHTML=`<span class="lesson-kicker">${escapeHtml(s.viewer.kicker)}</span><h3>${s.viewer.title}</h3><p>${escapeHtml(s.viewer.intro)}</p>${learnerContent(s)}`;
-      requestAnimationFrame(drawViewerEdges);
+      bindComplexViewport(s);
+      requestAnimationFrame(()=>{layoutComplexNodes(s);drawViewerEdges();animateGraphTransition(s,'viewer');});
       bindConceptReferences($('#lessonBody'));
+      $('#openChapterMenu')?.addEventListener('click',()=>{state.chapterMenuOpen=true;renderViewer(s);});
+      $('#closeChapterMenu')?.addEventListener('click',()=>{state.chapterMenuOpen=false;renderViewer(s);});
+      $$('[data-viewer-chapter]').forEach(button=>button.addEventListener('click',()=>{const chapter=s.chapters[Number(button.dataset.viewerChapter)];state.step=chapter.steps[0];state.chapterMenuOpen=false;state.codeViewerMode=null;state.activeNodeId=null;renderViewer(s);}));
+      $$('[data-open-code-viewer]').forEach(button=>button.addEventListener('click',event=>{event.stopPropagation();state.codeViewerNodeId=button.dataset.openCodeViewer;state.codeViewerMode='focus';renderViewer(s);}));
+      $('#closeCodeViewer')?.addEventListener('click',()=>{state.codeViewerMode=null;renderViewer(s);});
+      $$('[data-code-view-mode]').forEach(button=>button.addEventListener('click',()=>{state.codeViewerMode=button.dataset.codeViewMode;renderViewer(s);}));
+      $$('[data-code-line]').forEach(button=>button.addEventListener('click',()=>{const viewer=$('.code-viewer-lines');if(viewer)viewer.scrollTop=(Number(button.dataset.codeLine)-1)*11;}));
+      $$('[data-complex-node]').forEach(card=>{
+        const select=()=>{state.activeNodeId=card.dataset.complexNode;renderViewer(s);};
+        card.addEventListener('click',select);
+        card.addEventListener('keydown',event=>{if(event.target===card&&(event.key==='Enter'||event.key===' ')){event.preventDefault();select();}});
+      });
+      $$('.complex-node-accordion').forEach(details=>{
+        details.addEventListener('click',event=>event.stopPropagation());
+        details.addEventListener('toggle',()=>requestAnimationFrame(()=>layoutComplexNodes(s)));
+      });
+      $$('.complex-node-code-frame').forEach(frame=>{
+        frame.addEventListener('pointerdown',event=>event.stopPropagation());
+        frame.addEventListener('click',event=>event.stopPropagation());
+        const scroller=frame.querySelector('.complex-node-code-scroll');
+        let codeDrag=null;
+        scroller.addEventListener('pointerdown',event=>{
+          if(event.button!==undefined&&event.button!==0)return;
+          codeDrag={pointerId:event.pointerId,x:event.clientX,y:event.clientY,left:scroller.scrollLeft,top:scroller.scrollTop};
+          scroller.setPointerCapture(event.pointerId);
+        });
+        scroller.addEventListener('pointermove',event=>{
+          if(!codeDrag||codeDrag.pointerId!==event.pointerId)return;
+          event.preventDefault();
+          scroller.scrollLeft=codeDrag.left-(event.clientX-codeDrag.x);
+          scroller.scrollTop=codeDrag.top-(event.clientY-codeDrag.y);
+        },{passive:false});
+        const finishCodeDrag=event=>{
+          if(!codeDrag||codeDrag.pointerId!==event.pointerId)return;
+          if(scroller.hasPointerCapture(event.pointerId))scroller.releasePointerCapture(event.pointerId);
+          codeDrag=null;
+        };
+        scroller.addEventListener('pointerup',finishCodeDrag);
+        scroller.addEventListener('pointercancel',finishCodeDrag);
+      });
       $('#viewerChildTrigger')?.addEventListener('click',()=>{state.viewerChildOpen=true;renderViewer(s);});
       $('#closeViewerChildren')?.addEventListener('click',()=>{state.viewerChildOpen=false;renderViewer(s);});
       $$('[data-viewer-child-detail]').forEach(button=>button.addEventListener('click',()=>{state.viewerChildDetail=button.dataset.viewerChildDetail;renderViewer(s);}));
@@ -927,12 +1852,12 @@
     $('#zoomIn').addEventListener('click',()=>setZoom(state.zoom===60?100:140));
     $('#zoomReset').addEventListener('click',()=>setZoom(100));
     $('#canvas').addEventListener('wheel',event=>{if(event.ctrlKey||event.metaKey){event.preventDefault();setZoom(event.deltaY>0?(state.zoom===140?100:60):(state.zoom===60?100:140));}},{passive:false});
-    $('#prevStep').addEventListener('click',()=>{state.step=Math.max(0,state.step-1);renderViewer(scenarios[state.scenario]);});
-    $('#nextStep').addEventListener('click',()=>{state.step=Math.min(scenarios[state.scenario].steps.length-1,state.step+1);renderViewer(scenarios[state.scenario]);});
+    $('#prevStep').addEventListener('click',()=>{state.step=Math.max(0,state.step-1);state.chapterMenuOpen=false;state.codeViewerMode=null;renderViewer(scenarios[state.scenario]);});
+    $('#nextStep').addEventListener('click',()=>{state.step=Math.min(scenarios[state.scenario].steps.length-1,state.step+1);state.chapterMenuOpen=false;state.codeViewerMode=null;renderViewer(scenarios[state.scenario]);});
     $('#closeConcept').addEventListener('click',()=>closeConceptPreview(true));
     $('#conceptOrigin').addEventListener('click',event=>event.preventDefault());
     document.addEventListener('pointerdown',event=>{if(!$('#conceptPopover').hidden&&!event.target.closest('#conceptPopover')&&!event.target.closest('[data-concept-ref]'))closeConceptPreview();});
-    document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!$('#conceptPopover').hidden)closeConceptPreview(true);});
+    document.addEventListener('keydown',event=>{if(event.key!=='Escape')return;if(state.codeViewerMode){state.codeViewerMode=null;renderViewer(scenarios[state.scenario]);return;}if(state.chapterMenuOpen){state.chapterMenuOpen=false;renderViewer(scenarios[state.scenario]);return;}if(!$('#conceptPopover').hidden)closeConceptPreview(true);});
     $('#playSteps').addEventListener('click',()=>{state.step=(state.step+1)%scenarios[state.scenario].steps.length;renderEditor(scenarios[state.scenario]);});
     new ResizeObserver(()=>requestAnimationFrame(drawEdges)).observe($('#canvas'));
     new ResizeObserver(()=>requestAnimationFrame(drawViewerEdges)).observe($('#lessonBody'));
