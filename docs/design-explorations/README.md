@@ -7,7 +7,7 @@
 공개 미리보기는 [dotzari.memos.my](https://dotzari.memos.my)에서 볼 수 있다.
 Jamserver의 `dotzari` 앱으로 등록되어 있으며, 별도 종료 시각 없이 계속 실행된다.
 
-구현 가능한 컴포넌트와 캔버스 인터랙션을 묶은 새 디자인 시스템 데모는
+라이브러리를 실제 학습 화면처럼 사용하는 모바일 우선 워킹 데모는
 [dotzari.memos.my/design-system/](https://dotzari.memos.my/design-system/)에서 볼 수 있다.
 `apps/design-system-demo`를 빌드하면 이 디렉터리의 `design-system/` 정적 파일이
 갱신된다.

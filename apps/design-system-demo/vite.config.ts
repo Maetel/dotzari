@@ -6,6 +6,10 @@ export default defineConfig({
   plugins: [svelte()],
   server: {
     allowedHosts: ['.trycloudflare.com', 'dotzari.memos.my'],
+    watch: {
+      usePolling: true,
+      interval: 500,
+    },
   },
   build: {
     outDir: '../../docs/design-explorations/design-system',

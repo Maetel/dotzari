@@ -204,7 +204,7 @@ export const demoLesson: Lesson = {
     { id: 'overview', chapterId: 'complete', eyebrow: '3장 · 스텝 3', title: '전체 요청 경로를 한 번에 살펴봅니다.', description: '24개 요소가 입력, 실행, 위임, 대기, 재진입, 결과의 여섯 역할로 정렬됩니다.' },
   ],
   nodes: [
-    node('source', 'JavaScript 소스', 'collect', 0, 0, '함수와 모듈이 실행의 출발점입니다.', { type: 'code', filename: 'server.mjs', language: 'JavaScript', code: handlerCode, sections: [{ id: 'setup', title: '준비와 저장', startLine: 1, endLine: 70, description: '서버 설정과 파일 저장 함수를 준비합니다.' }, { id: 'request', title: '요청 처리', startLine: 71, endLine: 126, description: '입력을 검사하고 경로에 맞는 함수를 실행합니다.' }, { id: 'server', title: '서버와 종료', startLine: 127, endLine: handlerLineCount, description: '오류와 지표를 기록하고 안전하게 종료합니다.' }] }, 430),
+    node('source', 'JavaScript 소스', 'collect', 0, 0, '함수와 모듈이 실행의 출발점입니다.', { type: 'code', filename: 'server.mjs', language: 'JavaScript', code: handlerCode, sections: [{ id: 'setup', title: '준비와 저장', startLine: 1, endLine: 70, description: '서버 설정과 파일 저장 함수를 준비합니다.' }, { id: 'request', title: '요청 처리', startLine: 71, endLine: 126, description: '입력을 검사하고 경로에 맞는 함수를 실행합니다.' }, { id: 'server', title: '서버와 종료', startLine: 127, endLine: handlerLineCount, description: '오류와 지표를 기록하고 안전하게 종료합니다.' }] }, 390),
     node('loader', '모듈 로더', 'collect', 1, 0, 'import와 require에 적힌 의존성을 찾습니다.', { type: 'routes', items: [{ label: 'ES module', value: 'import' }, { label: 'CommonJS', value: 'require' }] }),
     node('parser', '파서', 'collect', 2, 0, '소스를 문법 구조로 해석합니다.', { type: 'accordion', summary: '해석 결과 보기', body: '문장을 토큰으로 나누고 실행 가능한 구문 트리를 만듭니다.', detail: '문법 오류가 있으면 실행 전에 중단합니다.' }),
     node('config', '환경 설정', 'collect', 3, 0, '실행 인자와 환경 변수를 제공합니다.', { type: 'table', columns: ['이름', '예시'], rows: [['PORT', '3000'], ['NODE_ENV', 'production']] }),

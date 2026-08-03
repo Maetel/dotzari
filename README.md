@@ -6,7 +6,7 @@ Dotzari is a Svelte-first library for building interactive, timeline-based diagr
 
 - [Product and architecture SSOT](./docs/product-spec.md)
 - [Design system specification](./docs/design-system.md)
-- [Interactive design system demo](https://dotzari.memos.my/design-system/)
+- [Working lesson demo](https://dotzari.memos.my/design-system/)
 - [Five interactive design explorations](./docs/design-explorations/index.html)
 - [Design exploration notes](./docs/design-explorations/README.md)
 
@@ -14,6 +14,6 @@ Dotzari is a Svelte-first library for building interactive, timeline-based diagr
 
 - `packages/design-system`: framework-neutral tokens, geometry, clustering, and canvas interaction state
 - `packages/design-system-svelte`: Svelte UI and canvas components
-- `apps/design-system-demo`: component catalog and interactive canvas lab
+- `apps/design-system-demo`: 실제 학습 흐름을 체험하는 모바일 우선 워킹 데모
 
 Run `npx pnpm@11.18.0 install`, then `npx pnpm@11.18.0 dev` for local development.
