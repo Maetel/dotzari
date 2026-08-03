@@ -272,9 +272,8 @@
     .phone-head button { width: 25px; height: 25px; border-radius: 7px; background: var(--panel2); color: var(--muted); cursor: pointer; }
     .phone-title { min-width: 0; flex: 1; } .phone-title strong, .phone-title span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .phone-title strong { font-size: 9px; } .phone-title span { margin-top: 2px; color: var(--muted); font-size: 7px; }
-    .phone-progress { display: flex; gap: 3px; padding: 9px 14px 0; }
-    .phone-progress i { flex: 1; height: 3px; border-radius: 3px; background: var(--line); } .phone-progress i.done { background: var(--accent); }
-    .lesson-body { height: 440px; padding: 14px; overflow-y: auto; }
+    .phone-progress { display: block; height: 76px; padding: 7px 14px 0; }
+    .lesson-body { height: 378px; padding: 11px 14px 14px; overflow-y: auto; }
     .lesson-kicker { color: var(--accent); font-size: 7px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
     .lesson-body h3 { margin: 6px 0 5px; font-size: 19px; line-height: 1.18; letter-spacing: -.04em; }
     .lesson-body > p { margin: 0; color: var(--muted); font-size: 10px; line-height: 1.55; }
@@ -337,19 +336,22 @@
     .complex-node-table span { color: var(--muted); }
     .complex-node-table b { color: var(--ink); text-align: right; }
     .complex-node-table > :nth-last-child(-n+2) { border-bottom: 0; }
-    .chapter-bar { margin-top: 10px; padding: 7px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel2); }
-    .chapter-current { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; padding: 1px 2px 7px; background: transparent; cursor: pointer; text-align: left; }
+    .chapter-bar { padding: 6px 7px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel2); }
+    .chapter-current { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; padding: 0 1px 5px; background: transparent; cursor: pointer; text-align: left; }
     .chapter-current span { min-width: 0; }
     .chapter-current small, .chapter-current strong { display: block; }
-    .chapter-current small { color: var(--accent); font-size: 5.8px; font-weight: 900; }
-    .chapter-current strong { margin-top: 2px; overflow: hidden; font-size: 8px; text-overflow: ellipsis; white-space: nowrap; }
-    .chapter-current b { flex: 0 0 auto; color: var(--muted); font-size: 6px; }
-    .chapter-track { display: grid; grid-template-columns: repeat(3,1fr); gap: 4px; }
-    .chapter-track button { position: relative; min-width: 0; height: 28px; padding: 5px 4px 4px 18px; overflow: hidden; border: 1px solid var(--line); border-radius: 7px; background: var(--panel); color: var(--muted); cursor: pointer; font-size: 5.5px; font-weight: 800; text-align: left; text-overflow: ellipsis; white-space: nowrap; }
-    .chapter-track button::before { content: attr(data-number); position: absolute; left: 5px; top: 6px; display: grid; place-items: center; width: 9px; height: 9px; border-radius: 50%; background: var(--panel2); color: var(--muted); font-size: 4.8px; }
-    .chapter-track button.done { color: var(--ink); }
-    .chapter-track button.active { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
-    .chapter-track button.active::before { background: var(--accent); color: white; }
+    .chapter-current small { color: var(--muted); font-size: 5.3px; font-weight: 850; }
+    .chapter-current strong { margin-top: 1px; overflow: hidden; font-size: 7.5px; text-overflow: ellipsis; white-space: nowrap; }
+    .chapter-current b { flex: 0 0 auto; color: var(--accent); font-size: 5.7px; }
+    .chapter-track { display: flex; gap: 4px; }
+    .chapter-track-group { display: grid; grid-template-rows: auto 3px; gap: 3px; min-width: 0; flex: var(--chapter-span,1); }
+    .chapter-track-label { min-width: 0; padding: 0 1px; overflow: hidden; background: transparent; color: var(--muted); cursor: pointer; font-size: 5.2px; font-weight: 850; text-align: left; text-overflow: ellipsis; white-space: nowrap; }
+    .chapter-track-group.done .chapter-track-label { color: var(--ink); }
+    .chapter-track-group.active .chapter-track-label { color: var(--accent); }
+    .chapter-step-track { display: grid; gap: 2px; min-width: 0; }
+    .chapter-step { height: 3px; min-width: 0; padding: 0; border-radius: 3px; background: var(--line); cursor: pointer; }
+    .chapter-step.done { background: color-mix(in srgb, var(--accent) 55%, var(--line)); }
+    .chapter-step.active { background: var(--accent); box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 22%, transparent); }
     .chapter-region { position: absolute; z-index: 0; border: 1px dashed color-mix(in srgb, var(--chapter-color) 45%, var(--line)); border-radius: 18px; background: color-mix(in srgb, var(--chapter-color) 5%, transparent); pointer-events: none; }
     .chapter-region.active { border-style: solid; background: color-mix(in srgb, var(--chapter-color) 9%, transparent); }
     .chapter-region-label { position: absolute; left: 12px; top: 10px; display: grid; gap: 1px; max-width: 210px; padding: 6px 8px; border-radius: 7px; background: color-mix(in srgb, var(--panel) 92%, transparent); box-shadow: 0 2px 8px rgba(30,38,31,.08); }
@@ -1715,9 +1717,12 @@ process.on('SIGTERM', () => shutdown('SIGTERM'));`,
 
     function chapterNavigationMarkup(s) {
       const activeIndex=activeChapterIndex(s), active=s.chapters[activeIndex];
-      const track=s.chapters.map((chapter,index)=>`<button type="button" class="${index<activeIndex?'done':''} ${index===activeIndex?'active':''}" data-viewer-chapter="${index}" data-number="${chapter.number}" aria-label="${escapeHtml(chapter.title)} 챕터로 이동">${escapeHtml(chapter.title)}</button>`).join('');
+      const track=s.chapters.map((chapter,index)=>{
+        const steps=chapter.steps.map(step=>`<button type="button" class="chapter-step ${step<state.step?'done':''} ${step===state.step?'active':''}" data-viewer-step="${step}" aria-label="${chapter.number}장 ${chapter.steps.indexOf(step)+1}단계, ${escapeHtml(s.steps[step][0])}"></button>`).join('');
+        return `<section class="chapter-track-group ${index<activeIndex?'done':''} ${index===activeIndex?'active':''}" style="--chapter-span:${chapter.steps.length}"><button type="button" class="chapter-track-label" data-viewer-chapter="${index}" aria-label="${escapeHtml(chapter.title)} 챕터의 첫 단계로 이동">${chapter.number}장</button><div class="chapter-step-track" style="grid-template-columns:repeat(${chapter.steps.length},minmax(0,1fr))">${steps}</div></section>`;
+      }).join('');
       const sheet=state.chapterMenuOpen?`<aside class="chapter-sheet" aria-label="전체 챕터"><header class="chapter-sheet-head"><span><small>${s.chapters.length}개 챕터 · ${s.steps.length}개 스텝</small><strong>${escapeHtml(s.document)}</strong></span><button type="button" id="closeChapterMenu" aria-label="챕터 목록 닫기">×</button></header><div class="chapter-sheet-list">${s.chapters.map((chapter,index)=>{const done=chapter.steps.filter(step=>step<state.step).length;return `<button type="button" class="chapter-sheet-card ${index===activeIndex?'active':''}" data-viewer-chapter="${index}"><b>${chapter.number}장</b><span><strong>${escapeHtml(chapter.title)}</strong><small>${escapeHtml(chapter.summary)}</small></span><small>${done}/${chapter.steps.length}</small></button>`;}).join('')}</div></aside>`:'';
-      return `<nav class="chapter-bar" aria-label="챕터 이동"><button type="button" class="chapter-current" id="openChapterMenu"><span><small>${active.number}장 · 스텝 ${active.steps.indexOf(state.step)+1}/${active.steps.length}</small><strong>${escapeHtml(active.title)}</strong></span><b>전체 보기 ›</b></button><div class="chapter-track">${track}</div></nav>${sheet}`;
+      return `<nav class="chapter-bar" aria-label="챕터와 단계 이동"><button type="button" class="chapter-current" id="openChapterMenu"><span><small>현재 챕터</small><strong>${active.number}장 · ${escapeHtml(active.title)}</strong></span><b>스텝 ${active.steps.indexOf(state.step)+1}/${active.steps.length} · 전체 보기 ›</b></button><div class="chapter-track">${track}</div></nav>${sheet}`;
     }
 
     function chapterRegionsMarkup(s,worldH) {
@@ -1762,7 +1767,7 @@ process.on('SIGTERM', () => shutdown('SIGTERM'));`,
       const stageHeights=[...new Set(s.nodes.map(node=>node.appear))].map(stage=>s.nodes.filter(node=>node.appear===stage).reduce((sum,node)=>sum+node.viewerH,0)+Math.max(0,s.nodes.filter(node=>node.appear===stage).length-1)*8+94);
       const worldW=Math.max(620,(Math.max(...s.nodes.map(node=>node.appear))+1)*320+300), worldH=Math.max(410,...stageHeights), scaledW=worldW*state.viewerScale, scaledH=worldH*state.viewerScale;
       const nodes=visible.map(node=>{const position=viewerStagePosition(node,state.step,s);return `<article class="v-node complex-node ${node.appear===state.step?'stage-new':''} ${state.activeNodeId===node.id?'selected':''}" tabindex="0" role="button" aria-label="${escapeHtml(node.title)} 노드" data-viewer-node-id="${escapeHtml(node.id)}" data-complex-node="${escapeHtml(node.id)}" title="${escapeHtml(node.body)}" style="left:${coordinateCss(position.x,position.unit)};top:${coordinateCss(position.y,position.unit)};--viewer-w:${node.viewerW}px;--viewer-h:${node.viewerH}px;--node-color:${node.color}">${complexNodeContent(node)}</article>`;}).join('');
-      return `${chapterNavigationMarkup(s)}<div class="complex-graph-meta"><span><b>${visible.length}</b> / ${s.nodes.length}개 노드</span><span>${newNodes}개 생성</span><span>${movingNodes}개 이동</span><span>${activeEdges}개 새 연결</span></div><div class="complex-viewport-wrap"><div class="complex-view-controls" aria-label="캔버스 확대 및 축소"><button type="button" id="viewerZoomOut" aria-label="축소">−</button><output id="viewerZoomValue">${Math.round(state.viewerScale*100)}%</output><button type="button" id="viewerZoomIn" aria-label="확대">＋</button><button type="button" id="viewerZoomReset" aria-label="100%로 보기">↺</button></div><div class="viewer-diagram complex" id="complexViewport"><div class="complex-world-shell" id="complexWorldShell" style="width:${scaledW}px;height:${scaledH}px"><div class="complex-world" id="complexWorld" style="width:${worldW}px;height:${worldH}px;transform:scale(${state.viewerScale})">${chapterRegionsMarkup(s,worldH)}${viewerEdgeMarkup(edges.map(edge=>[edge[0],edge[1],edge[3]===state.step]))}${nodes}</div></div></div><div class="complex-legend">${legend}</div></div><div class="explain-card complex-explanation"><strong>${escapeHtml(selected?.title||s.steps[state.step][0])}</strong><p>${escapeHtml(selected?.body||s.steps[state.step][1])}</p></div>${codeViewerMarkup(s)}`;
+      return `<div class="complex-graph-meta"><span><b>${visible.length}</b> / ${s.nodes.length}개 노드</span><span>${newNodes}개 생성</span><span>${movingNodes}개 이동</span><span>${activeEdges}개 새 연결</span></div><div class="complex-viewport-wrap"><div class="complex-view-controls" aria-label="캔버스 확대 및 축소"><button type="button" id="viewerZoomOut" aria-label="축소">−</button><output id="viewerZoomValue">${Math.round(state.viewerScale*100)}%</output><button type="button" id="viewerZoomIn" aria-label="확대">＋</button><button type="button" id="viewerZoomReset" aria-label="100%로 보기">↺</button></div><div class="viewer-diagram complex" id="complexViewport"><div class="complex-world-shell" id="complexWorldShell" style="width:${scaledW}px;height:${scaledH}px"><div class="complex-world" id="complexWorld" style="width:${worldW}px;height:${worldH}px;transform:scale(${state.viewerScale})">${chapterRegionsMarkup(s,worldH)}${viewerEdgeMarkup(edges.map(edge=>[edge[0],edge[1],edge[3]===state.step]))}${nodes}</div></div></div><div class="complex-legend">${legend}</div></div><div class="explain-card complex-explanation"><strong>${escapeHtml(selected?.title||s.steps[state.step][0])}</strong><p>${escapeHtml(selected?.body||s.steps[state.step][1])}</p></div>${codeViewerMarkup(s)}`;
     }
 
     function learnerContent(s) {
@@ -1778,7 +1783,7 @@ process.on('SIGTERM', () => shutdown('SIGTERM'));`,
     function renderViewer(s) {
       closeConceptPreview();
       $('#phoneTitle').textContent=s.document; $('#phoneMeta').textContent=s.meta; $('#phoneStepTitle').textContent=s.steps[state.step][0]; $('#phoneStepCount').textContent=`${state.step+1} / ${s.steps.length} 단계`;
-      $('#phoneProgress').innerHTML=s.steps.map((_,i)=>`<i class="${i<=state.step?'done':''}"></i>`).join('');
+      $('#phoneProgress').innerHTML=chapterNavigationMarkup(s);
       $('#lessonBody').innerHTML=`<span class="lesson-kicker">${escapeHtml(s.viewer.kicker)}</span><h3>${s.viewer.title}</h3><p>${escapeHtml(s.viewer.intro)}</p>${learnerContent(s)}`;
       bindComplexViewport(s);
       requestAnimationFrame(()=>{layoutComplexNodes(s);drawViewerEdges();animateGraphTransition(s,'viewer');});
@@ -1786,6 +1791,7 @@ process.on('SIGTERM', () => shutdown('SIGTERM'));`,
       $('#openChapterMenu')?.addEventListener('click',()=>{state.chapterMenuOpen=true;renderViewer(s);});
       $('#closeChapterMenu')?.addEventListener('click',()=>{state.chapterMenuOpen=false;renderViewer(s);});
       $$('[data-viewer-chapter]').forEach(button=>button.addEventListener('click',()=>{const chapter=s.chapters[Number(button.dataset.viewerChapter)];state.step=chapter.steps[0];state.chapterMenuOpen=false;state.codeViewerMode=null;state.activeNodeId=null;renderViewer(s);}));
+      $$('[data-viewer-step]').forEach(button=>button.addEventListener('click',()=>{state.step=Number(button.dataset.viewerStep);state.chapterMenuOpen=false;state.codeViewerMode=null;state.activeNodeId=null;renderViewer(s);}));
       $$('[data-open-code-viewer]').forEach(button=>button.addEventListener('click',event=>{event.stopPropagation();state.codeViewerNodeId=button.dataset.openCodeViewer;state.codeViewerMode='focus';renderViewer(s);}));
       $('#closeCodeViewer')?.addEventListener('click',()=>{state.codeViewerMode=null;renderViewer(s);});
       $$('[data-code-view-mode]').forEach(button=>button.addEventListener('click',()=>{state.codeViewerMode=button.dataset.codeViewMode;renderViewer(s);}));
