@@ -5,6 +5,7 @@ import {
   keyboardNudge,
   screenToCanvas,
   shouldAutoFocusCanvas,
+  visibleViewportAxis,
   worldBoundsToScrollOffset,
   zoomViewportAt,
 } from './geometry.js';
@@ -39,6 +40,27 @@ describe('canvas geometry', () => {
     expect(offset.x).toBeCloseTo(166.44);
   });
 
+  it('centers bounds in the part of a canvas visible through browser zoom', () => {
+    const bounds = { x: 372, y: 92, width: 260, height: 540 };
+    const visible = visibleViewportAxis(1, 388, 0, 300);
+    const offset = worldBoundsToScrollOffset(
+      bounds,
+      0.72,
+      { width: visible.size, height: 786 },
+      { width: 1101, height: 920 },
+      {
+        viewportOffset: { x: visible.offset, y: 0 },
+        scrollViewportSize: { width: 388, height: 786 },
+      },
+    );
+
+    const screenLeft = bounds.x * 0.72 - offset.x - visible.offset;
+    expect(visible).toEqual({ offset: 0, size: 299 });
+    expect(visibleViewportAxis(1, 388, 70, 300)).toEqual({ offset: 69, size: 300 });
+    expect(screenLeft).toBeCloseTo((visible.size - bounds.width * 0.72) / 2);
+    expect(offset.x).toBeCloseTo(211.94);
+  });
+
   it('clamps first-column focus at the world origin instead of creating a mobile-only origin', () => {
     expect(worldBoundsToScrollOffset(
       { x: 32, y: 92, width: 390, height: 500 },
@@ -55,6 +77,7 @@ describe('canvas geometry', () => {
     expect(shouldAutoFocusCanvas(initial, settled, true)).toBe(false);
     expect(shouldAutoFocusCanvas(settled, { stepId: 'delegate', viewportWidth: 390 }, false)).toBe(true);
     expect(shouldAutoFocusCanvas(settled, { stepId: 'delegate', viewportWidth: 390 }, true)).toBe(false);
+    expect(shouldAutoFocusCanvas(settled, { ...settled, viewportOffsetX: 40 }, false)).toBe(true);
   });
 
   it('attaches edge endpoints to node boundaries', () => {

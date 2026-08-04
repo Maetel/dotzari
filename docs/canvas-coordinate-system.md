@@ -10,26 +10,28 @@
 | --- | --- | --- |
 | 월드 좌표 | 확대 전 CSS px, 전체 캔버스 왼쪽 위가 `(0, 0)` | 노드 `x`, `y`, `width`, `height`, 챕터 경계, 연결선 |
 | 스크롤 좌표 | 확대가 적용된 콘텐츠 px, 스크롤 가능한 콘텐츠 왼쪽 위가 `(0, 0)` | `scrollLeft`, `scrollTop` |
-| viewport 좌표 | 실제 화면 px, 보이는 캔버스 영역 왼쪽 위가 `(0, 0)` | `clientWidth`, `clientHeight`, `PointerEvent.clientX/Y`에서 캔버스 rect를 뺀 값 |
+| 스크롤 영역 좌표 | 캔버스 element가 차지하는 layout px | `clientWidth`, `clientHeight` |
+| 보이는 화면 좌표 | 브라우저 확대까지 반영해 사용자가 실제로 보는 캔버스 영역 왼쪽 위가 `(0, 0)` | 캔버스 content rect와 `visualViewport`의 교차 영역, `PointerEvent.clientX/Y` |
 
 페이지 좌표와 상단 메뉴 높이는 캔버스 카메라 계산에 넣지 않습니다. 상단 메뉴를 제외한
-실제 캔버스 element의 `clientWidth`와 `clientHeight`가 viewport 크기입니다. iOS safe area도
-앱 shell이 처리하며 월드 원점을 바꾸지 않습니다.
+실제 캔버스 element 안에서 `visualViewport`와 겹치는 부분이 카메라 viewport입니다.
+브라우저 배율이 100%가 아닐 때는 `clientWidth` 전체를 화면에 보이는 폭으로 간주하지 않습니다.
+iOS safe area는 앱 shell이 처리하며 월드 원점을 바꾸지 않습니다.
 
 ## 2. 변환식
 
 월드의 한 점을 viewport에서 표시할 위치는 다음과 같습니다.
 
 ```text
-viewportX = worldX × zoom − scrollLeft
-viewportY = worldY × zoom − scrollTop
+viewportX = worldX × zoom − scrollLeft − visibleOffsetX
+viewportY = worldY × zoom − scrollTop − visibleOffsetY
 ```
 
 따라서 월드의 한 점을 viewport의 원하는 위치에 놓는 카메라 값은 다음과 같습니다.
 
 ```text
-scrollLeft = worldX × zoom − desiredViewportX
-scrollTop  = worldY × zoom − desiredViewportY
+scrollLeft = worldX × zoom − desiredViewportX − visibleOffsetX
+scrollTop  = worldY × zoom − desiredViewportY − visibleOffsetY
 ```
 
 `scrollLeft`와 `scrollTop`은 이미 확대가 반영된 콘텐츠 px입니다. 여기에 zoom을 다시 곱하거나
@@ -40,11 +42,14 @@ scrollTop  = worldY × zoom − desiredViewportY
 
 - 모바일에서도 노드의 절대 월드 좌표와 열 간격을 바꾸지 않습니다.
 - 달라지는 값은 실제 캔버스 viewport 크기와 기본 zoom뿐입니다.
+- iPhone Safari의 브라우저 확대 상태에서는 `visualViewport.width`와 캔버스 content rect의
+  교차 폭을 사용합니다. layout viewport의 `clientWidth`만 사용하면 노드가 오른쪽으로 밀립니다.
 - 현재 스텝으로 이동할 때 `스텝 번호 × 열 너비` 같은 추정값을 사용하지 않습니다. 렌더링 후
   측정된 현재 스텝 노드의 왼쪽·오른쪽 경계를 사용합니다.
 - 측정된 경계는 `worldBoundsToScrollOffset`으로 변환하고, 가능한 경우 viewport 가로 중앙에
   배치합니다. 월드 시작과 끝에서는 실제 스크롤 범위 안으로 제한합니다.
-- 마지막 열도 중앙에 놓을 수 있도록 월드 오른쪽에 viewport 절반만큼의 카메라 여백을 둡니다.
+- 마지막 열도 중앙에 놓을 수 있도록 월드 오른쪽에 현재 보이는 viewport 중심을 반영한 카메라
+  여백을 둡니다.
   이 여백은 배경이 이어지는 탐색 공간이며 노드·챕터·연결선의 절대 좌표를 변경하지 않습니다.
 - 직접 주소로 스텝에 진입해도 같은 위치가 나와야 합니다. viewport가 연결되고 노드 측정이
   끝난 뒤 최초 카메라를 설정합니다.
@@ -80,6 +85,8 @@ scrollTop  = worldY × zoom − desiredViewportY
 6. 최종 스텝처럼 새 노드가 없는 단계: 마지막으로 생성된 열을 기준으로 표시합니다.
 7. 590px에서 직접 진입한 뒤 같은 페이지를 390px로 줄이면 현재 스텝이 390px 기준 중앙으로
    다시 이동합니다. 먼저 드래그한 경우에는 같은 폭 변경 뒤에도 사용자 위치를 유지합니다.
+8. 390px layout viewport에서 브라우저 배율을 130%로 설정해 실제 보이는 폭이 300px가 되어도
+   현재 스텝과 다음 스텝의 노드 묶음이 그 300px 안에서 중앙에 표시됩니다.
 
 코어 단위 테스트는 모바일 viewport에서 실제 경계를 중앙에 놓는 계산과 월드 시작점 제한을
 검증합니다. 브라우저 검증에서는 노드의 `getBoundingClientRect()`가 viewport 안에서 읽을 수
@@ -100,3 +107,16 @@ scrollTop  = worldY × zoom − desiredViewportY
 - 캔버스 드래그로 `scrollLeft`가 `167 → 287`로 바뀐 뒤 550ms 후에도 `287`을 유지했다.
 - 1024×768, 1280×900, 1440×900의 Paper·Midnight에서 페이지 넘침, 캔버스 잘림, 오류
   overlay와 browser runtime error가 없었다.
+
+## 7. 2026-08-04 iPhone visual viewport 검증 기록
+
+- 390×844 layout viewport에 브라우저 배율 130%를 적용하면 `visualViewport.width`는 300px,
+  캔버스 `clientWidth`는 388px였다.
+- 두 번째 스텝은 `scrollLeft 212`, 현재 노드 경계 `56.84–244.04px`로 보이는 300px 영역의
+  중앙에 표시됐다.
+- 같은 상태에서 다음 스텝으로 이동하면 `scrollLeft 457`, 새 노드 경계
+  `56.64–243.84px`로 다시 중앙에 표시됐다.
+- 브라우저 배율 100%에서는 기존 값인 `scrollLeft 167`, `101.84–289.04px`를 유지했고,
+  두 배율 모두 문서 가로 넘침과 browser runtime error가 없었다.
+- 캔버스 확대를 72%에서 87%로 바꾼 뒤 `scrollLeft 242`가 되었고, 이어서 브라우저 배율을
+  130%로 바꿔도 `242`를 유지해 사용자가 정한 카메라 위치를 덮어쓰지 않았다.

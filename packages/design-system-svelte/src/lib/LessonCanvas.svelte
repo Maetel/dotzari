@@ -7,6 +7,7 @@
     layoutLessonFlow,
     lessonNodeWidth,
     shouldAutoFocusCanvas,
+    visibleViewportAxis,
     worldBoundsToScrollOffset,
     type CanvasNodeModel,
     type Lesson,
@@ -30,20 +31,41 @@
     onopencontent?: (nodeId: string) => void;
   } = $props();
 
+  interface ViewportMeasurement extends Size {
+    visibleWidth: number;
+    visibleHeight: number;
+    visibleOffsetX: number;
+    visibleOffsetY: number;
+  }
+
   let viewport: HTMLDivElement | undefined;
-  let viewportSize = $state<Size>({ width: 0, height: 0 });
+  let viewportMeasurement = $state<ViewportMeasurement>({
+    width: 0,
+    height: 0,
+    visibleWidth: 0,
+    visibleHeight: 0,
+    visibleOffsetX: 0,
+    visibleOffsetY: 0,
+  });
   let scale = $state(untrack(() => initialScale));
   let dragging = $state(false);
   let measuredSizes = $state<ReadonlyMap<string, Size>>(new Map());
   let drag: { pointerId: number; x: number; y: number; left: number; top: number; moved: boolean } | null = null;
   let activePointers = new Set<number>();
-  let lastAutoFocus = $state<{ stepId: string; viewportWidth: number } | null>(null);
+  let lastAutoFocus = $state<{ stepId: string; viewportWidth: number; viewportOffsetX: number } | null>(null);
   let userControlsCamera = $state(false);
   let cameraStepId = '';
 
   let snapshot = $derived(deriveLessonSnapshot(lesson, stepId));
   let layout = $derived(layoutLessonFlow(snapshot, measuredSizes));
-  let cameraWorldWidth = $derived(layout.width + (viewportSize.width > 0 ? viewportSize.width / scale / 2 : 0));
+  let cameraWorldWidth = $derived.by(() => {
+    const visibleCenterX = viewportMeasurement.visibleOffsetX + viewportMeasurement.visibleWidth / 2;
+    const trailingViewportSpace = Math.max(
+      viewportMeasurement.width / 2,
+      viewportMeasurement.width - visibleCenterX,
+    );
+    return layout.width + (viewportMeasurement.width > 0 ? trailingViewportSpace / scale : 0);
+  });
   let placementById = $derived(new Map(layout.nodes.map((node) => [node.id, node])));
   let chapterById = $derived(new Map(lesson.chapters.map((chapter) => [chapter.id, chapter])));
   let edgeItems = $derived.by(() => snapshot.visibleEdges.flatMap((edge) => {
@@ -84,20 +106,67 @@
   function observeViewport(element: HTMLDivElement) {
     viewport = element;
     const ownerWindow = element.ownerDocument.defaultView;
+    const read = (): ViewportMeasurement => {
+      const width = element.clientWidth;
+      const height = element.clientHeight;
+      const visualViewport = ownerWindow?.visualViewport;
+      if (!visualViewport) {
+        return {
+          width,
+          height,
+          visibleWidth: width,
+          visibleHeight: height,
+          visibleOffsetX: 0,
+          visibleOffsetY: 0,
+        };
+      }
+
+      const rect = element.getBoundingClientRect();
+      const horizontal = visibleViewportAxis(
+        rect.left + element.clientLeft,
+        width,
+        visualViewport.offsetLeft,
+        visualViewport.width,
+      );
+      const vertical = visibleViewportAxis(
+        rect.top + element.clientTop,
+        height,
+        visualViewport.offsetTop,
+        visualViewport.height,
+      );
+      return {
+        width,
+        height,
+        visibleWidth: horizontal.size || width,
+        visibleHeight: vertical.size || height,
+        visibleOffsetX: horizontal.size ? horizontal.offset : 0,
+        visibleOffsetY: vertical.size ? vertical.offset : 0,
+      };
+    };
+    const sameMeasurement = (left: ViewportMeasurement, right: ViewportMeasurement) => (
+      left.width === right.width
+      && left.height === right.height
+      && Math.abs(left.visibleWidth - right.visibleWidth) < 1
+      && Math.abs(left.visibleHeight - right.visibleHeight) < 1
+      && Math.abs(left.visibleOffsetX - right.visibleOffsetX) < 1
+      && Math.abs(left.visibleOffsetY - right.visibleOffsetY) < 1
+    );
     const update = () => {
-      const next = { width: element.clientWidth, height: element.clientHeight };
-      if (next.width !== viewportSize.width || next.height !== viewportSize.height) viewportSize = next;
+      const next = read();
+      if (!sameMeasurement(next, viewportMeasurement)) viewportMeasurement = next;
     };
     const observer = new ResizeObserver(update);
     observer.observe(element);
     ownerWindow?.addEventListener('resize', update, { passive: true });
     ownerWindow?.visualViewport?.addEventListener('resize', update, { passive: true });
+    ownerWindow?.visualViewport?.addEventListener('scroll', update, { passive: true });
     update();
     return {
       destroy() {
         observer.disconnect();
         ownerWindow?.removeEventListener('resize', update);
         ownerWindow?.visualViewport?.removeEventListener('resize', update);
+        ownerWindow?.visualViewport?.removeEventListener('scroll', update);
         if (viewport === element) viewport = undefined;
       },
     };
@@ -107,21 +176,31 @@
     const element = viewport;
     if (!element) return;
     const previous = scale;
-    const centerX = (element.scrollLeft + element.clientWidth / 2) / previous;
-    const centerY = (element.scrollTop + element.clientHeight / 2) / previous;
+    const viewportCenterX = viewportMeasurement.visibleOffsetX + viewportMeasurement.visibleWidth / 2;
+    const viewportCenterY = viewportMeasurement.visibleOffsetY + viewportMeasurement.visibleHeight / 2;
+    const centerX = (element.scrollLeft + viewportCenterX) / previous;
+    const centerY = (element.scrollTop + viewportCenterY) / previous;
     userControlsCamera = true;
     scale = clamp(nextScale, .65, 1.6);
     void tick().then(() => {
       if (!element.isConnected) return;
-      element.scrollLeft = centerX * scale - element.clientWidth / 2;
-      element.scrollTop = centerY * scale - element.clientHeight / 2;
+      element.scrollLeft = centerX * scale - viewportCenterX;
+      element.scrollTop = centerY * scale - viewportCenterY;
     });
   }
 
   function pointerDown(event: PointerEvent) {
     const element = viewport;
     activePointers.add(event.pointerId);
-    if (!element || activePointers.size > 1 || event.button !== 0 || (event.target as Element).closest('[data-lesson-interactive], [data-lesson-controls]')) return;
+    if (!element) return;
+    if (activePointers.size > 1) {
+      userControlsCamera = true;
+      if (drag && element.hasPointerCapture(drag.pointerId)) element.releasePointerCapture(drag.pointerId);
+      drag = null;
+      dragging = false;
+      return;
+    }
+    if (event.button !== 0 || (event.target as Element).closest('[data-lesson-interactive], [data-lesson-controls]')) return;
     drag = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, left: element.scrollLeft, top: element.scrollTop, moved: false };
     element.setPointerCapture(event.pointerId);
   }
@@ -152,9 +231,15 @@
 
   $effect(() => {
     const currentStepId = snapshot.step.id;
-    const width = viewportSize.width;
-    const height = viewportSize.height;
-    const focusSnapshot = { stepId: currentStepId, viewportWidth: width };
+    const width = viewportMeasurement.visibleWidth;
+    const height = viewportMeasurement.visibleHeight;
+    const scrollViewportWidth = viewportMeasurement.width;
+    const scrollViewportHeight = viewportMeasurement.height;
+    const focusSnapshot = {
+      stepId: currentStepId,
+      viewportWidth: width,
+      viewportOffsetX: viewportMeasurement.visibleOffsetX,
+    };
     if (cameraStepId !== currentStepId) {
       cameraStepId = currentStepId;
       userControlsCamera = false;
@@ -180,13 +265,25 @@
       scale,
       { width, height },
       { width: cameraWorldWidth, height: layout.height },
-      { padding: 16, alignX: 'center', alignY: 'start' },
+      {
+        padding: 16,
+        alignX: 'center',
+        alignY: 'start',
+        viewportOffset: { x: viewportMeasurement.visibleOffsetX, y: viewportMeasurement.visibleOffsetY },
+        scrollViewportSize: { width: scrollViewportWidth, height: scrollViewportHeight },
+      },
     );
     let attempts = 0;
     const applyFocus = () => {
       if (!element.isConnected || snapshot.step.id !== currentStepId || userControlsCamera) return;
-      if (Math.abs(element.clientWidth - width) >= 1 || Math.abs(element.clientHeight - height) >= 1) {
-        viewportSize = { width: element.clientWidth, height: element.clientHeight };
+      const current = viewportMeasurement;
+      if (
+        Math.abs(current.visibleWidth - width) >= 1
+        || Math.abs(current.visibleHeight - height) >= 1
+        || Math.abs(current.visibleOffsetX - focusSnapshot.viewportOffsetX) >= 1
+        || current.width !== scrollViewportWidth
+        || current.height !== scrollViewportHeight
+      ) {
         return;
       }
       element.scrollLeft = offset.x;

@@ -29,7 +29,13 @@ export function worldBoundsToScrollOffset(
   zoom: number,
   viewportSize: Size,
   worldSize: Size,
-  options: { padding?: number; alignX?: 'start' | 'center'; alignY?: 'start' | 'center' } = {},
+  options: {
+    padding?: number;
+    alignX?: 'start' | 'center';
+    alignY?: 'start' | 'center';
+    viewportOffset?: Point;
+    scrollViewportSize?: Size;
+  } = {},
 ): Point {
   const padding = options.padding ?? 16;
   const axisOffset = (
@@ -38,24 +44,49 @@ export function worldBoundsToScrollOffset(
     viewportLength: number,
     worldLength: number,
     alignment: 'start' | 'center',
+    viewportOffset: number,
+    scrollViewportLength: number,
   ) => {
     const scaledLength = length * zoom;
     const targetStart = alignment === 'center'
       ? Math.max(padding, (viewportLength - scaledLength) / 2)
       : padding;
-    const maximum = Math.max(0, worldLength * zoom - viewportLength);
-    return clamp(start * zoom - targetStart, 0, maximum);
+    const maximum = Math.max(0, worldLength * zoom - scrollViewportLength);
+    return clamp(start * zoom - targetStart - viewportOffset, 0, maximum);
   };
 
+  const viewportOffset = options.viewportOffset ?? { x: 0, y: 0 };
+  const scrollViewportSize = options.scrollViewportSize ?? viewportSize;
+
   return {
-    x: axisOffset(bounds.x, bounds.width, viewportSize.width, worldSize.width, options.alignX ?? 'center'),
-    y: axisOffset(bounds.y, bounds.height, viewportSize.height, worldSize.height, options.alignY ?? 'start'),
+    x: axisOffset(bounds.x, bounds.width, viewportSize.width, worldSize.width, options.alignX ?? 'center', viewportOffset.x, scrollViewportSize.width),
+    y: axisOffset(bounds.y, bounds.height, viewportSize.height, worldSize.height, options.alignY ?? 'start', viewportOffset.y, scrollViewportSize.height),
   };
+}
+
+export interface VisibleViewportAxis {
+  offset: number;
+  size: number;
+}
+
+/**
+ * Returns the visible part of an element axis in the element's own content coordinates.
+ */
+export function visibleViewportAxis(
+  contentStart: number,
+  contentSize: number,
+  visualStart: number,
+  visualSize: number,
+): VisibleViewportAxis {
+  const start = clamp(visualStart - contentStart, 0, contentSize);
+  const end = clamp(visualStart + visualSize - contentStart, start, contentSize);
+  return { offset: start, size: end - start };
 }
 
 export interface CanvasAutoFocusSnapshot {
   stepId: string;
   viewportWidth: number;
+  viewportOffsetX?: number;
 }
 
 /**
@@ -68,7 +99,8 @@ export function shouldAutoFocusCanvas(
 ): boolean {
   if (userControlsCamera) return false;
   if (!previous || previous.stepId !== current.stepId) return true;
-  return Math.abs(previous.viewportWidth - current.viewportWidth) >= 1;
+  return Math.abs(previous.viewportWidth - current.viewportWidth) >= 1
+    || Math.abs((previous.viewportOffsetX ?? 0) - (current.viewportOffsetX ?? 0)) >= 1;
 }
 
 export function zoomViewportAt(
